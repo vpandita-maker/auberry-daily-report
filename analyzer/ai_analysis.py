@@ -10,11 +10,26 @@ def analyze_reviews(reviews, brand_name):
     
     reviews_text = ""
     for i, r in enumerate(reviews):
-        reviews_text += f"{i+1}. [{r['source']}] Rating: {r['rating']}/5 | {r['text'][:400]}\n\n"
+        reviews_text += (
+            f"{i+1}. [{r['source']}] "
+            f"Date: {r.get('date_exact') or r.get('date') or 'Unknown'} | "
+            f"Location: {r.get('outlet_address', 'Unknown')} | "
+            f"Rating: {r['rating']}/5 | "
+            f"{r['text'][:500]}\n\n"
+        )
     
-    prompt = f"""You are analyzing customer reviews for "{brand_name}", an Indian bakery/cafe brand.
+    prompt = f"""You are analyzing customer reviews for "{brand_name}", an Indian bakery/cafe brand with multiple outlets.
 
 Analyze these reviews and return ONLY a valid JSON object. No preamble, no explanation, just JSON.
+
+Requirements:
+- Treat this as one combined portfolio-wide report, not separate branch mini-reports.
+- Focus only on the last one month of reviews provided in the input.
+- Keep the output concise, strategic, and executive-friendly.
+- Whenever praise or criticism clearly belongs to a specific outlet, mention the exact outlet and/or location in the wording.
+- Use the review dates provided to ground the analysis in time; do not invent dates.
+- Give strategic recommendations with measurable success metrics.
+- Do not use vague phrases like "some outlets" when an outlet/location is identifiable from the input.
 
 {{
     "brand_name": "{brand_name}",
@@ -22,19 +37,27 @@ Analyze these reviews and return ONLY a valid JSON object. No preamble, no expla
     "average_rating": 0.0,
     "total_reviews_analyzed": 0,
     "categories": {{
-        "food_quality": {{"score": 0.0, "summary": "one sentence", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
-        "service": {{"score": 0.0, "summary": "one sentence", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
-        "ambiance": {{"score": 0.0, "summary": "one sentence", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
-        "value_for_money": {{"score": 0.0, "summary": "one sentence", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
-        "coffee_quality": {{"score": 0.0, "summary": "one sentence", "top_issues": ["issue1"], "top_praises": ["praise1"]}}
+        "food_quality": {{"score": 0.0, "summary": "one sentence with outlet names if relevant", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
+        "service": {{"score": 0.0, "summary": "one sentence with outlet names if relevant", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
+        "ambiance": {{"score": 0.0, "summary": "one sentence with outlet names if relevant", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
+        "value_for_money": {{"score": 0.0, "summary": "one sentence with outlet names if relevant", "top_issues": ["issue1"], "top_praises": ["praise1"]}},
+        "coffee_quality": {{"score": 0.0, "summary": "one sentence with outlet names if relevant", "top_issues": ["issue1"], "top_praises": ["praise1"]}}
     }},
     "most_mentioned_items": [
         {{"item": "item name", "sentiment": "positive or negative", "mentions": 0}}
     ],
-    "top_3_urgent_issues": ["issue1", "issue2", "issue3"],
-    "top_3_strengths": ["strength1", "strength2", "strength3"],
+    "top_3_urgent_issues": ["issue with outlet/location if identifiable", "issue2", "issue3"],
+    "top_3_strengths": ["strength with outlet/location if identifiable", "strength2", "strength3"],
     "rating_risk": "low or medium or high",
-    "week_priority_action": "One specific actionable recommendation"
+    "top_3_recommendations": [
+        {{
+            "title": "short strategic action",
+            "location_focus": "specific outlet/location or portfolio-wide",
+            "action": "what to do",
+            "success_metric": "numeric target or measurable KPI",
+            "timeline": "specific time horizon"
+        }}
+    ]
 }}
 
 Reviews to analyze:

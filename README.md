@@ -20,7 +20,7 @@ python3 send_report.py
 
 ## Outlet configuration
 
-The project now supports multiple outlets through `outlets.json`. Each run loops through the configured branches, generates one PDF per outlet, and emails all successful reports in a single daily message.
+The project now supports multiple outlets through `outlets.json`. Each run loops through the configured branches, blends the reviews into one portfolio-wide analysis, generates a single PDF in the original report structure, and emails that combined brief.
 
 Example format:
 

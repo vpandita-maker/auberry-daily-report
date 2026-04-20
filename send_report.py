@@ -1,6 +1,8 @@
 import json
 import os
+import re
 import smtplib
+from datetime import UTC, datetime
 from email.message import EmailMessage
 from email.utils import formataddr
 from pathlib import Path
@@ -27,6 +29,38 @@ SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USERNAME)
 SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Vansh Pandita")
 
 
+def _recipient_name(email):
+    local = email.split("@", 1)[0]
+    cleaned = re.sub(r"\d+", " ", local)
+    cleaned = cleaned.replace(".", " ").replace("_", " ").replace("-", " ").strip()
+    normalized_cleaned = re.sub(r"[^a-z]", "", cleaned.lower())
+    sender_local = SMTP_FROM.split("@", 1)[0] if SMTP_FROM else ""
+    normalized_sender = re.sub(r"[^a-z]", "", sender_local.lower())
+    if normalized_cleaned and normalized_cleaned == normalized_sender and SMTP_FROM_NAME.strip():
+        return SMTP_FROM_NAME.strip()
+    parts = [part.capitalize() for part in cleaned.split() if part]
+    return parts[0] if parts else "there"
+
+
+def _is_recent_review(review, cutoff_timestamp):
+    timestamp = review.get("timestamp")
+    if timestamp:
+        return timestamp >= cutoff_timestamp
+
+    relative = str(review.get("date", "")).strip().lower()
+    recent_markers = (
+        "today",
+        "yesterday",
+        "day ago",
+        "days ago",
+        "a week ago",
+        "weeks ago",
+        "a month ago",
+        "month ago",
+    )
+    return any(marker in relative for marker in recent_markers)
+
+
 def load_outlets():
     if OUTLETS_FILE.exists():
         with OUTLETS_FILE.open("r", encoding="utf-8") as config_file:
@@ -48,42 +82,90 @@ def load_outlets():
     return [{"name": BRAND_NAME, "place_id": PLACE_ID}]
 
 
-def build_report(outlet):
-    reviews = get_google_reviews(outlet["place_id"])
-    if not reviews:
-        raise RuntimeError("No reviews were fetched, so the report was not generated.")
+def build_combined_report(outlets):
+    combined_reviews = []
+    participating_outlets = []
+    failed_outlets = []
+    review_dates = []
+    outlet_locations = []
+    cutoff = datetime.now(UTC).timestamp() - (30 * 24 * 60 * 60)
 
-    analysis = analyze_reviews(reviews, outlet["name"])
+    for outlet in outlets:
+        try:
+            reviews = get_google_reviews(outlet["place_id"])
+            if not reviews:
+                raise RuntimeError("No reviews were fetched")
+
+            outlet_address = reviews[0].get("outlet_address", "") if reviews else ""
+            if outlet_address:
+                outlet_locations.append(f"{outlet['name']}: {outlet_address}")
+
+            for review in reviews:
+                enriched = dict(review)
+                if not _is_recent_review(enriched, cutoff):
+                    continue
+                outlet_name = outlet["name"]
+                review_text = enriched.get("text", "").strip()
+                location = enriched.get("outlet_address", "")
+                review_date = enriched.get("date_exact") or enriched.get("date") or "Unknown"
+                if enriched.get("date_exact"):
+                    review_dates.append(enriched["date_exact"])
+                enriched["source"] = f"Google - {outlet_name}"
+                prefix = f"[Outlet: {outlet_name} | Location: {location} | Review date: {review_date}]"
+                enriched["text"] = f"{prefix} {review_text}" if review_text else prefix
+                combined_reviews.append(enriched)
+            if any(review.get("source") == f"Google - {outlet_name}" for review in combined_reviews):
+                participating_outlets.append(outlet["name"])
+        except Exception as exc:
+            failed_outlets.append({"name": outlet["name"], "error": str(exc)})
+            print(f"Skipped {outlet['name']}: {exc}")
+
+    if not combined_reviews:
+        raise RuntimeError("No outlet reviews were fetched successfully.")
+
+    analysis = analyze_reviews(combined_reviews, "Auberry The Bake Shop - All Outlets")
+    analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
+    analysis["portfolio_outlets"] = participating_outlets
+    analysis["portfolio_failed_outlets"] = failed_outlets
+    analysis["portfolio_locations"] = outlet_locations
+    analysis["review_dates"] = sorted(set(review_dates))
+    analysis["report_scope"] = "Last 30 days only"
+    if analysis["review_dates"]:
+        first_review = datetime.strptime(analysis["review_dates"][0], "%Y-%m-%d").strftime("%b %d, %Y")
+        last_review = datetime.strptime(analysis["review_dates"][-1], "%Y-%m-%d").strftime("%b %d, %Y")
+        analysis["review_window"] = f"{first_review} to {last_review}"
+    else:
+        analysis["review_window"] = "Dates unavailable"
     pdf_path = generate_pdf_report(analysis)
-    return Path(pdf_path), analysis
+    return Path(pdf_path), analysis, failed_outlets
 
 
-def send_email(report_results, failed_outlets):
+def send_email(pdf_path, analysis, failed_outlets, recipient=None):
     if not SMTP_USERNAME or not SMTP_PASSWORD or not SMTP_FROM:
         raise RuntimeError(
             "Missing SMTP credentials. Set SMTP_USERNAME, SMTP_PASSWORD, and SMTP_FROM in .env."
         )
 
-    subject = f"Daily Review Intelligence Report - Auberry ({len(report_results)} outlets)"
+    target_recipient = recipient or REPORT_RECIPIENT
+    outlet_count = len(analysis.get("portfolio_outlets", []))
+    subject = f"Daily Review Intelligence Report - Auberry ({outlet_count} outlets combined)"
+    greeting_name = _recipient_name(target_recipient)
+    top_issue = (analysis.get("top_3_urgent_issues") or ["service and food consistency issues"])[0]
+    top_strength = (analysis.get("top_3_strengths") or ["strong dessert quality across key outlets"])[0]
+    top_recommendation = (analysis.get("top_3_recommendations") or [{}])[0]
+    recommendation_text = top_recommendation.get("title") or "a targeted corrective action plan"
+    overview = (
+        f"Auberry's last-30-day review brief shows {analysis['overall_sentiment']} sentiment and a "
+        f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
+        f"Key themes include {top_issue.lower()} alongside strengths such as {top_strength.lower()}. "
+        f"The report pinpoints outlet-specific issues, including Musarambagh and Kukatpally, and recommends {recommendation_text.lower()} "
+        f"to reduce risk and stabilize guest experience across all {outlet_count} outlets."
+    )
     body_lines = [
-        "Hi,",
+        f"Hi {greeting_name},",
         "",
-        "Attached are today's review intelligence reports for Auberry.",
-        "",
-        "Outlet snapshot:",
+        overview,
     ]
-
-    for result in report_results:
-        analysis = result["analysis"]
-        body_lines.extend(
-            [
-                f"- {result['name']}: {analysis['overall_sentiment'].title()} | "
-                f"{analysis['average_rating']:.1f}/5 | "
-                f"{analysis['total_reviews_analyzed']} reviews | "
-                f"Risk {analysis['rating_risk'].title()}",
-                f"  Priority action: {analysis['week_priority_action']}",
-            ]
-        )
 
     if failed_outlets:
         body_lines.extend(
@@ -106,18 +188,16 @@ def send_email(report_results, failed_outlets):
     message = EmailMessage()
     message["Subject"] = subject
     message["From"] = formataddr((SMTP_FROM_NAME, SMTP_FROM))
-    message["To"] = REPORT_RECIPIENT
+    message["To"] = target_recipient
     message.set_content("\n".join(body_lines))
 
-    for result in report_results:
-        pdf_path = result["pdf_path"]
-        with pdf_path.open("rb") as attachment:
-            message.add_attachment(
-                attachment.read(),
-                maintype="application",
-                subtype="pdf",
-                filename=pdf_path.name,
-            )
+    with pdf_path.open("rb") as attachment:
+        message.add_attachment(
+            attachment.read(),
+            maintype="application",
+            subtype="pdf",
+            filename=pdf_path.name,
+        )
 
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.starttls()
@@ -126,28 +206,10 @@ def send_email(report_results, failed_outlets):
 
 
 def main():
-    report_results = []
-    failed_outlets = []
-
-    for outlet in load_outlets():
-        try:
-            pdf_path, analysis = build_report(outlet)
-            report_results.append(
-                {
-                    "name": outlet["name"],
-                    "pdf_path": pdf_path,
-                    "analysis": analysis,
-                }
-            )
-        except Exception as exc:
-            failed_outlets.append({"name": outlet["name"], "error": str(exc)})
-            print(f"Skipped {outlet['name']}: {exc}")
-
-    if not report_results:
-        raise RuntimeError("No outlet reports were generated successfully.")
-
-    send_email(report_results, failed_outlets)
-    print(f"Sent {len(report_results)} report(s) to {REPORT_RECIPIENT}")
+    portfolio_path, analysis, failed_outlets = build_combined_report(load_outlets())
+    test_recipient = os.getenv("REPORT_RECIPIENT_OVERRIDE", "").strip() or None
+    send_email(portfolio_path, analysis, failed_outlets, recipient=test_recipient)
+    print(f"Sent combined report to {test_recipient or REPORT_RECIPIENT}")
 
 
 if __name__ == "__main__":

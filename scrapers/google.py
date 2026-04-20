@@ -1,5 +1,6 @@
 import requests
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,9 +37,10 @@ def get_google_reviews(place_id):
     url = "https://maps.googleapis.com/maps/api/place/details/json"
     params = {
         "place_id": place_id,
-        "fields": "name,rating,reviews,user_ratings_total",
+        "fields": "name,formatted_address,rating,reviews,user_ratings_total",
         "key": api_key,
-        "language": "en"
+        "language": "en",
+        "reviews_sort": "newest",
     }
     
     response = requests.get(url, params=params)
@@ -52,15 +54,23 @@ def get_google_reviews(place_id):
     print(f"\nRestaurant: {result.get('name')}")
     print(f"Overall rating: {result.get('rating')}")
     print(f"Total ratings: {result.get('user_ratings_total')}")
+    formatted_address = result.get("formatted_address", "")
     
     reviews = []
     for r in result.get("reviews", []):
+        timestamp = r.get("time")
+        exact_date = ""
+        if timestamp:
+            exact_date = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d")
         reviews.append({
             "source": "Google",
             "rating": r.get("rating"),
             "text": r.get("text", ""),
             "author": r.get("author_name", ""),
-            "date": r.get("relative_time_description", "")
+            "date": r.get("relative_time_description", ""),
+            "date_exact": exact_date,
+            "timestamp": timestamp,
+            "outlet_address": formatted_address,
         })
     
     print(f"Reviews fetched: {len(reviews)}\n")

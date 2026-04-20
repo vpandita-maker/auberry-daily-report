@@ -7,7 +7,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import (
+    CondPageBreak,
     HRFlowable,
+    KeepTogether,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -67,49 +69,6 @@ def _score_colors(score):
     if score >= 3.4:
         return WARN_BG, WARN_TEXT
     return DANGER_BG, DANGER_TEXT
-
-
-def _score_to_bar(score, max_score=5, segments=10):
-    filled = max(0, min(segments, round((score / max_score) * segments)))
-    return filled, segments - filled
-
-
-def _score_bar_flowable(score, styles, width=2.2 * inch, segments=10):
-    filled, empty = _score_to_bar(score, segments=segments)
-    segment_width = width / segments
-    score_bg, _score_text = _score_colors(score)
-
-    label = Paragraph("<b>Score bar</b>", styles["small"])
-    bar = Table([[""] * segments], colWidths=[segment_width] * segments, rowHeights=[0.12 * inch])
-    style_commands = [
-        ("BOX", (0, 0), (-1, -1), 0.4, LINE),
-        ("INNERGRID", (0, 0), (-1, -1), 0.35, WHITE),
-        ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-    ]
-    for idx in range(segments):
-        fill = score_bg if idx < filled else colors.HexColor("#E9E2D8")
-        style_commands.append(("BACKGROUND", (idx, 0), (idx, 0), fill))
-    bar.setStyle(TableStyle(style_commands))
-
-    caption = Paragraph(f"{score:.1f} / 5 across {segments} segments", styles["small"])
-    container = Table([[label, bar, caption]], colWidths=[0.9 * inch, width, 1.55 * inch])
-    container.setStyle(
-        TableStyle(
-            [
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 0),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-                ("TOPPADDING", (0, 0), (-1, -1), 0),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-            ]
-        )
-    )
-    return container
-
-
 def _build_styles():
     return {
         "eyebrow": ParagraphStyle(
@@ -306,13 +265,20 @@ def _section_header(label, title, styles):
     ]
 
 
+def _smart_section(label, title, styles, content, min_space=1.8 * inch):
+    section = [CondPageBreak(min_space)]
+    section.extend(_section_header(label, title, styles))
+    section.extend(content)
+    return section
+
+
 def _category_card(cat_key, cat_info, styles):
     name = cat_key.replace("_", " ").title()
     score = float(cat_info.get("score", 0))
     score_bg, score_text = _score_colors(score)
-    summary = _truncate(cat_info.get("summary"), 135)
-    issue = _truncate((cat_info.get("top_issues") or ["No issue surfaced"])[0], 85)
-    praise = _truncate((cat_info.get("top_praises") or ["No standout praise surfaced"])[0], 85)
+    summary = str(cat_info.get("summary") or "Not mentioned").strip()
+    issue = str((cat_info.get("top_issues") or ["No issue surfaced"])[0]).strip()
+    praise = str((cat_info.get("top_praises") or ["No standout praise surfaced"])[0]).strip()
 
     header = Table(
         [[
@@ -338,7 +304,7 @@ def _category_card(cat_key, cat_info, styles):
         [
             [header],
             [Paragraph(summary, styles["body"])],
-            [_score_bar_flowable(score, styles)],
+            [Paragraph(f"<b>Score:</b> {score:.1f} / 5", styles["small"])],
             [Paragraph(f"<b>Primary issue:</b> {issue}", styles["small"])],
             [Paragraph(f"<b>Primary strength:</b> {praise}", styles["small"])],
         ],
@@ -397,12 +363,29 @@ def _item_table(items, styles):
 
 def _numbered_list(title, items, styles):
     content = []
-    content.extend(_section_header("Snapshot", title, styles))
     for index, item in enumerate(items, start=1):
         content.append(Paragraph(f"<b>{index}.</b> {_truncate(item, 220)}", styles["list_item"]))
         content.append(Spacer(1, 4))
     content.append(Spacer(1, 6))
-    return content
+    return _smart_section("Snapshot", title, styles, content, min_space=2.0 * inch)
+
+
+def _recommendations_section(recommendations, styles):
+    content = []
+    for index, item in enumerate(recommendations[:3], start=1):
+        title = _truncate(item.get("title"), 120)
+        location_focus = _truncate(item.get("location_focus"), 120)
+        action = _truncate(item.get("action"), 220)
+        success_metric = _truncate(item.get("success_metric"), 140)
+        timeline = _truncate(item.get("timeline"), 80)
+        content.append(Paragraph(f"<b>{index}. {title}</b>", styles["body"]))
+        content.append(Spacer(1, 2))
+        content.append(Paragraph(f"<b>Location focus:</b> {location_focus}", styles["small"]))
+        content.append(Paragraph(f"<b>Action:</b> {action}", styles["small"]))
+        content.append(Paragraph(f"<b>Success metric:</b> {success_metric}", styles["small"]))
+        content.append(Paragraph(f"<b>Timeline:</b> {timeline}", styles["small"]))
+        content.append(Spacer(1, 8))
+    return _smart_section("Action", "Top 3 Recommendations", styles, content, min_space=2.4 * inch)
 
 
 def _page_background(canvas, _doc):
@@ -414,29 +397,22 @@ def _page_background(canvas, _doc):
     canvas.restoreState()
 
 
-def generate_pdf_report(analysis, output_dir="output"):
-    os.makedirs(output_dir, exist_ok=True)
+def _safe_filename(text):
+    return text.replace(" ", "_").replace("-", "").replace("/", "")
 
-    styles = _build_styles()
+
+def _build_report_story(analysis, styles, date_str):
     brand = analysis["brand_name"]
     display_brand = brand.replace(" - ", "<br/>")
-    date_str = datetime.now().strftime("%B %d, %Y")
-    safe_name = brand.replace(" ", "_").replace("-", "").replace("/", "")
-    filename = f"{output_dir}/{safe_name}_Report_{datetime.now().strftime('%Y%m%d')}.pdf"
-
-    doc = SimpleDocTemplate(
-        filename,
-        pagesize=A4,
-        rightMargin=0.78 * inch,
-        leftMargin=0.78 * inch,
-        topMargin=0.72 * inch,
-        bottomMargin=0.72 * inch,
-    )
-
     story = []
-
     sentiment_bg, sentiment_text = _sentiment_colors(analysis.get("overall_sentiment"))
     risk_bg, risk_text = _risk_colors(analysis.get("rating_risk"))
+    review_window = analysis.get("review_window")
+    hero_meta = f"{date_str}<br/>Performance brief built from {analysis['total_reviews_analyzed']} customer reviews."
+    if analysis.get("report_scope"):
+        hero_meta += f"<br/>Scope: {analysis['report_scope']}"
+    if review_window:
+        hero_meta += f"<br/>Review dates covered: {review_window}"
 
     hero = Table(
         [
@@ -444,14 +420,10 @@ def generate_pdf_report(analysis, output_dir="output"):
             [Paragraph(display_brand, styles["hero_title"])],
             [
                 Paragraph(
-                    f"{date_str}<br/>Performance brief built from {analysis['total_reviews_analyzed']} customer reviews.",
+                    hero_meta,
                     styles["hero_meta"],
                 )
             ],
-            [Paragraph(
-                f"<b>This week's priority action:</b> {_truncate(analysis.get('week_priority_action'), 180)}",
-                styles["hero_body"],
-            )],
         ],
         colWidths=[6.0 * inch],
     )
@@ -467,8 +439,7 @@ def generate_pdf_report(analysis, output_dir="output"):
                 ("TOPPADDING", (0, 0), (0, 0), 18),
                 ("BOTTOMPADDING", (0, 0), (0, 0), 2),
                 ("BOTTOMPADDING", (0, 1), (0, 1), 4),
-                ("BOTTOMPADDING", (0, 2), (0, 2), 10),
-                ("BOTTOMPADDING", (0, 3), (0, 3), 18),
+                ("BOTTOMPADDING", (0, 2), (0, 2), 18),
             ]
         )
     )
@@ -498,7 +469,6 @@ def generate_pdf_report(analysis, output_dir="output"):
     story.append(summary_row)
     story.append(Spacer(1, 22))
 
-    story.extend(_section_header("Overview", "Executive Snapshot", styles))
     metrics = [
         _metric_card("Overall sentiment", str(analysis["overall_sentiment"]).title(), "Current customer mood", styles),
         _metric_card("Average rating", f"{analysis['average_rating']:.1f}/5", "Public review average", styles),
@@ -517,22 +487,30 @@ def generate_pdf_report(analysis, output_dir="output"):
             ]
         )
     )
-    story.append(metric_grid)
-    story.append(Spacer(1, 18))
+    story.extend(_smart_section("Overview", "Executive Snapshot", styles, [metric_grid, Spacer(1, 18)], min_space=2.4 * inch))
 
-    story.extend(_section_header("Breakdown", "Category Performance", styles))
+    breakdown_content = []
     for cat_key, cat_info in analysis["categories"].items():
-        story.append(_category_card(cat_key, cat_info, styles))
-        story.append(Spacer(1, 10))
+        breakdown_content.append(CondPageBreak(2.9 * inch))
+        breakdown_content.append(KeepTogether([_category_card(cat_key, cat_info, styles), Spacer(1, 10)]))
+    story.extend(_smart_section("Breakdown", "Category Performance", styles, breakdown_content, min_space=3.2 * inch))
 
     if analysis.get("most_mentioned_items"):
-        story.append(Spacer(1, 4))
-        story.extend(_section_header("Menu", "Most Mentioned Items", styles))
-        story.append(_item_table(analysis["most_mentioned_items"], styles))
-        story.append(Spacer(1, 18))
+        story.extend(
+            _smart_section(
+                "Menu",
+                "Most Mentioned Items",
+                styles,
+                [Spacer(1, 4), _item_table(analysis["most_mentioned_items"], styles), Spacer(1, 18)],
+                min_space=2.6 * inch,
+            )
+        )
 
     story.extend(_numbered_list("Top 3 Urgent Issues", analysis["top_3_urgent_issues"], styles))
     story.extend(_numbered_list("Top 3 Strengths", analysis["top_3_strengths"], styles))
+
+    if analysis.get("top_3_recommendations"):
+        story.extend(_recommendations_section(analysis["top_3_recommendations"], styles))
 
     closing = Table(
         [
@@ -560,6 +538,28 @@ def generate_pdf_report(analysis, output_dir="output"):
     story.append(closing)
     story.append(Spacer(1, 10))
     story.append(Paragraph(f"{brand} | {date_str}", styles["footer"]))
+
+    return story
+
+
+def generate_pdf_report(analysis, output_dir="output"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    styles = _build_styles()
+    date_str = datetime.now().strftime("%B %d, %Y")
+    safe_name = _safe_filename(analysis["brand_name"])
+    filename = f"{output_dir}/{safe_name}_Report_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+    doc = SimpleDocTemplate(
+        filename,
+        pagesize=A4,
+        rightMargin=0.78 * inch,
+        leftMargin=0.78 * inch,
+        topMargin=0.72 * inch,
+        bottomMargin=0.72 * inch,
+    )
+
+    story = _build_report_story(analysis, styles, date_str)
 
     doc.build(story, onFirstPage=_page_background, onLaterPages=_page_background)
     print(f"\nReport saved: {filename}")
