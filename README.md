@@ -1,6 +1,6 @@
 # Auberry Daily Review Report
 
-This project fetches fresh Google reviews for Auberry The Bake Shop, analyzes them with Anthropic, generates a premium PDF report, and emails it automatically.
+This project fetches fresh Google reviews for Auberry The Bake Shop, analyzes them with Anthropic, generates premium PDF reports, and emails them automatically.
 
 ## Local run
 
@@ -12,10 +12,22 @@ This project fetches fresh Google reviews for Auberry The Bake Shop, analyzes th
 python3 -m pip install -r requirements.txt
 ```
 
-4. Generate and send the report:
+4. Generate and send the reports:
 
 ```bash
 python3 send_report.py
+```
+
+## Outlet configuration
+
+The project now supports multiple outlets through `outlets.json`. Each run loops through the configured branches, generates one PDF per outlet, and emails all successful reports in a single daily message.
+
+Example format:
+
+```json
+[
+  { "name": "Auberry The Bake Shop - Kondapur", "place_id": "..." }
+]
 ```
 
 ## GitHub Actions schedule
@@ -26,8 +38,6 @@ The included workflow runs every day at `03:30 UTC`, which is `09:00 AM IST`.
 
 - `GOOGLE_PLACES_API_KEY`
 - `ANTHROPIC_API_KEY`
-- `AUBERRY_PLACE_ID`
-- `AUBERRY_BRAND_NAME`
 - `REPORT_RECIPIENT`
 - `SMTP_HOST`
 - `SMTP_PORT`
@@ -35,3 +45,8 @@ The included workflow runs every day at `03:30 UTC`, which is `09:00 AM IST`.
 - `SMTP_PASSWORD`
 - `SMTP_FROM`
 - `SMTP_FROM_NAME`
+
+Optional legacy fallback values if `outlets.json` is missing:
+
+- `AUBERRY_PLACE_ID`
+- `AUBERRY_BRAND_NAME`
