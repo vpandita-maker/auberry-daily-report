@@ -1,0 +1,185 @@
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                  Table, TableStyle, HRFlowable)
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from datetime import datetime
+import os
+
+
+def score_to_bar(score, max_score=5):
+    filled = int((score / max_score) * 10)
+    empty = 10 - filled
+    return f"{'#' * cd restaurant-intel
+rm reports/pdf_generator.py
+nano reports/pdf_generator.py
+
+
+def generate_pdf_report(analysis, output_dir="output"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    brand = analysis["brand_name"]
+    date_str = datetime.now().strftime("%B %d, %Y")
+    safe_name = brand.replace(' ', '_').replace('-', '').replace('/', '')
+    filename = f"{output_dir}/{safe_name}_Report_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+    doc = SimpleDocTemplate(filename, pagesize=A4, rightMargin=0.75*inch,
+                             leftMargin=0.75*inch, topMargin=0.75*inch, bottomMargin=0.75*inch)
+
+    title_style = ParagraphStyle('CustomTitle', fontSize=22, fontName='Helvetica-Bold',
+                                  textColor=colors.HexColor('#1a1a2e'), spaceAfter=4, alignment=TA_CENTER)
+    subtitle_style = ParagraphStyle('CustomSub', fontSize=11, fontName='Helvetica',
+                                     textColor=colors.HexColor('#666666'), spaceAfter=20, alignment=TA_CENTER)
+    section_style = ParagraphStyle('CustomSection', fontSize=13, fontName='Helvetica-Bold',
+                                    textColor=colors.HexColor('#1a1a2e'), spaceBefore=15, spaceAfter=8)
+    body_style = ParagraphStyle('CustomBody', fontSize=10, fontName='Helvetica',
+                                 textColor=colors.HexColor('#333333'), spaceAfter=6, leading=14)
+
+    story = []
+
+    story.append(Paragraph("Review Intelligence Report", title_style))
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer,
+                                  Table, TableStyle, HRFlowable)
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from datetime import datetime
+import os
+
+
+def score_to_bar(score, max_score=5):
+    filled = int((score / max_score) * 10)
+    empty = 10 - filled
+    return f"{'#' * filled}{'-' * empty} {score:.1f}/5"
+
+
+def generate_pdf_report(analysis, output_dir="output"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    brand = analysis["brand_name"]
+    date_str = datetime.now().strftime("%B %d, %Y")
+    safe_name = brand.replace(' ', '_').replace('-', '').replace('/', '')
+    filename = f"{output_dir}/{safe_name}_Report_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+    doc = SimpleDocTemplate(filename, pagesize=A4, rightMargin=0.75*inch,
+                             leftMargin=0.75*inch, topMargin=0.75*inch, bottomMargin=0.75*inch)
+
+    title_style = ParagraphStyle('CustomTitle', fontSize=22, fontName='Helvetica-Bold',
+                                  textColor=colors.HexColor('#1a1a2e'), spaceAfter=4, alignment=TA_CENTER)
+    subtitle_style = ParagraphStyle('CustomSub', fontSize=11, fontName='Helvetica',
+                                     textColor=colors.HexColor('#666666'), spaceAfter=20, alignment=TA_CENTER)
+    section_style = ParagraphStyle('CustomSection', fontSize=13, fontName='Helvetica-Bold',
+                                    textColor=colors.HexColor('#1a1a2e'), spaceBefore=15, spaceAfter=8)
+    body_style = ParagraphStyle('CustomBody', fontSize=10, fontName='Helvetica',
+                                 textColor=colors.HexColor('#333333'), spaceAfter=6, leading=14)
+
+    story = []
+
+    story.append(Paragraph("Review Intelligence Report", title_style))
+    story.append(Paragraph(f"{brand} - {date_str}", subtitle_style))
+    story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor('#1a1a2e')))
+    story.append(Spacer(1, 15))
+
+    overview_data = [
+        ["Overall Sentiment", "Avg Rating", "Reviews Analyzed", "Rating Risk"],
+        [analysis["overall_sentiment"].upper(), f"{analysis['average_rating']}/5",
+         str(analysis["total_reviews_analyzed"]), analysis["rating_risk"].upper()]
+    ]
+
+    overview_table = Table(overview_data, colWidths=[130, 100, 130, 100])
+    overview_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1a1a2e')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,0), 9),
+        ('FONTNAME', (0,1), (-1,1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,1), (-1,1), 13),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+        ('BACKGROUND', (0,1), (-1,1), colors.HexColor('#f8f9fa')),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+    ]))
+    story.append(overview_table)
+    story.append(Spacer(1, 20))
+
+    story.append(Paragraph("Category Breakdown", section_style))
+
+    cat_data = [["Category", "Score", "Key Issue", "Key Strength"]]
+    for cat_key, cat_info in analysis["categories"].items():
+        cat_name = cat_key.replace("_", " ").title()
+        issue = cat_info["top_issues"][0] if cat_info.get("top_issues") else "None identified"
+        praise = cat_info["top_praises"][0] if cat_info.get("top_praises") else "None identified"
+        cat_data.append([
+            cat_name, score_to_bar(cat_info["score"]),
+            issue[:55] + "..." if len(issue) > 55 else issue,
+            praise[:55] + "..." if len(praise) > 55 else praise
+        ])
+
+    cat_table = Table(cat_data, colWidths=[100, 120, 150, 150])
+    cat_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2c3e50')),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 8.5),
+        ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
+        ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#f8f9fa')]),
+        ('LEFTPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 6),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+    ]))
+    story.append(cat_table)
+    story.append(Spacer(1, 20))
+
+    if analysis.get("most_mentioned_items"):
+        story.append(Paragraph("Most Mentioned Items", section_style))
+        item_data = [["Item", "Sentiment", "Mentions"]]
+        for item in analysis["most_mentioned_items"][:5]:
+            item_data.append([item["item"], item["sentiment"].upper(), str(item["mentions"])])
+        item_table = Table(item_data, colWidths=[200, 120, 80])
+        item_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#2c3e50')),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,-1), 9),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#dddddd')),
+            ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#f8f9fa')]),
+            ('ALIGN', (1,0), (-1,-1), 'CENTER'),
+            ('LEFTPADDING', (0,0), (-1,-1), 8),
+            ('TOPPADDING', (0,0), (-1,-1), 6),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+        ]))
+        story.append(item_table)
+        story.append(Spacer(1, 20))
+
+    story.append(Paragraph("Top 3 Urgent Issues", section_style))
+    for i, issue in enumerate(analysis["top_3_urgent_issues"], 1):
+        story.append(Paragraph(f"{i}. {issue}", body_style))
+    story.append(Spacer(1, 15))
+
+    story.append(Paragraph("Top 3 Strengths", section_style))
+    for i, strength in enumerate(analysis["top_3_strengths"], 1):
+        story.append(Paragraph(f"{i}. {strength}", body_style))
+    story.append(Spacer(1, 15))
+
+    story.append(Paragraph("This Week's Priority Action", section_style))
+    story.append(Paragraph(analysis["week_priority_action"], body_style))
+    story.append(Spacer(1, 20))
+
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#dddddd')))
+    story.append(Spacer(1, 8))
+    footer_style = ParagraphStyle('CustomFooter', fontSize=8, fontName='Helvetica',
+                                   textColor=colors.HexColor('#999999'), alignment=TA_CENTER)
+    story.append(Paragraph(
+        f"Generated by Restaurant Intelligence Platform | {date_str} | Confidential", footer_style))
+
+    doc.build(story)
+    print(f"\nReport saved: {filename}")
+    return filename
