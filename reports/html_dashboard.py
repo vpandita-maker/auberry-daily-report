@@ -429,7 +429,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         radial-gradient(circle at top right, rgba(99,216,95,0.10), transparent 18%),
         linear-gradient(180deg, #161a30 0%, #13182c 100%);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       animation: page-fade 700ms cubic-bezier(.22,1,.36,1);
     }}
     .page {{
@@ -469,32 +469,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .brand-block {{
       display: flex;
-      gap: 16px;
+      gap: 0;
       align-items: center;
-    }}
-    .logo-badge {{
-      width: 92px;
-      height: 92px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, #2c2347, #1f233b);
-      border: 1px solid #302f55;
-      display: grid;
-      place-items: center;
-      flex-shrink: 0;
-    }}
-    .logo-inner {{
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      background: #f4dff1;
-      color: #281827;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      font-weight: 800;
-      line-height: 1.02;
-      padding: 6px;
-      font-size: 12px;
     }}
     .brand-copy h1 {{
       margin: 0;
@@ -1015,9 +991,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
     <section class="dashboard">
       <div class="topbar">
         <div class="brand-block">
-          <div class="logo-badge">
-            <div class="logo-inner">Auberry<br /><small>The Bake Shop</small></div>
-          </div>
           <div class="brand-copy">
             <h1>{brand}</h1>
             <p>Executive Dashboard</p>
