@@ -338,7 +338,7 @@ def _render_recommendations(items):
         timeline = str(item.get("timeline", "No timeline"))
         cards.append(
             """
-            <a class="action-row" href="#outlet-heatmap">
+            <article class="action-row">
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
@@ -356,7 +356,7 @@ def _render_recommendations(items):
                   <span>{timeline}</span>
                 </span>
               </div>
-            </a>
+            </article>
             """.format(
                 title=escape(str(item.get("title", "Untitled recommendation"))),
                 focus=escape(focus),
@@ -491,27 +491,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
       flex-wrap: wrap;
       justify-content: flex-end;
     }}
-    .filter-pill {{
-      min-width: 210px;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(34,40,62,0.95);
-      color: var(--text);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .filter-text {{
+      color: var(--muted);
       font-size: 14px;
-      transition:
-        transform 180ms cubic-bezier(.22,1,.36,1),
-        border-color 180ms ease,
-        box-shadow 180ms ease,
-        background 180ms ease;
+      line-height: 1.5;
+      white-space: nowrap;
     }}
-    .filter-pill:hover {{
-      transform: translateY(-4px);
-      border-color: rgba(171,125,244,0.36);
-      box-shadow: 0 18px 30px rgba(8, 11, 26, 0.24);
+    .filter-text strong {{
+      color: var(--text);
+      font-weight: 700;
     }}
     .kpis {{
       grid-column: 1 / -1;
@@ -631,32 +619,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .pill-neutral {{ background: var(--yellow-bg); color: var(--yellow); }}
     .pill-na {{ background: rgba(170,177,204,0.18); color: #c3c8db; }}
     .list-footer {{
-      padding: 0 14px 14px;
-    }}
-    .ghost-btn {{
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      text-align: center;
-      color: var(--text);
-      background: rgba(255,255,255,0.02);
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      transition:
-        transform 180ms cubic-bezier(.22,1,.36,1),
-        border-color 180ms ease,
-        background 180ms ease,
-        box-shadow 180ms ease;
-    }}
-    .ghost-btn:hover {{
-      transform: translateY(-4px);
-      border-color: rgba(171,125,244,0.4);
-      background: rgba(171,125,244,0.08);
-      box-shadow: 0 18px 28px rgba(10, 12, 30, 0.22);
+      padding: 0 18px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }}
     .heatmap-panel {{
       padding: 18px;
@@ -884,7 +850,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       border-radius: 18px;
       border: 1px solid rgba(171,125,244,0.16);
       background: linear-gradient(180deg, rgba(57,62,97,0.95), rgba(44,48,78,0.95));
-      text-decoration: none;
       color: inherit;
       transition:
         transform 200ms cubic-bezier(.22,1,.36,1),
@@ -964,7 +929,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       background: linear-gradient(180deg, rgba(171,125,244,0.14), rgba(171,125,244,0.06));
       border-color: rgba(171,125,244,0.18);
     }}
-    .button-link:hover, .action-row:hover {{
+    .action-row:hover {{
       filter: brightness(1.05);
       transform: translateY(-4px);
       border-color: rgba(255,255,255,0.12);
@@ -1030,9 +995,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .topbar {{
         grid-template-columns: 1fr;
       }}
-      .filter-pill {{
-        width: 100%;
-        min-width: 0;
+      .filter-text {{
+        white-space: normal;
       }}
       .list-row {{
         grid-template-columns: 24px 44px minmax(0, 1fr);
@@ -1084,8 +1048,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
           </div>
         </div>
         <div class="filters">
-          <div class="filter-pill"><span>All Outlets</span><span>⌄</span></div>
-          <div class="filter-pill"><span>{review_window}</span><span>⌄</span></div>
+          <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
+          <div class="filter-text"><strong>Window:</strong> {review_window}</div>
         </div>
       </div>
 
@@ -1140,12 +1104,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <section class="card list-panel" id="underperforming-items">
           <div class="panel-header">
             <h3 class="panel-title">Underperforming Items</h3>
-            <div class="panel-subtitle">By Mentions</div>
+          <div class="panel-subtitle">By Mentions</div>
           </div>
           <div class="list-body">{underperforming_html}</div>
-          <div class="list-footer">
-            <a class="ghost-btn button-link" href="#items-overview">View All Items</a>
-          </div>
+          <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
         </section>
       </div>
 
