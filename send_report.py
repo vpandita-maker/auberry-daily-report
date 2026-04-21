@@ -69,6 +69,15 @@ def _is_recent_review(review, cutoff_timestamp):
     return any(marker in relative for marker in recent_markers)
 
 
+def _should_hide_failed_outlet(error_message):
+    normalized = str(error_message).strip().lower()
+    hidden_markers = (
+        "no reviews were fetched",
+        "missing a resolvable google place_id",
+    )
+    return any(marker in normalized for marker in hidden_markers)
+
+
 def load_outlets():
     if OUTLETS_FILE.exists():
         with OUTLETS_FILE.open("r", encoding="utf-8") as config_file:
@@ -95,6 +104,7 @@ def build_combined_report(outlets):
     combined_reviews = []
     participating_outlets = []
     failed_outlets = []
+    visible_failed_outlets = []
     review_dates = []
     outlet_locations = []
     cutoff = datetime.now(UTC).timestamp() - (30 * 24 * 60 * 60)
@@ -132,7 +142,10 @@ def build_combined_report(outlets):
             if any(review.get("source") == f"Google - {outlet_name}" for review in combined_reviews):
                 participating_outlets.append(outlet["name"])
         except Exception as exc:
-            failed_outlets.append({"name": outlet["name"], "error": str(exc)})
+            failed = {"name": outlet["name"], "error": str(exc)}
+            failed_outlets.append(failed)
+            if not _should_hide_failed_outlet(failed["error"]):
+                visible_failed_outlets.append(failed)
             print(f"Skipped {outlet['name']}: {exc}")
 
     if not combined_reviews:
@@ -141,7 +154,7 @@ def build_combined_report(outlets):
     analysis = analyze_reviews(combined_reviews, "Auberry The Bake Shop - All Outlets")
     analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
     analysis["portfolio_outlets"] = participating_outlets
-    analysis["portfolio_failed_outlets"] = failed_outlets
+    analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
     analysis["review_dates"] = sorted(set(review_dates))
     analysis["report_scope"] = "Last 30 days only"
@@ -153,7 +166,7 @@ def build_combined_report(outlets):
         analysis["review_window"] = "Dates unavailable"
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
-    return Path(html_path), analysis, failed_outlets
+    return Path(html_path), analysis, visible_failed_outlets
 
 
 def publish_dashboard_site(html_path, site_dir="site"):
