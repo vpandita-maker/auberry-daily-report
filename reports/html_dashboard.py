@@ -273,31 +273,40 @@ def _render_mentions_board(items):
 
 def _render_alerts(analysis):
     issues = analysis.get("top_3_urgent_issues") or []
-    recommendations = analysis.get("top_3_recommendations") or []
     failed_outlets = analysis.get("portfolio_failed_outlets") or []
     alerts = []
 
-    if issues:
-        primary = issues[0]
+    for index, issue in enumerate(issues):
+        kicker = "Urgent" if index == 0 else "Watchlist"
+        impact = "impact-high" if index == 0 else "impact-medium"
+        status = "In Progress" if index == 0 else "Monitoring"
         alerts.append(
             """
-            <div class="alert-card alert-urgent">
-              <div class="alert-kicker">Urgent</div>
+            <div class="alert-card {tone}">
+              <div class="alert-kicker">{kicker}</div>
               <h4>{title}</h4>
               <p>{body}</p>
               <div class="alert-meta">
-                <span class="impact impact-high">High Impact</span>
-                <span class="status-chip">In Progress</span>
+                <span class="impact {impact}">{impact_label}</span>
+                <span class="status-chip">{status}</span>
               </div>
             </div>
             """.format(
-                title=escape(primary),
-                body=escape("Highest-priority issue surfaced from the latest review cycle."),
+                tone="alert-urgent" if index == 0 else "alert-warning",
+                kicker=escape(kicker),
+                title=escape(issue),
+                body=escape(
+                    "Highest-priority issue surfaced from the latest review cycle."
+                    if index == 0
+                    else "Keep this under observation in the next review cycle."
+                ),
+                impact=impact,
+                impact_label="High Impact" if index == 0 else "Medium Impact",
+                status=escape(status),
             )
         )
 
-    if failed_outlets:
-        failed = failed_outlets[0]
+    for failed in failed_outlets:
         alerts.append(
             """
             <div class="alert-card alert-warning">
@@ -312,42 +321,6 @@ def _render_alerts(analysis):
             """.format(
                 title=escape(f"{failed['name']}: data unavailable"),
                 body=escape(str(failed.get("error", "This outlet did not contribute fresh reviews today."))),
-            )
-        )
-    elif len(issues) > 1:
-        alerts.append(
-            """
-            <div class="alert-card alert-warning">
-              <div class="alert-kicker">Watchlist</div>
-              <h4>{title}</h4>
-              <p>{body}</p>
-              <div class="alert-meta">
-                <span class="impact impact-medium">Medium Impact</span>
-                <span class="status-chip">Monitoring</span>
-              </div>
-            </div>
-            """.format(
-                title=escape(issues[1]),
-                body=escape("Keep this under observation in the next review cycle."),
-            )
-        )
-
-    if not alerts and recommendations:
-        rec = recommendations[0]
-        alerts.append(
-            """
-            <div class="alert-card alert-info">
-              <div class="alert-kicker">Focus</div>
-              <h4>{title}</h4>
-              <p>{body}</p>
-              <div class="alert-meta">
-                <span class="impact impact-low">Low Risk</span>
-                <span class="status-chip">Planned</span>
-              </div>
-            </div>
-            """.format(
-                title=escape(str(rec.get("title", "Portfolio focus"))),
-                body=escape(str(rec.get("action", "No additional action text available."))),
             )
         )
 
@@ -1005,12 +978,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
           {alerts_html}
         </section>
 
-        <section class="card side-panel rec" id="ai-recommendations">
-          <h3 class="panel-title">AI Recommendations</h3>
+        <section class="card side-panel rec" id="recommendations">
+          <h3 class="panel-title">Recommendations</h3>
           {recommendations_html}
-          <div style="margin-top:14px;">
-            <a class="ghost-btn button-link" href="#ai-recommendations" style="border-color:#5c478f;color:#d2b4ff;">View All Actions</a>
-          </div>
         </section>
       </div>
 
