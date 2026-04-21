@@ -1,6 +1,9 @@
-import requests
 import os
+import re
 from datetime import datetime
+from urllib.parse import parse_qs, urlparse
+
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -75,3 +78,35 @@ def get_google_reviews(place_id):
     
     print(f"Reviews fetched: {len(reviews)}\n")
     return reviews
+
+
+def extract_place_id_from_google_url(source_url):
+    parsed = urlparse(source_url)
+    query_params = parse_qs(parsed.query)
+
+    for key in ("q", "query", "place_id"):
+        for value in query_params.get(key, []):
+            match = re.search(r"(ChI[A-Za-z0-9_-]{20,})", value)
+            if match:
+                return match.group(1)
+
+    if parsed.path:
+        match = re.search(r"(ChI[A-Za-z0-9_-]{20,})", parsed.path)
+        if match:
+            return match.group(1)
+
+    try:
+        response = requests.get(source_url, allow_redirects=True, timeout=20)
+        candidates = [
+            response.url,
+            response.text,
+        ]
+    except requests.RequestException:
+        return None
+
+    for candidate in candidates:
+        match = re.search(r"(ChI[A-Za-z0-9_-]{20,})", candidate)
+        if match:
+            return match.group(1)
+
+    return None

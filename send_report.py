@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 from analyzer.ai_analysis import analyze_reviews
 from reports.pdf_generator import generate_pdf_report
-from scrapers.google import get_google_reviews
+from scrapers.google import extract_place_id_from_google_url, get_google_reviews
 
 
 load_dotenv()
@@ -27,9 +27,12 @@ SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USERNAME)
 SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Vansh Pandita")
+RECIPIENT_NAME_OVERRIDE = os.getenv("RECIPIENT_NAME_OVERRIDE", "").strip()
 
 
 def _recipient_name(email):
+    if RECIPIENT_NAME_OVERRIDE:
+        return RECIPIENT_NAME_OVERRIDE
     local = email.split("@", 1)[0]
     cleaned = re.sub(r"\d+", " ", local)
     cleaned = cleaned.replace(".", " ").replace("_", " ").replace("-", " ").strip()
@@ -72,11 +75,12 @@ def load_outlets():
         for outlet in outlets:
             name = str(outlet.get("name", "")).strip()
             place_id = str(outlet.get("place_id", "")).strip()
-            if not name or not place_id:
+            source_url = str(outlet.get("source_url", "")).strip()
+            if not name or not (place_id or source_url):
                 raise RuntimeError(
-                    f"Every outlet in {OUTLETS_FILE} must include non-empty 'name' and 'place_id' values."
+                    f"Every outlet in {OUTLETS_FILE} must include a non-empty 'name' plus either 'place_id' or 'source_url'."
                 )
-            normalized.append({"name": name, "place_id": place_id})
+            normalized.append({"name": name, "place_id": place_id, "source_url": source_url})
         return normalized
 
     return [{"name": BRAND_NAME, "place_id": PLACE_ID}]
@@ -92,7 +96,13 @@ def build_combined_report(outlets):
 
     for outlet in outlets:
         try:
-            reviews = get_google_reviews(outlet["place_id"])
+            place_id = outlet.get("place_id", "")
+            if not place_id and outlet.get("source_url"):
+                place_id = extract_place_id_from_google_url(outlet["source_url"])
+            if not place_id:
+                raise RuntimeError("Missing a resolvable Google place_id")
+
+            reviews = get_google_reviews(place_id)
             if not reviews:
                 raise RuntimeError("No reviews were fetched")
 

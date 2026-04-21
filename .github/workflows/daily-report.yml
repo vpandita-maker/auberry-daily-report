@@ -2,25 +2,139 @@ name: Auberry Daily Report
 
 on:
   schedule:
+    # 11:30 PM America/New_York during daylight saving time
     - cron: "30 3 * * *"
+    # One-night override for Apr 20, 2026 at 11:38 PM America/New_York
+    - cron: "38 3 * * *"
+    # 12:00 AM America/New_York during daylight saving time (retry window)
+    - cron: "0 4 * * *"
+    # 11:30 PM America/New_York during standard time
+    - cron: "30 4 * * *"
+    # 12:00 AM America/New_York during standard time (retry window)
+    - cron: "0 5 * * *"
   workflow_dispatch:
 
 jobs:
   send-report:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    concurrency:
+      group: auberry-daily-report
+      cancel-in-progress: false
     steps:
+      - name: Decide whether this run should send
+        id: schedule_guard
+        if: github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const workflowFile = '.github/workflows/daily-report.yml';
+            const toleranceMinutes = 20;
+            const now = new Date();
+
+            function getNewYorkParts(date) {
+              const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'America/New_York',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hourCycle: 'h23',
+              });
+              return Object.fromEntries(
+                formatter
+                  .formatToParts(date)
+                  .filter((part) => part.type !== 'literal')
+                  .map((part) => [part.type, part.value])
+              );
+            }
+
+            function minutesFromMidnight(parts) {
+              return Number(parts.hour) * 60 + Number(parts.minute);
+            }
+
+            function circularDistanceMinutes(a, b) {
+              const diff = Math.abs(a - b);
+              return Math.min(diff, 1440 - diff);
+            }
+
+            const nyParts = getNewYorkParts(now);
+            const currentMinutes = minutesFromMidnight(nyParts);
+            const primaryMinutes = 23 * 60 + 30;
+            const specialPrimaryMinutes = 23 * 60 + 38;
+            const backupMinutes = 0;
+            const distanceToPrimary = circularDistanceMinutes(currentMinutes, primaryMinutes);
+            const distanceToSpecialPrimary = circularDistanceMinutes(currentMinutes, specialPrimaryMinutes);
+            const distanceToBackup = circularDistanceMinutes(currentMinutes, backupMinutes);
+            const nyDate = `${nyParts.year}-${nyParts.month}-${nyParts.day}`;
+            const specialOverrideDate = '2026-04-20';
+            const isSpecialOverrideDate = nyDate === specialOverrideDate;
+
+            let slot = '';
+            if (isSpecialOverrideDate && distanceToSpecialPrimary <= toleranceMinutes) {
+              slot = 'primary';
+            } else if (!isSpecialOverrideDate && distanceToPrimary <= toleranceMinutes) {
+              slot = 'primary';
+            } else if (distanceToBackup <= toleranceMinutes) {
+              slot = 'backup';
+            }
+
+            if (!slot) {
+              core.notice(`Skipping off-window cron at New York time ${nyParts.hour}:${nyParts.minute}.`);
+              core.setOutput('should_send', 'false');
+              return;
+            }
+
+            if (slot === 'backup') {
+              const recentRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: workflowFile,
+                event: 'schedule',
+                per_page: 100,
+              });
+
+              const cutoff = now.getTime() - (3 * 60 * 60 * 1000);
+              const priorSuccess = recentRuns.find((run) => {
+                if (run.id === context.runId) {
+                  return false;
+                }
+                if (run.conclusion !== 'success') {
+                  return false;
+                }
+                const updatedAt = Date.parse(run.updated_at || run.created_at);
+                return Number.isFinite(updatedAt) && updatedAt >= cutoff;
+              });
+
+              if (priorSuccess) {
+                core.notice(`Skipping backup run because scheduled run ${priorSuccess.id} already succeeded.`);
+                core.setOutput('should_send', 'false');
+                return;
+              }
+            }
+
+            core.notice(`Proceeding with ${slot} send window at New York time ${nyParts.hour}:${nyParts.minute}.`);
+            core.setOutput('should_send', 'true');
+
       - name: Check out repository
+        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
+        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
+        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         run: python -m pip install -r requirements.txt
 
       - name: Write environment file
+        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         run: |
           cat <<'EOF' > .env
           GOOGLE_PLACES_API_KEY=${{ secrets.GOOGLE_PLACES_API_KEY }}
@@ -37,4 +151,5 @@ jobs:
           EOF
 
       - name: Generate and send report
+        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         run: python send_report.py

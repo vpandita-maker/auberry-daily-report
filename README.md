@@ -26,9 +26,12 @@ Example format:
 
 ```json
 [
-  { "name": "Auberry The Bake Shop - Kondapur", "place_id": "..." }
+  { "name": "Auberry The Bake Shop - Kondapur", "place_id": "..." },
+  { "name": "Shared Google Listing", "source_url": "https://share.google/..." }
 ]
 ```
+
+Each outlet must include `name` and either `place_id` or `source_url`. `source_url` works best with full Google Maps URLs that contain a resolvable place identifier.
 
 ## GitHub Actions schedule
 
