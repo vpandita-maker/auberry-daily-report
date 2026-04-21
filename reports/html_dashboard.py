@@ -512,19 +512,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: center;
       font-size: 14px;
     }}
-    .compare-btn {{
-      padding: 14px 18px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #9b74ef, #b788ff);
-      color: #211532;
-      font-weight: 700;
-      min-width: 190px;
-      text-align: center;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }}
     .kpis {{
       grid-column: 1 / -1;
       display: grid;
@@ -833,50 +820,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       word-break: break-word;
     }}
     .action-meta {{ color: var(--muted); font-size: 13px; margin-top: 4px; }}
-    .compare-panel {{
-      grid-column: 1 / -1;
-      padding: 18px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto auto auto;
-      gap: 16px;
-      align-items: center;
-    }}
-    .compare-copy h3 {{
-      margin: 0;
-      font-size: 18px;
-    }}
-    .compare-copy p {{
-      margin: 6px 0 0;
-      color: var(--muted);
-    }}
-    .compare-pill {{
-      min-width: 220px;
-      padding: 14px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      font-weight: 700;
-      white-space: normal;
-      line-height: 1.2;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-      text-align: center;
-    }}
-    .compare-pill.negative {{ color: #ff8484; background: #422734; }}
-    .compare-pill.positive {{ color: #6ee178; background: #243d2d; }}
-    .compare-cta {{
-      padding: 14px 18px;
-      border-radius: 14px;
-      border: 1px solid #6e54ba;
-      color: #c5a6ff;
-      background: rgba(171,125,244,0.12);
-      font-weight: 800;
-      text-align: center;
-      min-width: 180px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }}
     .button-link:hover, .action-row:hover {{
       filter: brightness(1.06);
       transform: translateY(-1px);
@@ -898,9 +841,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         grid-template-columns: 1fr;
       }}
       .left-column, .center-column, .right-column {{
-        grid-template-columns: 1fr;
-      }}
-      .compare-panel {{
         grid-template-columns: 1fr;
       }}
     }}
@@ -963,7 +903,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <div class="filters">
           <div class="filter-pill"><span>All Outlets</span><span>⌄</span></div>
           <div class="filter-pill"><span>{review_window}</span><span>⌄</span></div>
-          <a class="compare-btn button-link" href="#quick-compare">Compare Outlets</a>
         </div>
       </div>
 
@@ -1065,16 +1004,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </section>
       </div>
 
-      <section class="card compare-panel" id="quick-compare">
-        <div class="compare-copy">
-          <h3>Quick Compare</h3>
-          <p>See the current gap between outlet focus areas.</p>
-        </div>
-        <div class="compare-pill negative">{watch_outlet}</div>
-        <div class="compare-pill positive">{best_outlet}</div>
-        <a class="compare-cta button-link" href="#outlet-heatmap">View Comparison</a>
-      </section>
-
       <div class="footer-note">Live executive dashboard for {brand} • Updated {date_str}</div>
     </section>
   </main>
@@ -1103,16 +1032,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         alerts_html=_render_alerts(analysis),
         recommendations_html=_render_recommendations(recommendations),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
-        watch_outlet=escape(
-            _display_outlet_name(
-                _extract_outlet_name(" ".join(analysis.get("top_3_urgent_issues") or []), outlets) or "Most at risk outlet"
-            )
-        ),
-        best_outlet=escape(
-            _display_outlet_name(
-                _extract_outlet_name(" ".join(analysis.get("top_3_strengths") or []), outlets) or "Strongest outlet signal"
-            )
-        ),
         date_str=escape(date_str),
         spark_green="""
           <svg viewBox="0 0 100 36" fill="none"><path d="M0 24 L10 26 L20 18 L30 25 L40 20 L50 11 L60 14 L70 5 L80 8 L90 7 L100 3" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
