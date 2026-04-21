@@ -239,35 +239,36 @@ def _render_heatmap(rows):
     """.format(header_cells=header_cells, rows="".join(row_html))
 
 
-def _render_bubbles(items):
+def _render_mentions_board(items):
     if not items:
         return "<div class='empty-block'>No item trends available.</div>"
 
-    bubble_markup = []
-    size_classes = ["bubble-xl", "bubble-lg", "bubble-md", "bubble-md", "bubble-sm", "bubble-sm", "bubble-xs"]
-    for index, item in enumerate(items[:7]):
+    cards = []
+    for index, item in enumerate(items[:8], start=1):
         mentions = int(item.get("mentions", 0) or 0)
         sentiment = _normalize_sentiment(item.get("sentiment"))
-        bubble_markup.append(
+        cards.append(
             """
-            <div class="bubble {size} bubble-{sentiment}">
-              <strong>{name}</strong>
-              <span>{mentions} mention{plural}</span>
-            </div>
+            <article class="mention-card mention-{sentiment}">
+              <div class="mention-rank">{rank}</div>
+              <div class="mention-body">
+                <h4>{name}</h4>
+                <div class="mention-meta">
+                  <span>{mentions} mention{plural}</span>
+                  <span class="pill pill-{sentiment}">{sentiment_label}</span>
+                </div>
+              </div>
+            </article>
             """.format(
-                size=size_classes[min(index, len(size_classes) - 1)],
                 sentiment=escape(sentiment),
+                rank=index,
                 name=escape(str(item.get("item", "Unknown"))),
                 mentions=mentions,
                 plural="" if mentions == 1 else "s",
+                sentiment_label=escape(sentiment.title() if sentiment != "na" else "N/A"),
             )
         )
-    first_row = "".join(bubble_markup[:4])
-    second_row = "".join(bubble_markup[4:])
-    rows = [f"<div class='bubble-row bubble-row-top'>{first_row}</div>"]
-    if second_row:
-        rows.append(f"<div class='bubble-row bubble-row-bottom'>{second_row}</div>")
-    return "".join(rows)
+    return "".join(cards)
 
 
 def _render_alerts(analysis):
@@ -714,61 +715,52 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .bubble-wrap {{
       display: grid;
-      gap: 18px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
       min-height: 270px;
       padding-top: 14px;
       align-content: start;
     }}
-    .bubble-row {{
-      display: flex;
-      gap: 18px;
-      align-items: flex-end;
-      justify-content: flex-start;
-      flex-wrap: nowrap;
+    .mention-card {{
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-height: 92px;
     }}
-    .bubble-row-bottom {{
-      padding-left: 20px;
-    }}
-    .bubble {{
-      border-radius: 50%;
+    .mention-positive {{ background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }}
+    .mention-neutral {{ background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }}
+    .mention-negative {{ background: linear-gradient(180deg, rgba(214,101,101,0.22), rgba(187,79,79,0.18)); }}
+    .mention-na {{ background: linear-gradient(180deg, rgba(107,115,139,0.22), rgba(83,90,113,0.18)); }}
+    .mention-rank {{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
       display: grid;
       place-items: center;
-      text-align: center;
-      padding: 12px;
-      line-height: 1.15;
-      border: 2px solid rgba(255,255,255,0.14);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
-      overflow: hidden;
+      font-weight: 800;
+      color: #eef1ff;
     }}
-    .bubble strong {{
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-wrap: balance;
+    .mention-body h4 {{
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
       overflow-wrap: anywhere;
       word-break: break-word;
-      max-width: 92%;
-      line-height: 1.1;
-      font-size: 14px;
     }}
-    .bubble span {{
+    .mention-meta {{
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
       color: rgba(255,255,255,0.86);
-      font-size: 12px;
-      margin-top: 5px;
-      max-width: 88%;
-      line-height: 1.1;
-      overflow-wrap: anywhere;
+      font-size: 13px;
     }}
-    .bubble-positive {{ background: linear-gradient(180deg, #4caa4b, #41893f); }}
-    .bubble-neutral {{ background: linear-gradient(180deg, #d5a218, #b88814); }}
-    .bubble-negative {{ background: linear-gradient(180deg, #d66565, #bb4f4f); }}
-    .bubble-na {{ background: linear-gradient(180deg, #6b738b, #535a71); }}
-    .bubble-xl {{ width: 176px; height: 176px; }}
-    .bubble-lg {{ width: 138px; height: 138px; }}
-    .bubble-md {{ width: 116px; height: 116px; }}
-    .bubble-sm {{ width: 104px; height: 104px; }}
-    .bubble-xs {{ width: 96px; height: 96px; }}
     .side-panel {{
       padding: 18px;
     }}
@@ -900,17 +892,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         font-size: 13px;
       }}
       .bubble-wrap {{
-        gap: 14px;
-      }}
-      .bubble-row {{
-        flex-wrap: wrap;
-        justify-content: center;
-      }}
-      .bubble-row-bottom {{
-        padding-left: 0;
-      }}
-      .bubble strong {{
-        font-size: 14px;
+        grid-template-columns: 1fr;
       }}
     }}
   </style>
@@ -1013,7 +995,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <span><i style="background:#dba923;"></i> Neutral</span>
             <span><i style="background:#e85f68;"></i> Negative</span>
           </div>
-          <div class="bubble-wrap">{bubbles_html}</div>
+          <div class="bubble-wrap">{mentions_board_html}</div>
         </section>
       </div>
 
@@ -1056,7 +1038,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             "negative",
         ),
         heatmap_html=_render_heatmap(heatmap_rows),
-        bubbles_html=_render_bubbles(items),
+        mentions_board_html=_render_mentions_board(items),
         alerts_html=_render_alerts(analysis),
         recommendations_html=_render_recommendations(recommendations),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
