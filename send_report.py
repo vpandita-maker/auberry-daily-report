@@ -17,6 +17,8 @@ from scrapers.google import extract_place_id_from_google_url, get_google_reviews
 
 load_dotenv()
 
+REPORT_WINDOW_DAYS = 7
+
 
 OUTLETS_FILE = Path(os.getenv("AUBERRY_OUTLETS_FILE", "outlets.json"))
 PLACE_ID = os.getenv("AUBERRY_PLACE_ID", "ChIJtVnlYUyTyzsRqFxHmIIV7Sc")
@@ -107,7 +109,7 @@ def build_combined_report(outlets):
     visible_failed_outlets = []
     review_dates = []
     outlet_locations = []
-    cutoff = datetime.now(UTC).timestamp() - (30 * 24 * 60 * 60)
+    cutoff = datetime.now(UTC).timestamp() - (REPORT_WINDOW_DAYS * 24 * 60 * 60)
 
     for outlet in outlets:
         try:
@@ -157,7 +159,7 @@ def build_combined_report(outlets):
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
     analysis["review_dates"] = sorted(set(review_dates))
-    analysis["report_scope"] = "Last 30 days only"
+    analysis["report_scope"] = f"Last {REPORT_WINDOW_DAYS} days only"
     if analysis["review_dates"]:
         first_review = datetime.strptime(analysis["review_dates"][0], "%Y-%m-%d").strftime("%b %d, %Y")
         last_review = datetime.strptime(analysis["review_dates"][-1], "%Y-%m-%d").strftime("%b %d, %Y")
@@ -195,7 +197,7 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     recommendation_text = top_recommendation.get("title") or "a targeted corrective action plan"
     dashboard_url = DASHBOARD_URL or analysis.get("dashboard_url") or ""
     overview = (
-        f"Auberry's last-30-day review brief shows {analysis['overall_sentiment']} sentiment and a "
+        f"Auberry's last-{REPORT_WINDOW_DAYS}-day review brief shows {analysis['overall_sentiment']} sentiment and a "
         f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
         f"Key themes include {top_issue.lower()} alongside strengths such as {top_strength.lower()}. "
         f"The report pinpoints outlet-specific issues, including Musarambagh and Kukatpally, and recommends {recommendation_text.lower()} "

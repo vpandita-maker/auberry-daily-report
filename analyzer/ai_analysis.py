@@ -24,7 +24,7 @@ Analyze these reviews and return ONLY a valid JSON object. No preamble, no expla
 
 Requirements:
 - Treat this as one combined portfolio-wide report, not separate branch mini-reports.
-- Focus only on the last one month of reviews provided in the input.
+- Focus only on the last 7 days of reviews provided in the input.
 - Keep the output concise, strategic, and executive-friendly.
 - Whenever praise or criticism clearly belongs to a specific outlet, mention the exact outlet and/or location in the wording.
 - Use the review dates provided to ground the analysis in time; do not invent dates.

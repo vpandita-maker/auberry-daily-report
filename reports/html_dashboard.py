@@ -392,7 +392,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         sentiment_pct = round((positive_categories / len(categories)) * 100)
 
     review_window = str(analysis.get("review_window", "Dates unavailable"))
-    report_scope = str(analysis.get("report_scope", "Last 30 days"))
+    report_scope = str(analysis.get("report_scope", "Last 7 days"))
     risk_level = str(analysis.get("rating_risk", "Unknown")).title()
     risk_tone = "low" if risk_level.lower() == "low" else "medium" if risk_level.lower() == "medium" else "high"
 
