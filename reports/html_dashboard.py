@@ -243,12 +243,12 @@ def _render_bubbles(items):
     if not items:
         return "<div class='empty-block'>No item trends available.</div>"
 
-    bubbles = []
+    bubble_markup = []
     size_classes = ["bubble-xl", "bubble-lg", "bubble-md", "bubble-md", "bubble-sm", "bubble-sm", "bubble-xs"]
     for index, item in enumerate(items[:7]):
         mentions = int(item.get("mentions", 0) or 0)
         sentiment = _normalize_sentiment(item.get("sentiment"))
-        bubbles.append(
+        bubble_markup.append(
             """
             <div class="bubble {size} bubble-{sentiment}">
               <strong>{name}</strong>
@@ -262,7 +262,12 @@ def _render_bubbles(items):
                 plural="" if mentions == 1 else "s",
             )
         )
-    return "".join(bubbles)
+    first_row = "".join(bubble_markup[:4])
+    second_row = "".join(bubble_markup[4:])
+    rows = [f"<div class='bubble-row bubble-row-top'>{first_row}</div>"]
+    if second_row:
+        rows.append(f"<div class='bubble-row bubble-row-bottom'>{second_row}</div>")
+    return "".join(rows)
 
 
 def _render_alerts(analysis):
@@ -708,53 +713,62 @@ def generate_html_dashboard(analysis, output_dir="output"):
       padding: 18px;
     }}
     .bubble-wrap {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      align-items: flex-end;
+      display: grid;
+      gap: 18px;
       min-height: 270px;
-      padding-top: 10px;
+      padding-top: 14px;
+      align-content: start;
+    }}
+    .bubble-row {{
+      display: flex;
+      gap: 18px;
+      align-items: flex-end;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+    }}
+    .bubble-row-bottom {{
+      padding-left: 20px;
     }}
     .bubble {{
       border-radius: 50%;
       display: grid;
       place-items: center;
       text-align: center;
-      padding: 14px;
+      padding: 12px;
       line-height: 1.15;
       border: 2px solid rgba(255,255,255,0.14);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+      overflow: hidden;
     }}
-    .bubble strong {{ display: block; font-size: 16px; }}
     .bubble strong {{
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-wrap: balance;
       overflow-wrap: anywhere;
       word-break: break-word;
-      max-width: 100%;
+      max-width: 92%;
       line-height: 1.1;
-      font-size: 15px;
+      font-size: 14px;
     }}
     .bubble span {{
       color: rgba(255,255,255,0.86);
-      font-size: 13px;
-      margin-top: 6px;
-      max-width: 100%;
-      line-height: 1.15;
+      font-size: 12px;
+      margin-top: 5px;
+      max-width: 88%;
+      line-height: 1.1;
       overflow-wrap: anywhere;
     }}
     .bubble-positive {{ background: linear-gradient(180deg, #4caa4b, #41893f); }}
     .bubble-neutral {{ background: linear-gradient(180deg, #d5a218, #b88814); }}
     .bubble-negative {{ background: linear-gradient(180deg, #d66565, #bb4f4f); }}
     .bubble-na {{ background: linear-gradient(180deg, #6b738b, #535a71); }}
-    .bubble-xl {{ width: 168px; height: 168px; }}
-    .bubble-lg {{ width: 136px; height: 136px; }}
-    .bubble-md {{ width: 118px; height: 118px; }}
+    .bubble-xl {{ width: 176px; height: 176px; }}
+    .bubble-lg {{ width: 138px; height: 138px; }}
+    .bubble-md {{ width: 116px; height: 116px; }}
     .bubble-sm {{ width: 104px; height: 104px; }}
-    .bubble-xs {{ width: 92px; height: 92px; }}
+    .bubble-xs {{ width: 96px; height: 96px; }}
     .side-panel {{
       padding: 18px;
     }}
@@ -886,7 +900,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
         font-size: 13px;
       }}
       .bubble-wrap {{
+        gap: 14px;
+      }}
+      .bubble-row {{
+        flex-wrap: wrap;
         justify-content: center;
+      }}
+      .bubble-row-bottom {{
+        padding-left: 0;
       }}
       .bubble strong {{
         font-size: 14px;
