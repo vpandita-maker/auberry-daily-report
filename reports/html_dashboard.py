@@ -443,7 +443,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: grid;
       grid-template-columns: 350px minmax(0, 1fr) 320px;
       gap: 16px;
-      align-items: start;
+      align-items: stretch;
     }}
     .card {{
       background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
@@ -540,7 +540,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
       justify-content: center;
     }}
     .sparkline svg {{ width: 100%; height: 44px; }}
-    .left-column, .center-column, .right-column {{
+    .left-column, .right-column {{
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      align-self: stretch;
+    }}
+    .center-column {{
       display: grid;
       gap: 16px;
       align-content: start;
@@ -564,6 +571,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .list-panel {{
       padding-bottom: 14px;
       height: max-content;
+    }}
+    .left-column .list-panel:last-child {{
+      flex: 1 1 auto;
+      min-height: 0;
     }}
     .list-body {{
       padding: 8px 14px 14px;
@@ -778,6 +789,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       padding: 18px;
       height: max-content;
     }}
+    .right-column .side-panel {{
+      flex: 1 1 auto;
+      min-height: 0;
+    }}
     .side-panel.danger h3 {{ color: #ff6d6d; }}
     .alert-card {{
       margin-top: 14px;
@@ -970,7 +985,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
         grid-template-columns: 1fr;
       }}
       .left-column, .center-column, .right-column {{
+        display: grid;
         grid-template-columns: 1fr;
+        align-self: start;
       }}
     }}
     @media (max-width: 980px) {{
