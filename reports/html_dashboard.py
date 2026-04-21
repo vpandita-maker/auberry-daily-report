@@ -339,20 +339,22 @@ def _render_recommendations(items):
         cards.append(
             """
             <a class="action-row" href="#outlet-heatmap">
-              <div class="action-icon">→</div>
-              <div class="action-copy">
-                <div class="action-title">{title}</div>
-                <div class="action-meta">{focus}</div>
-                <div class="action-metrics">
-                  <span class="action-chip metric-chip">
-                    <strong>Target</strong>
-                    <span>{metric}</span>
-                  </span>
-                  <span class="action-chip timeline-chip">
-                    <strong>Timeline</strong>
-                    <span>{timeline}</span>
-                  </span>
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">{title}</div>
+                  <div class="action-meta">{focus}</div>
                 </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>{metric}</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>{timeline}</span>
+                </span>
               </div>
             </a>
             """.format(
@@ -362,7 +364,7 @@ def _render_recommendations(items):
                 timeline=escape(timeline),
             )
         )
-    return "".join(cards)
+    return "<div class='recommendations-grid'>{}</div>".format("".join(cards))
 
 
 def generate_html_dashboard(analysis, output_dir="output"):
@@ -435,12 +437,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .page {{
       max-width: 1536px;
       margin: 0 auto;
-      padding: 18px;
+      padding: 20px;
     }}
     .dashboard {{
       display: grid;
-      grid-template-columns: 380px minmax(0, 1fr) 340px;
-      gap: 12px;
+      grid-template-columns: 350px minmax(0, 1fr) 320px;
+      gap: 16px;
     }}
     .card {{
       background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
@@ -551,8 +553,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .sparkline svg {{ width: 100%; height: 44px; }}
     .left-column, .center-column, .right-column {{
       display: grid;
-      gap: 12px;
+      gap: 16px;
       align-content: start;
+      min-width: 0;
     }}
     .panel-title {{
       margin: 0;
@@ -572,6 +575,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .list-body {{
       padding: 8px 14px 14px;
+      min-width: 0;
     }}
     .list-row {{
       display: grid;
@@ -590,6 +594,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       background: rgba(255,255,255,0.035);
       border-color: rgba(255,255,255,0.12);
     }}
+    .item-copy {{
+      min-width: 0;
+    }}
     .item-rank {{
       color: #d4d8ea;
       font-weight: 700;
@@ -606,7 +613,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 800;
       font-size: 20px;
     }}
-    .item-name {{ font-weight: 700; }}
+    .item-name {{
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
     .item-meta {{ color: var(--muted); font-size: 13px; margin-top: 2px; }}
     .pill {{
       padding: 6px 10px;
@@ -701,6 +713,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: center;
       padding: 0 8px;
       font-weight: 700;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }}
     .heat-cell {{
       min-height: 48px;
@@ -791,7 +806,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       padding: 18px;
     }}
     .side-panel.danger h3 {{ color: #ff6d6d; }}
-    .side-panel.rec h3 {{ color: #bc93ff; }}
     .alert-card {{
       margin-top: 14px;
       border-radius: 16px;
@@ -842,21 +856,50 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .impact-medium {{ background: var(--yellow-bg); color: var(--yellow); }}
     .impact-low {{ background: var(--green-bg); color: var(--green); }}
     .status-chip {{ background: rgba(255,255,255,0.04); color: #e9ecfb; }}
+    .recommendations-panel {{
+      grid-column: 1 / -1;
+      padding: 20px;
+    }}
+    .recommendations-panel .panel-title {{
+      color: #bc93ff;
+    }}
+    .recommendations-panel .panel-subtitle {{
+      margin-top: 6px;
+      max-width: 820px;
+      line-height: 1.5;
+    }}
+    .recommendations-grid {{
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }}
     .action-row {{
       display: grid;
-      grid-template-columns: 28px 1fr;
-      gap: 12px;
-      align-items: start;
-      padding: 16px 0;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      gap: 14px;
+      align-content: start;
+      padding: 18px;
+      min-height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(171,125,244,0.16);
+      background: linear-gradient(180deg, rgba(57,62,97,0.95), rgba(44,48,78,0.95));
       text-decoration: none;
       color: inherit;
       transition:
         transform 200ms cubic-bezier(.22,1,.36,1),
         filter 200ms ease,
-        border-color 200ms ease;
+        border-color 200ms ease,
+        box-shadow 200ms ease,
+        background 200ms ease;
     }}
-    .action-row:first-of-type {{ border-top: none; }}
+    .action-topline {{
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }}
     .action-icon {{
       width: 28px;
       height: 28px;
@@ -867,26 +910,38 @@ def generate_html_dashboard(analysis, output_dir="output"):
       place-items: center;
       font-weight: 800;
     }}
-    .action-title {{ font-weight: 700; }}
+    .action-copy {{
+      min-width: 0;
+    }}
+    .action-title {{
+      font-weight: 700;
+      font-size: 17px;
+      line-height: 1.3;
+    }}
     .action-title, .action-meta {{
       overflow-wrap: anywhere;
       word-break: break-word;
     }}
-    .action-meta {{ color: var(--muted); font-size: 13px; margin-top: 4px; }}
+    .action-meta {{
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 1.45;
+    }}
     .action-metrics {{
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      gap: 12px;
     }}
     .action-chip {{
       display: grid;
       gap: 4px;
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding: 14px;
+      border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.04);
       min-width: 0;
+      align-content: start;
     }}
     .action-chip strong {{
       font-size: 11px;
@@ -913,6 +968,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       filter: brightness(1.05);
       transform: translateY(-4px);
       border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 22px 34px rgba(9, 11, 28, 0.24);
     }}
     .empty-block {{
       color: var(--muted);
@@ -925,7 +981,18 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 12px;
       padding-bottom: 6px;
     }}
-    @media (max-width: 1260px) {{
+    @media (max-width: 1360px) {{
+      .dashboard {{
+        grid-template-columns: 320px minmax(0, 1fr);
+      }}
+      .right-column {{
+        grid-column: 1 / -1;
+      }}
+      .recommendations-grid {{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }}
+    }}
+    @media (max-width: 1120px) {{
       .dashboard {{
         grid-template-columns: 1fr;
       }}
@@ -949,13 +1016,30 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .filters {{
         justify-content: flex-start;
       }}
+      .recommendations-grid {{
+        grid-template-columns: 1fr;
+      }}
     }}
     @media (max-width: 720px) {{
+      .page {{
+        padding: 14px;
+      }}
       .kpis {{
         grid-template-columns: 1fr;
       }}
       .topbar {{
         grid-template-columns: 1fr;
+      }}
+      .filter-pill {{
+        width: 100%;
+        min-width: 0;
+      }}
+      .list-row {{
+        grid-template-columns: 24px 44px minmax(0, 1fr);
+      }}
+      .list-row .pill {{
+        grid-column: 2 / -1;
+        justify-self: start;
       }}
       .heat-header-cell {{
         font-size: 11px;
@@ -972,6 +1056,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       }}
       .action-metrics {{
         grid-template-columns: 1fr;
+      }}
+      .action-row {{
+        padding: 16px;
       }}
     }}
     @keyframes page-fade {{
@@ -1090,12 +1177,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
           <h3 class="panel-title">Urgent &amp; Important</h3>
           {alerts_html}
         </section>
-
-        <section class="card side-panel rec" id="recommendations">
-          <h3 class="panel-title">Recommendations</h3>
-          {recommendations_html}
-        </section>
       </div>
+
+      <section class="card recommendations-panel" id="recommendations">
+        <h3 class="panel-title">Recommendations</h3>
+        <div class="panel-subtitle">Action plans with measurable targets and timelines across the full portfolio.</div>
+        {recommendations_html}
+      </section>
 
       <div class="footer-note">Live executive dashboard for {brand} • Updated {date_str}</div>
     </section>
