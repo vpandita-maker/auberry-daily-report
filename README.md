@@ -1,6 +1,6 @@
 # Auberry Daily Review Report
 
-This project fetches fresh Google reviews for Auberry The Bake Shop, analyzes them with Anthropic, generates premium PDF reports, and emails them automatically.
+This project fetches fresh Google reviews for Auberry The Bake Shop, analyzes them with Anthropic, generates both a premium PDF report and a static HTML dashboard, and emails them automatically.
 
 ## Local run
 
@@ -20,7 +20,7 @@ python3 send_report.py
 
 ## Outlet configuration
 
-The project now supports multiple outlets through `outlets.json`. Each run loops through the configured branches, blends the reviews into one portfolio-wide analysis, generates a single PDF in the original report structure, and emails that combined brief.
+The project now supports multiple outlets through `outlets.json`. Each run loops through the configured branches, blends the reviews into one portfolio-wide analysis, generates a single PDF plus a static HTML dashboard, and emails that combined brief.
 
 Example format:
 
