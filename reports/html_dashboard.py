@@ -349,13 +349,13 @@ def _render_recommendations(items):
     for item in items[:3]:
         cards.append(
             """
-            <div class="action-row">
+            <a class="action-row" href="#outlet-heatmap">
               <div class="action-icon">→</div>
               <div class="action-copy">
                 <div class="action-title">{title}</div>
                 <div class="action-meta">{focus} • {timeline}</div>
               </div>
-            </div>
+            </a>
             """.format(
                 title=escape(str(item.get("title", "Untitled recommendation"))),
                 focus=escape(str(item.get("location_focus", "Portfolio-wide"))),
@@ -520,6 +520,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 700;
       min-width: 190px;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }}
     .kpis {{
       grid-column: 1 / -1;
@@ -631,6 +635,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: var(--text);
       background: rgba(255,255,255,0.02);
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }}
     .heatmap-panel {{
       padding: 18px;
@@ -805,6 +813,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: start;
       padding: 12px 0;
       border-top: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none;
+      color: inherit;
     }}
     .action-row:first-of-type {{ border-top: none; }}
     .action-icon {{
@@ -862,6 +872,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 800;
       text-align: center;
       min-width: 180px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }}
+    .button-link:hover, .action-row:hover {{
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+      transition: 120ms ease;
     }}
     .empty-block {{
       color: var(--muted);
@@ -944,7 +963,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <div class="filters">
           <div class="filter-pill"><span>All Outlets</span><span>⌄</span></div>
           <div class="filter-pill"><span>{review_window}</span><span>⌄</span></div>
-          <div class="compare-btn">Compare Outlets</div>
+          <a class="compare-btn button-link" href="#quick-compare">Compare Outlets</a>
         </div>
       </div>
 
@@ -988,7 +1007,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       </section>
 
       <div class="left-column">
-        <section class="card list-panel">
+        <section class="card list-panel" id="top-items">
           <div class="panel-header">
             <h3 class="panel-title">Top Items</h3>
             <div class="panel-subtitle">By Mentions</div>
@@ -996,20 +1015,20 @@ def generate_html_dashboard(analysis, output_dir="output"):
           <div class="list-body">{top_items_html}</div>
         </section>
 
-        <section class="card list-panel">
+        <section class="card list-panel" id="underperforming-items">
           <div class="panel-header">
             <h3 class="panel-title">Underperforming Items</h3>
             <div class="panel-subtitle">By Mentions</div>
           </div>
           <div class="list-body">{underperforming_html}</div>
           <div class="list-footer">
-            <div class="ghost-btn">View All Items</div>
+            <a class="ghost-btn button-link" href="#items-overview">View All Items</a>
           </div>
         </section>
       </div>
 
       <div class="center-column">
-        <section class="card heatmap-panel">
+        <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
           <div class="legend">
             <span><i style="background:#58b958;"></i> Positive</span>
@@ -1020,7 +1039,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
           {heatmap_html}
         </section>
 
-        <section class="card bubbles-panel">
+        <section class="card bubbles-panel" id="items-overview">
           <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">({outlet_scope})</span></h3>
           <div class="legend">
             <span><i style="background:#58b958;"></i> Positive</span>
@@ -1037,23 +1056,23 @@ def generate_html_dashboard(analysis, output_dir="output"):
           {alerts_html}
         </section>
 
-        <section class="card side-panel rec">
+        <section class="card side-panel rec" id="ai-recommendations">
           <h3 class="panel-title">AI Recommendations</h3>
           {recommendations_html}
           <div style="margin-top:14px;">
-            <div class="ghost-btn" style="border-color:#5c478f;color:#d2b4ff;">View All Actions</div>
+            <a class="ghost-btn button-link" href="#ai-recommendations" style="border-color:#5c478f;color:#d2b4ff;">View All Actions</a>
           </div>
         </section>
       </div>
 
-      <section class="card compare-panel">
+      <section class="card compare-panel" id="quick-compare">
         <div class="compare-copy">
           <h3>Quick Compare</h3>
           <p>See the current gap between outlet focus areas.</p>
         </div>
         <div class="compare-pill negative">{watch_outlet}</div>
         <div class="compare-pill positive">{best_outlet}</div>
-        <div class="compare-cta">View Comparison</div>
+        <a class="compare-cta button-link" href="#outlet-heatmap">View Comparison</a>
       </section>
 
       <div class="footer-note">Live executive dashboard for {brand} • Updated {date_str}</div>
