@@ -272,6 +272,22 @@ def _smart_section(label, title, styles, content, min_space=1.8 * inch):
     return section
 
 
+def _stacked_cards_section(label, title, styles, cards, min_space=1.8 * inch):
+    section = [CondPageBreak(min_space)]
+    header = _section_header(label, title, styles)
+
+    if not cards:
+        return section + header
+
+    first_card, *remaining_cards = cards
+    section.append(KeepTogether(header + [first_card]))
+
+    for card in remaining_cards:
+        section.append(card)
+
+    return section
+
+
 def _category_card(cat_key, cat_info, styles):
     name = cat_key.replace("_", " ").title()
     score = float(cat_info.get("score", 0))
@@ -489,11 +505,10 @@ def _build_report_story(analysis, styles, date_str):
     )
     story.extend(_smart_section("Overview", "Executive Snapshot", styles, [metric_grid, Spacer(1, 18)], min_space=2.4 * inch))
 
-    breakdown_content = []
+    breakdown_cards = []
     for cat_key, cat_info in analysis["categories"].items():
-        breakdown_content.append(CondPageBreak(2.9 * inch))
-        breakdown_content.append(KeepTogether([_category_card(cat_key, cat_info, styles), Spacer(1, 10)]))
-    story.extend(_smart_section("Breakdown", "Category Performance", styles, breakdown_content, min_space=3.2 * inch))
+        breakdown_cards.append(KeepTogether([_category_card(cat_key, cat_info, styles), Spacer(1, 10)]))
+    story.extend(_stacked_cards_section("Breakdown", "Category Performance", styles, breakdown_cards, min_space=3.8 * inch))
 
     if analysis.get("most_mentioned_items"):
         story.extend(
