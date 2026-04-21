@@ -190,8 +190,6 @@ def send_email(pdf_path, analysis, failed_outlets, recipient=None):
     body_lines.extend(
         [
             "",
-            "Generated automatically by Vansh Pandita.",
-            "",
         ]
     )
 
