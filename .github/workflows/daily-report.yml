@@ -4,8 +4,8 @@ on:
   schedule:
     # 11:30 PM America/New_York during daylight saving time
     - cron: "30 3 * * *"
-    # One-night override for Apr 20, 2026 at 11:38 PM America/New_York
-    - cron: "38 3 * * *"
+    # One-night override for Apr 20, 2026 at 11:41 PM America/New_York
+    - cron: "41 3 * * *"
     # 12:00 AM America/New_York during daylight saving time (retry window)
     - cron: "0 4 * * *"
     # 11:30 PM America/New_York during standard time
@@ -64,7 +64,7 @@ jobs:
             const nyParts = getNewYorkParts(now);
             const currentMinutes = minutesFromMidnight(nyParts);
             const primaryMinutes = 23 * 60 + 30;
-            const specialPrimaryMinutes = 23 * 60 + 38;
+            const specialPrimaryMinutes = 23 * 60 + 41;
             const backupMinutes = 0;
             const distanceToPrimary = circularDistanceMinutes(currentMinutes, primaryMinutes);
             const distanceToSpecialPrimary = circularDistanceMinutes(currentMinutes, specialPrimaryMinutes);
@@ -93,7 +93,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 workflow_id: workflowFile,
-                event: 'schedule',
                 per_page: 100,
               });
 
