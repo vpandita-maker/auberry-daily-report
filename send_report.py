@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 import smtplib
 from datetime import UTC, datetime
 from email.message import EmailMessage
@@ -149,6 +150,16 @@ def build_combined_report(outlets):
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
     return Path(html_path), analysis, failed_outlets
+
+
+def publish_dashboard_site(html_path, site_dir="site"):
+    site_path = Path(site_dir)
+    site_path.mkdir(parents=True, exist_ok=True)
+
+    index_path = site_path / "index.html"
+    shutil.copyfile(html_path, index_path)
+    (site_path / ".nojekyll").write_text("", encoding="utf-8")
+    return index_path.resolve()
 
 
 def send_email(html_path, analysis, failed_outlets, recipient=None):

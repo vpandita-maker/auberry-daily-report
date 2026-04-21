@@ -1,0 +1,68 @@
+name: Deploy Auberry Dashboard
+
+on:
+  workflow_run:
+    workflows: ["Auberry Daily Report"]
+    types:
+      - completed
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-dashboard:
+    if: |
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: auberry-dashboard-pages
+      cancel-in-progress: true
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Write environment file
+        run: |
+          cat <<'EOF' > .env
+          GOOGLE_PLACES_API_KEY=${{ secrets.GOOGLE_PLACES_API_KEY }}
+          ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+          AUBERRY_PLACE_ID=${{ secrets.AUBERRY_PLACE_ID }}
+          AUBERRY_BRAND_NAME=${{ secrets.AUBERRY_BRAND_NAME }}
+          REPORT_RECIPIENT=${{ secrets.REPORT_RECIPIENT }}
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM=${{ secrets.SMTP_FROM }}
+          SMTP_FROM_NAME=${{ secrets.SMTP_FROM_NAME }}
+          DASHBOARD_URL=${{ secrets.DASHBOARD_URL }}
+          EOF
+
+      - name: Generate dashboard site
+        run: python publish_dashboard.py
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
