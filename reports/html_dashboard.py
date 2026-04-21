@@ -21,6 +21,23 @@ def _slug(text):
     return re.sub(r"[^a-z0-9]+", " ", str(text).lower()).strip()
 
 
+def _outlet_aliases(outlet):
+    base = _slug(outlet)
+    aliases = {base}
+    trimmed = base.replace("auberry the bake shop", "").replace("auberry", "").strip()
+    if trimmed:
+        aliases.add(trimmed)
+    for token in trimmed.split():
+        if len(token) > 3:
+            aliases.add(token)
+    return {alias for alias in aliases if alias}
+
+
+def _text_mentions_outlet(text, outlet):
+    haystack = _slug(text)
+    return any(alias in haystack for alias in _outlet_aliases(outlet))
+
+
 def _normalize_sentiment(value):
     text = _slug(value)
     if text in {"positive", "good", "strong"}:
@@ -45,12 +62,8 @@ def _metric_delta(value, positive_suffix, negative_suffix):
 
 
 def _extract_outlet_name(text, outlets):
-    lowered = _slug(text)
     for outlet in outlets:
-        short = _slug(outlet.replace("auberry the bake shop", "").replace("auberry", ""))
-        if short and short in lowered:
-            return outlet
-        if _slug(outlet) in lowered:
+        if _text_mentions_outlet(text, outlet):
             return outlet
     return None
 
@@ -68,53 +81,47 @@ def _derive_item_panels(items):
 def _build_heatmap(analysis):
     outlets = analysis.get("portfolio_outlets") or ["All Outlets"]
     categories = analysis.get("categories") or {}
-    issue_text = " ".join(analysis.get("top_3_urgent_issues") or []).lower()
-    strength_text = " ".join(analysis.get("top_3_strengths") or []).lower()
-    rec_text = " ".join(
-        " ".join(
-            [
-                str(rec.get("title", "")),
-                str(rec.get("location_focus", "")),
-                str(rec.get("action", "")),
-            ]
-        )
-        for rec in (analysis.get("top_3_recommendations") or [])
-    ).lower()
 
     rows = []
     for outlet in outlets[:5]:
         row = {"outlet": outlet, "cells": []}
-        outlet_slug = _slug(outlet)
         for key, label, icon in CATEGORY_ORDER:
             info = categories.get(key) or {}
-            category_slug = _slug(label)
+            summary_text = str(info.get("summary", ""))
+            issues = info.get("top_issues") or []
+            praises = info.get("top_praises") or []
+            issues_text = " ".join(str(item) for item in issues)
+            praises_text = " ".join(str(item) for item in praises)
             status = "na"
             reason = "No clear outlet-level signal yet"
-            outlet_issue = outlet_slug and outlet_slug in issue_text and category_slug.split()[0] in issue_text
-            outlet_strength = outlet_slug and outlet_slug in strength_text and category_slug.split()[0] in strength_text
-            outlet_rec = outlet_slug and outlet_slug in rec_text and category_slug.split()[0] in rec_text
+            score = float(info.get("score", 0) or 0)
+            outlet_issue = _text_mentions_outlet(issues_text, outlet)
+            outlet_strength = _text_mentions_outlet(praises_text, outlet)
+            outlet_summary = _text_mentions_outlet(summary_text, outlet)
 
             if outlet_issue:
                 status = "negative"
-                reason = (info.get("top_issues") or ["Risk flagged in recent reviews"])[0]
+                reason = issues[0] if issues else "Risk flagged in recent reviews"
             elif outlet_strength:
                 status = "positive"
-                reason = (info.get("top_praises") or ["Positive feedback in recent reviews"])[0]
-            elif outlet_rec:
-                status = "neutral"
-                reason = info.get("summary") or "Active improvement recommendation"
-            elif len(outlets) == 1:
-                score = float(info.get("score", 0) or 0)
+                reason = praises[0] if praises else "Positive feedback in recent reviews"
+            elif outlet_summary:
                 if score >= 4.1:
                     status = "positive"
-                    reason = info.get("summary") or "Strong portfolio performance"
+                    reason = summary_text or "Strong portfolio performance"
                 elif score >= 3.2:
                     status = "neutral"
-                    reason = info.get("summary") or "Mixed but manageable feedback"
+                    reason = summary_text or "Mixed but manageable feedback"
                 elif score > 0:
                     status = "negative"
-                    reason = info.get("summary") or "Under pressure in reviews"
-            elif "coffee" in category_slug and not any("coffee" in _slug(i) for i in analysis.get("top_3_urgent_issues") or []):
+                    reason = summary_text or "Under pressure in reviews"
+            elif score >= 4.4 and key != "coffee_quality":
+                status = "positive"
+                reason = summary_text or "Strong portfolio-wide signal"
+            elif score >= 3.5 and key != "coffee_quality":
+                status = "neutral"
+                reason = summary_text or "Mixed portfolio-wide signal"
+            elif key == "coffee_quality" and score == 0:
                 status = "na"
                 reason = "Not enough direct feedback"
 
