@@ -37,19 +37,47 @@ DASHBOARD_URL = os.getenv(
 ).strip()
 
 
-def _recipient_name(email):
-    if RECIPIENT_NAME_OVERRIDE:
-        return RECIPIENT_NAME_OVERRIDE.strip().split()[0]
+def _split_display_name(display_name):
+    parts = [part for part in str(display_name).strip().split() if part]
+    if not parts:
+        return {"first_name": "", "last_name": "", "full_name": ""}
+    if len(parts) == 1:
+        return {"first_name": parts[0], "last_name": "", "full_name": parts[0]}
+    return {
+        "first_name": parts[0],
+        "last_name": parts[-1],
+        "full_name": f"{parts[0]} {parts[-1]}",
+    }
+
+
+def _infer_person_name_from_email(email, override=""):
+    if override.strip():
+        return _split_display_name(override)
+
     local = email.split("@", 1)[0]
     cleaned = re.sub(r"\d+", " ", local)
-    cleaned = cleaned.replace(".", " ").replace("_", " ").replace("-", " ").strip()
+    cleaned = re.sub(r"[._-]+", " ", cleaned).strip()
     normalized_cleaned = re.sub(r"[^a-z]", "", cleaned.lower())
     sender_local = SMTP_FROM.split("@", 1)[0] if SMTP_FROM else ""
     normalized_sender = re.sub(r"[^a-z]", "", sender_local.lower())
+
     if normalized_cleaned and normalized_cleaned == normalized_sender and SMTP_FROM_NAME.strip():
-        return SMTP_FROM_NAME.strip()
+        return _split_display_name(SMTP_FROM_NAME)
+
     parts = [part.capitalize() for part in cleaned.split() if part]
-    return parts[0] if parts else "there"
+    if not parts:
+        return {"first_name": "there", "last_name": "", "full_name": "there"}
+    if len(parts) == 1:
+        return {"first_name": parts[0], "last_name": "", "full_name": parts[0]}
+    return {
+        "first_name": parts[0],
+        "last_name": parts[-1],
+        "full_name": f"{parts[0]} {parts[-1]}",
+    }
+
+
+def _recipient_name(email):
+    return _infer_person_name_from_email(email, RECIPIENT_NAME_OVERRIDE)["first_name"]
 
 
 def _sender_first_name():
