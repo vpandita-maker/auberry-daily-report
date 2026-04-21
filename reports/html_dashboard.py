@@ -86,7 +86,14 @@ def _derive_item_panels(items):
     negative = [item for item in items if _normalize_sentiment(item.get("sentiment")) == "negative"]
     neutral = [item for item in items if _normalize_sentiment(item.get("sentiment")) == "neutral"]
 
-    top_items = sorted(positive or items, key=lambda item: (-int(item.get("mentions", 0)), str(item.get("item", ""))))[:5]
+    top_items = sorted(
+        positive or items,
+        key=lambda item: (
+            0 if _normalize_sentiment(item.get("sentiment")) == "positive" else 1,
+            -int(item.get("mentions", 0)),
+            str(item.get("item", "")),
+        ),
+    )[:5]
     underperforming = sorted(negative + neutral, key=lambda item: (-int(item.get("mentions", 0)), str(item.get("item", ""))))[:5]
     return top_items, underperforming
 
@@ -948,8 +955,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       <div class="left-column">
         <section class="card list-panel" id="top-items">
           <div class="panel-header">
-            <h3 class="panel-title">Top Items</h3>
-            <div class="panel-subtitle">By Mentions</div>
+            <h3 class="panel-title">Top Positive Items</h3>
+            <div class="panel-subtitle">Best-reviewed menu mentions</div>
           </div>
           <div class="list-body">{top_items_html}</div>
         </section>
