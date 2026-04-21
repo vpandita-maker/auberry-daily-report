@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 
 from analyzer.ai_analysis import analyze_reviews
 from reports.html_dashboard import generate_html_dashboard
-from reports.pdf_generator import generate_pdf_report
 from scrapers.google import extract_place_id_from_google_url, get_google_reviews
 
 
@@ -147,13 +146,12 @@ def build_combined_report(outlets):
         analysis["review_window"] = f"{first_review} to {last_review}"
     else:
         analysis["review_window"] = "Dates unavailable"
-    pdf_path = generate_pdf_report(analysis)
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
-    return Path(pdf_path), Path(html_path), analysis, failed_outlets
+    return Path(html_path), analysis, failed_outlets
 
 
-def send_email(pdf_path, html_path, analysis, failed_outlets, recipient=None):
+def send_email(html_path, analysis, failed_outlets, recipient=None):
     if not SMTP_USERNAME or not SMTP_PASSWORD or not SMTP_FROM:
         raise RuntimeError(
             "Missing SMTP credentials. Set SMTP_USERNAME, SMTP_PASSWORD, and SMTP_FROM in .env."
@@ -179,7 +177,7 @@ def send_email(pdf_path, html_path, analysis, failed_outlets, recipient=None):
         "",
         overview,
         "",
-        f"Static dashboard generated: {analysis.get('html_dashboard_path', html_path)}",
+        f"Dashboard generated: {analysis.get('html_dashboard_path', html_path)}",
     ]
 
     if failed_outlets:
@@ -204,14 +202,6 @@ def send_email(pdf_path, html_path, analysis, failed_outlets, recipient=None):
     message["To"] = target_recipient
     message.set_content("\n".join(body_lines))
 
-    with pdf_path.open("rb") as attachment:
-        message.add_attachment(
-            attachment.read(),
-            maintype="application",
-            subtype="pdf",
-            filename=pdf_path.name,
-        )
-
     with html_path.open("rb") as attachment:
         message.add_attachment(
             attachment.read(),
@@ -227,9 +217,9 @@ def send_email(pdf_path, html_path, analysis, failed_outlets, recipient=None):
 
 
 def main():
-    pdf_path, html_path, analysis, failed_outlets = build_combined_report(load_outlets())
+    html_path, analysis, failed_outlets = build_combined_report(load_outlets())
     test_recipient = os.getenv("REPORT_RECIPIENT_OVERRIDE", "").strip() or None
-    send_email(pdf_path, html_path, analysis, failed_outlets, recipient=test_recipient)
+    send_email(html_path, analysis, failed_outlets, recipient=test_recipient)
     print(f"Sent combined report to {test_recipient or REPORT_RECIPIENT}")
 
 
