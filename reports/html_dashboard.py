@@ -443,6 +443,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: grid;
       grid-template-columns: 350px minmax(0, 1fr) 320px;
       gap: 16px;
+      align-items: start;
     }}
     .card {{
       background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
@@ -544,6 +545,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       gap: 16px;
       align-content: start;
       min-width: 0;
+      align-self: start;
+      height: max-content;
     }}
     .panel-title {{
       margin: 0;
@@ -560,6 +563,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .list-panel {{
       padding-bottom: 14px;
+      height: max-content;
     }}
     .list-body {{
       padding: 8px 14px 14px;
@@ -626,6 +630,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .heatmap-panel {{
       padding: 18px;
+      height: max-content;
     }}
     .legend {{
       display: flex;
@@ -708,6 +713,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .heat-na {{ background: #5a637d; color: #eef2ff; }}
     .bubbles-panel {{
       padding: 18px;
+      height: max-content;
     }}
     .bubble-wrap {{
       display: grid;
@@ -770,6 +776,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .side-panel {{
       padding: 18px;
+      height: max-content;
     }}
     .side-panel.danger h3 {{ color: #ff6d6d; }}
     .alert-card {{
@@ -825,6 +832,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .recommendations-panel {{
       grid-column: 1 / -1;
       padding: 20px;
+      height: max-content;
     }}
     .recommendations-panel .panel-title {{
       color: #bc93ff;
