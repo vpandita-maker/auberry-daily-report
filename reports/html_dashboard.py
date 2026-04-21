@@ -33,6 +33,19 @@ def _outlet_aliases(outlet):
     return {alias for alias in aliases if alias}
 
 
+def _display_outlet_name(outlet):
+    text = str(outlet).strip()
+    short = (
+        text.replace("Auberry The Bake Shop -", "")
+        .replace("Auberry The Bake Shop", "")
+        .replace("AUBERRY -", "")
+        .replace("AUBERRY", "")
+        .strip(" -")
+        .strip()
+    )
+    return short or text
+
+
 def _text_mentions_outlet(text, outlet):
     haystack = _slug(text)
     return any(alias in haystack for alias in _outlet_aliases(outlet))
@@ -711,7 +724,26 @@ def generate_html_dashboard(analysis, output_dir="output"):
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
     }}
     .bubble strong {{ display: block; font-size: 16px; }}
-    .bubble span {{ color: rgba(255,255,255,0.86); font-size: 13px; margin-top: 6px; }}
+    .bubble strong {{
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-wrap: balance;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      max-width: 100%;
+      line-height: 1.1;
+      font-size: 15px;
+    }}
+    .bubble span {{
+      color: rgba(255,255,255,0.86);
+      font-size: 13px;
+      margin-top: 6px;
+      max-width: 100%;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }}
     .bubble-positive {{ background: linear-gradient(180deg, #4caa4b, #41893f); }}
     .bubble-neutral {{ background: linear-gradient(180deg, #d5a218, #b88814); }}
     .bubble-negative {{ background: linear-gradient(180deg, #d66565, #bb4f4f); }}
@@ -786,6 +818,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 800;
     }}
     .action-title {{ font-weight: 700; }}
+    .action-title, .action-meta {{
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
     .action-meta {{ color: var(--muted); font-size: 13px; margin-top: 4px; }}
     .compare-panel {{
       grid-column: 1 / -1;
@@ -809,6 +845,11 @@ def generate_html_dashboard(analysis, output_dir="output"):
       border-radius: 14px;
       border: 1px solid var(--border);
       font-weight: 700;
+      white-space: normal;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      text-align: center;
     }}
     .compare-pill.negative {{ color: #ff8484; background: #422734; }}
     .compare-pill.positive {{ color: #6ee178; background: #243d2d; }}
@@ -880,6 +921,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       }}
       .bubble-wrap {{
         justify-content: center;
+      }}
+      .bubble strong {{
+        font-size: 14px;
       }}
     }}
   </style>
@@ -1041,10 +1085,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
         recommendations_html=_render_recommendations(recommendations),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
         watch_outlet=escape(
-            _extract_outlet_name(" ".join(analysis.get("top_3_urgent_issues") or []), outlets) or "Most at risk outlet"
+            _display_outlet_name(
+                _extract_outlet_name(" ".join(analysis.get("top_3_urgent_issues") or []), outlets) or "Most at risk outlet"
+            )
         ),
         best_outlet=escape(
-            _extract_outlet_name(" ".join(analysis.get("top_3_strengths") or []), outlets) or "Strongest outlet signal"
+            _display_outlet_name(
+                _extract_outlet_name(" ".join(analysis.get("top_3_strengths") or []), outlets) or "Strongest outlet signal"
+            )
         ),
         date_str=escape(date_str),
         spark_green="""
