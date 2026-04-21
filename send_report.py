@@ -39,7 +39,7 @@ DASHBOARD_URL = os.getenv(
 
 def _recipient_name(email):
     if RECIPIENT_NAME_OVERRIDE:
-        return RECIPIENT_NAME_OVERRIDE
+        return RECIPIENT_NAME_OVERRIDE.strip().split()[0]
     local = email.split("@", 1)[0]
     cleaned = re.sub(r"\d+", " ", local)
     cleaned = cleaned.replace(".", " ").replace("_", " ").replace("-", " ").strip()
@@ -50,6 +50,11 @@ def _recipient_name(email):
         return SMTP_FROM_NAME.strip()
     parts = [part.capitalize() for part in cleaned.split() if part]
     return parts[0] if parts else "there"
+
+
+def _sender_first_name():
+    sender = SMTP_FROM_NAME.strip() or "Team"
+    return sender.split()[0]
 
 
 def _is_recent_review(review, cutoff_timestamp):
@@ -225,6 +230,8 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     body_lines.extend(
         [
             "",
+            "Best regards,",
+            _sender_first_name(),
         ]
     )
 
