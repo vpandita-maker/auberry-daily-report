@@ -29,6 +29,10 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", SMTP_USERNAME)
 SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Vansh Pandita")
 RECIPIENT_NAME_OVERRIDE = os.getenv("RECIPIENT_NAME_OVERRIDE", "").strip()
+DASHBOARD_URL = os.getenv(
+    "DASHBOARD_URL",
+    "https://vpandita-maker.github.io/auberry-daily-report/",
+).strip()
 
 
 def _recipient_name(email):
@@ -176,6 +180,7 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     top_strength = (analysis.get("top_3_strengths") or ["strong dessert quality across key outlets"])[0]
     top_recommendation = (analysis.get("top_3_recommendations") or [{}])[0]
     recommendation_text = top_recommendation.get("title") or "a targeted corrective action plan"
+    dashboard_url = DASHBOARD_URL or analysis.get("dashboard_url") or ""
     overview = (
         f"Auberry's last-30-day review brief shows {analysis['overall_sentiment']} sentiment and a "
         f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
@@ -188,7 +193,8 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
         "",
         overview,
         "",
-        f"Dashboard generated: {analysis.get('html_dashboard_path', html_path)}",
+        "View live dashboard:",
+        dashboard_url or "Dashboard URL unavailable",
     ]
 
     if failed_outlets:
@@ -212,14 +218,6 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     message["From"] = formataddr((SMTP_FROM_NAME, SMTP_FROM))
     message["To"] = target_recipient
     message.set_content("\n".join(body_lines))
-
-    with html_path.open("rb") as attachment:
-        message.add_attachment(
-            attachment.read(),
-            maintype="text",
-            subtype="html",
-            filename=html_path.name,
-        )
 
     with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
         server.starttls()
