@@ -2,14 +2,16 @@ name: Auberry Daily Report
 
 on:
   schedule:
-    # 11:30 PM America/New_York during daylight saving time
+    # 11:30 PM to 11:50 PM America/New_York during daylight saving time
     - cron: "30 3 * * *"
-    # One-night override for Apr 20, 2026 at 11:41 PM America/New_York
-    - cron: "41 3 * * *"
+    - cron: "40 3 * * *"
+    - cron: "50 3 * * *"
     # 12:00 AM America/New_York during daylight saving time (retry window)
     - cron: "0 4 * * *"
-    # 11:30 PM America/New_York during standard time
+    # 11:30 PM to 11:50 PM America/New_York during standard time
     - cron: "30 4 * * *"
+    - cron: "40 4 * * *"
+    - cron: "50 4 * * *"
     # 12:00 AM America/New_York during standard time (retry window)
     - cron: "0 5 * * *"
   workflow_dispatch:
@@ -31,7 +33,6 @@ jobs:
         with:
           script: |
             const workflowFile = '.github/workflows/daily-report.yml';
-            const toleranceMinutes = 20;
             const now = new Date();
 
             function getNewYorkParts(date) {
@@ -56,29 +57,17 @@ jobs:
               return Number(parts.hour) * 60 + Number(parts.minute);
             }
 
-            function circularDistanceMinutes(a, b) {
-              const diff = Math.abs(a - b);
-              return Math.min(diff, 1440 - diff);
-            }
-
             const nyParts = getNewYorkParts(now);
             const currentMinutes = minutesFromMidnight(nyParts);
-            const primaryMinutes = 23 * 60 + 30;
-            const specialPrimaryMinutes = 23 * 60 + 41;
-            const backupMinutes = 0;
-            const distanceToPrimary = circularDistanceMinutes(currentMinutes, primaryMinutes);
-            const distanceToSpecialPrimary = circularDistanceMinutes(currentMinutes, specialPrimaryMinutes);
-            const distanceToBackup = circularDistanceMinutes(currentMinutes, backupMinutes);
-            const nyDate = `${nyParts.year}-${nyParts.month}-${nyParts.day}`;
-            const specialOverrideDate = '2026-04-20';
-            const isSpecialOverrideDate = nyDate === specialOverrideDate;
+            const primaryWindowStart = 23 * 60 + 30;
+            const primaryWindowEnd = 23 * 60 + 59;
+            const backupWindowStart = 0;
+            const backupWindowEnd = 20;
 
             let slot = '';
-            if (isSpecialOverrideDate && distanceToSpecialPrimary <= toleranceMinutes) {
+            if (currentMinutes >= primaryWindowStart && currentMinutes <= primaryWindowEnd) {
               slot = 'primary';
-            } else if (!isSpecialOverrideDate && distanceToPrimary <= toleranceMinutes) {
-              slot = 'primary';
-            } else if (distanceToBackup <= toleranceMinutes) {
+            } else if (currentMinutes >= backupWindowStart && currentMinutes <= backupWindowEnd) {
               slot = 'backup';
             }
 
@@ -88,31 +77,29 @@ jobs:
               return;
             }
 
-            if (slot === 'backup') {
-              const recentRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                workflow_id: workflowFile,
-                per_page: 100,
-              });
+            const recentRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: workflowFile,
+              per_page: 100,
+            });
 
-              const cutoff = now.getTime() - (3 * 60 * 60 * 1000);
-              const priorSuccess = recentRuns.find((run) => {
-                if (run.id === context.runId) {
-                  return false;
-                }
-                if (run.conclusion !== 'success') {
-                  return false;
-                }
-                const updatedAt = Date.parse(run.updated_at || run.created_at);
-                return Number.isFinite(updatedAt) && updatedAt >= cutoff;
-              });
-
-              if (priorSuccess) {
-                core.notice(`Skipping backup run because scheduled run ${priorSuccess.id} already succeeded.`);
-                core.setOutput('should_send', 'false');
-                return;
+            const cutoff = now.getTime() - (3 * 60 * 60 * 1000);
+            const priorSuccess = recentRuns.find((run) => {
+              if (run.id === context.runId) {
+                return false;
               }
+              if (run.event !== 'schedule' || run.conclusion !== 'success') {
+                return false;
+              }
+              const updatedAt = Date.parse(run.updated_at || run.created_at);
+              return Number.isFinite(updatedAt) && updatedAt >= cutoff;
+            });
+
+            if (priorSuccess) {
+              core.notice(`Skipping ${slot} run because scheduled run ${priorSuccess.id} already succeeded recently.`);
+              core.setOutput('should_send', 'false');
+              return;
             }
 
             core.notice(`Proceeding with ${slot} send window at New York time ${nyParts.hour}:${nyParts.minute}.`);
