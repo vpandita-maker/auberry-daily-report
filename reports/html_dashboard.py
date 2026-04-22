@@ -250,6 +250,7 @@ def _render_mentions_board(items, mention_sources=None):
         sentiment = _normalize_sentiment(item.get("sentiment"))
         item_name = str(item.get("item", "Unknown"))
         sources = mention_sources.get(item_name, [])[:3]
+        primary_url = str(sources[0].get("source_url", "")).strip() if sources else ""
         source_html = ""
         if sources:
             links = []
@@ -265,9 +266,15 @@ def _render_mentions_board(items, mention_sources=None):
                 else:
                     links.append(f"<span>Source {source_index}: {label}</span>")
             source_html = f"<div class='mention-sources'>{''.join(links)}</div>"
+        tag = "a" if primary_url else "article"
+        attrs = (
+            f' class="mention-card mention-{escape(sentiment)} mention-linkable" href="{escape(primary_url)}" target="_blank" rel="noopener noreferrer"'
+            if primary_url
+            else f' class="mention-card mention-{escape(sentiment)}"'
+        )
         cards.append(
             """
-            <article class="mention-card mention-{sentiment}">
+            <{tag}{attrs}>
               <div class="mention-rank">{rank}</div>
               <div class="mention-body">
                 <h4>{name}</h4>
@@ -277,13 +284,15 @@ def _render_mentions_board(items, mention_sources=None):
                 </div>
                 {source_html}
               </div>
-            </article>
+            </{tag}>
             """.format(
-                sentiment=escape(sentiment),
+                tag=tag,
+                attrs=attrs,
                 rank=index,
                 name=escape(item_name),
                 mentions=mentions,
                 plural="" if mentions == 1 else "s",
+                sentiment=escape(sentiment),
                 sentiment_label=escape(sentiment.title() if sentiment != "na" else "N/A"),
                 source_html=source_html,
             )
@@ -819,14 +828,21 @@ def generate_html_dashboard(analysis, output_dir="output"):
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         border-color 180ms ease,
-        box-shadow 180ms ease,
-        filter 180ms ease;
+      box-shadow 180ms ease,
+      filter 180ms ease;
+    }}
+    .mention-card {{
+      color: inherit;
+      text-decoration: none;
     }}
     .mention-card:hover {{
       transform: translateY(-5px);
       border-color: rgba(255,255,255,0.16);
       box-shadow: 0 18px 28px rgba(6, 9, 21, 0.24);
       filter: brightness(1.03);
+    }}
+    .mention-linkable {{
+      cursor: pointer;
     }}
     .mention-positive {{ background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }}
     .mention-neutral {{ background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }}
