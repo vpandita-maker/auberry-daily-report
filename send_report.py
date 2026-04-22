@@ -122,6 +122,12 @@ def _truncate_text(text, limit=360):
     return value[: limit - 1].rstrip() + "…"
 
 
+def _review_mentions_item(review_text, item_name):
+    review_slug = re.sub(r"[^a-z0-9]+", " ", str(review_text).lower()).strip()
+    item_slug = re.sub(r"[^a-z0-9]+", " ", str(item_name).lower()).strip()
+    return bool(item_slug and item_slug in review_slug)
+
+
 def _should_hide_failed_outlet(error_message):
     normalized = str(error_message).strip().lower()
     hidden_markers = (
@@ -239,6 +245,28 @@ def build_combined_report(outlets):
             }
         )
     analysis["new_reviews_today"] = today_reviews
+
+    mention_sources = {}
+    for item in analysis.get("most_mentioned_items", []) or []:
+        item_name = str(item.get("item", "")).strip()
+        if not item_name:
+            continue
+        sources = []
+        for review in today_reviews:
+            if not _review_mentions_item(review.get("text", ""), item_name):
+                continue
+            sources.append(
+                {
+                    "outlet": review["outlet"],
+                    "date_time": review["date_time"],
+                    "source_url": review["source_url"],
+                }
+            )
+            if len(sources) >= 3:
+                break
+        mention_sources[item_name] = sources
+    analysis["mention_sources"] = mention_sources
+
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
     return Path(html_path), analysis, visible_failed_outlets

@@ -239,14 +239,32 @@ def _render_heatmap(rows):
     """.format(header_cells=header_cells, rows="".join(row_html))
 
 
-def _render_mentions_board(items):
+def _render_mentions_board(items, mention_sources=None):
     if not items:
         return "<div class='empty-block'>No item trends available.</div>"
 
+    mention_sources = mention_sources or {}
     cards = []
     for index, item in enumerate(items[:8], start=1):
         mentions = int(item.get("mentions", 0) or 0)
         sentiment = _normalize_sentiment(item.get("sentiment"))
+        item_name = str(item.get("item", "Unknown"))
+        sources = mention_sources.get(item_name, [])[:3]
+        source_html = ""
+        if sources:
+            links = []
+            for source_index, source in enumerate(sources, start=1):
+                url = str(source.get("source_url", "")).strip()
+                outlet = escape(str(source.get("outlet", "Outlet")))
+                date_time = escape(str(source.get("date_time", "Unknown time")))
+                label = f"{outlet} · {date_time}"
+                if url:
+                    links.append(
+                        f'<a href="{escape(url)}" target="_blank" rel="noopener noreferrer">Source {source_index}: {label}</a>'
+                    )
+                else:
+                    links.append(f"<span>Source {source_index}: {label}</span>")
+            source_html = f"<div class='mention-sources'>{''.join(links)}</div>"
         cards.append(
             """
             <article class="mention-card mention-{sentiment}">
@@ -257,15 +275,17 @@ def _render_mentions_board(items):
                   <span>{mentions} mention{plural}</span>
                   <span class="pill pill-{sentiment}">{sentiment_label}</span>
                 </div>
+                {source_html}
               </div>
             </article>
             """.format(
                 sentiment=escape(sentiment),
                 rank=index,
-                name=escape(str(item.get("item", "Unknown"))),
+                name=escape(item_name),
                 mentions=mentions,
                 plural="" if mentions == 1 else "s",
                 sentiment_label=escape(sentiment.title() if sentiment != "na" else "N/A"),
+                source_html=source_html,
             )
         )
     return "".join(cards)
@@ -433,6 +453,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     items = analysis.get("most_mentioned_items") or []
     recommendations = analysis.get("top_3_recommendations") or []
     review_references = analysis.get("new_reviews_today") or []
+    mention_sources = analysis.get("mention_sources") or {}
     outlets = analysis.get("portfolio_outlets") or []
     top_items, underperforming = _derive_item_panels(items)
     heatmap_rows = _build_heatmap(analysis)
@@ -836,6 +857,25 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: center;
       color: rgba(255,255,255,0.86);
       font-size: 13px;
+    }}
+    .mention-sources {{
+      margin-top: 12px;
+      display: grid;
+      gap: 6px;
+    }}
+    .mention-sources a, .mention-sources span {{
+      color: #b9d6ff;
+      font-size: 12px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
+    .mention-sources a {{
+      text-decoration: none;
+      font-weight: 700;
+    }}
+    .mention-sources a:hover {{
+      text-decoration: underline;
     }}
     .side-panel {{
       padding: 18px;
@@ -1365,7 +1405,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             "negative",
         ),
         heatmap_html=_render_heatmap(heatmap_rows),
-        mentions_board_html=_render_mentions_board(items),
+        mentions_board_html=_render_mentions_board(items, mention_sources),
         alerts_html=_render_alerts(analysis),
         recommendations_html=_render_recommendations(recommendations),
         review_references_html=_render_review_references(review_references),
