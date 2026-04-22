@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from html import escape
 from pathlib import Path
 import re
+from zoneinfo import ZoneInfo
 
 
 CATEGORY_ORDER = [
@@ -11,6 +12,7 @@ CATEGORY_ORDER = [
     ("value_for_money", "Value for Money", "V"),
     ("coffee_quality", "Coffee Quality", "C"),
 ]
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def _safe_filename(text):
@@ -44,6 +46,42 @@ def _display_outlet_name(outlet):
         .strip()
     )
     return short or text
+
+
+def _format_display_date(value):
+    text = str(value or "").strip()
+    if not text:
+        return "Unknown"
+    for fmt in ("%Y-%m-%d", "%b %d, %Y"):
+        try:
+            parsed = datetime.strptime(text, fmt)
+            return parsed.strftime("%d/%m/%y")
+        except ValueError:
+            continue
+    return text
+
+
+def _format_display_datetime(value):
+    text = str(value or "").strip()
+    if not text:
+        return "Unknown"
+    for fmt in ("%Y-%m-%d %H:%M UTC", "%Y-%m-%d"):
+        try:
+            parsed = datetime.strptime(text, fmt).replace(tzinfo=UTC)
+            if fmt == "%Y-%m-%d":
+                return parsed.astimezone(IST).strftime("%d/%m/%y")
+            return parsed.astimezone(IST).strftime("%d/%m/%y %I:%M %p IST")
+        except ValueError:
+            continue
+    return text
+
+
+def _format_review_window(value):
+    text = str(value or "").strip()
+    if " to " not in text:
+        return _format_display_date(text)
+    start, end = text.split(" to ", 1)
+    return f"{_format_display_date(start)} to {_format_display_date(end)}"
 
 
 def _text_mentions_outlet(text, outlet):
@@ -258,7 +296,7 @@ def _render_mentions_board(items, mention_sources=None):
                 location = escape(str(source.get("location", "")).strip())
                 author = escape(str(source.get("author", "Anonymous")))
                 rating = escape(str(source.get("rating", "N/A")))
-                date_time = escape(str(source.get("date_time", "Unknown time")))
+                date_time = escape(_format_display_datetime(source.get("date_time", "Unknown time")))
                 review_text = escape(str(source.get("text", "")).strip() or "Review text unavailable.")
                 links.append(
                     """
@@ -543,7 +581,7 @@ def _render_review_references(items):
                 outlet=escape(str(item.get("outlet", "Unknown outlet"))),
                 rating=escape(rating_label),
                 location=escape(str(item.get("location", "Location unavailable"))),
-                date_time=escape(str(item.get("date_time", "Unknown date/time"))),
+                date_time=escape(_format_display_datetime(item.get("date_time", "Unknown date/time"))),
                 author_html=author_html,
                 text=escape(str(item.get("text", ""))),
                 source_html=source_html,
@@ -578,7 +616,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     if categories:
         sentiment_pct = round((positive_categories / len(categories)) * 100)
 
-    review_window = str(analysis.get("review_window", "Dates unavailable"))
+    review_window = _format_review_window(analysis.get("review_window", "Dates unavailable"))
     report_scope = str(analysis.get("report_scope", "Today only"))
     risk_level = str(analysis.get("rating_risk", "Unknown")).title()
     risk_tone = "low" if risk_level.lower() == "low" else "medium" if risk_level.lower() == "medium" else "high"

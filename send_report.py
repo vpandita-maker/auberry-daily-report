@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from email.message import EmailMessage
 from email.utils import formataddr
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
@@ -35,6 +36,7 @@ DASHBOARD_URL = os.getenv(
     "DASHBOARD_URL",
     "https://vpandita-maker.github.io/auberry-daily-report/",
 ).strip()
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def _split_display_name(display_name):
@@ -125,6 +127,34 @@ def _truncate_text(text, limit=360):
 def _strip_review_prefix(text):
     value = str(text or "").strip()
     return re.sub(r"^\[[^\]]+\]\s*", "", value).strip()
+
+
+def _format_display_date(value):
+    text = str(value or "").strip()
+    if not text:
+        return "Unknown"
+    for fmt in ("%Y-%m-%d", "%b %d, %Y"):
+        try:
+            parsed = datetime.strptime(text, fmt)
+            return parsed.strftime("%d/%m/%y")
+        except ValueError:
+            continue
+    return text
+
+
+def _format_display_datetime(value):
+    text = str(value or "").strip()
+    if not text:
+        return "Unknown"
+    for fmt in ("%Y-%m-%d %H:%M UTC", "%Y-%m-%d"):
+        try:
+            parsed = datetime.strptime(text, fmt).replace(tzinfo=UTC)
+            if fmt == "%Y-%m-%d":
+                return parsed.astimezone(IST).strftime("%d/%m/%y")
+            return parsed.astimezone(IST).strftime("%d/%m/%y %I:%M %p IST")
+        except ValueError:
+            continue
+    return text
 
 
 def _normalize_term(text):
@@ -280,8 +310,8 @@ def build_combined_report(outlets):
     analysis["review_dates"] = sorted(set(review_dates))
     analysis["report_scope"] = "Today only"
     if analysis["review_dates"]:
-        first_review = datetime.strptime(analysis["review_dates"][0], "%Y-%m-%d").strftime("%b %d, %Y")
-        last_review = datetime.strptime(analysis["review_dates"][-1], "%Y-%m-%d").strftime("%b %d, %Y")
+        first_review = _format_display_date(analysis["review_dates"][0])
+        last_review = _format_display_date(analysis["review_dates"][-1])
         analysis["review_window"] = f"{first_review} to {last_review}"
     else:
         analysis["review_window"] = "Dates unavailable"
@@ -296,7 +326,7 @@ def build_combined_report(outlets):
                 "location": str(review.get("outlet_address", "")),
                 "author": str(review.get("author", "") or "Anonymous"),
                 "rating": review.get("rating"),
-                "date_time": str(review.get("date_time_exact") or review.get("date_exact") or review.get("date") or "Unknown"),
+                "date_time": _format_display_datetime(review.get("date_time_exact") or review.get("date_exact") or review.get("date") or "Unknown"),
                 "text": _truncate_text(_strip_review_prefix(review.get("text", "")), 360),
                 "source_url": str(review.get("source_url", "")),
                 "author_url": str(review.get("author_url", "")),
