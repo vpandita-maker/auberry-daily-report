@@ -477,15 +477,11 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .brand-copy h1 {{
       margin: 0;
-      font-size: 12px;
+      font-size: 16px;
       line-height: 1.4;
       letter-spacing: 0;
-      font-weight: 700;
+      font-weight: 400;
       font-family: Arial, Helvetica, sans-serif;
-    }}
-    .brand-copy p {{
-      margin: 6px 0 0;
-      font-size: 16px;
       color: var(--muted);
     }}
     .filters {{
@@ -1083,8 +1079,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       <div class="topbar">
         <div class="brand-block">
           <div class="brand-copy">
-            <h1>{brand}</h1>
-            <p>Executive Dashboard</p>
+            <h1>{brand} Executive Dashboard</h1>
           </div>
         </div>
         <div class="filters">
