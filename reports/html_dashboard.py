@@ -964,10 +964,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .footer-note {{
       grid-column: 1 / -1;
-      text-align: center;
-      color: var(--muted);
+      text-align: left;
+      color: #d9ddf2;
       font-size: 12px;
-      padding-bottom: 6px;
+      font-weight: 700;
+      line-height: 1.4;
+      padding: 6px 4px 8px;
+      animation: footer-slide-in 900ms cubic-bezier(.22,1,.36,1) 120ms both;
     }}
     @media (max-width: 1360px) {{
       .dashboard {{
@@ -1058,6 +1061,16 @@ def generate_html_dashboard(analysis, output_dir="output"):
       to {{
         opacity: 1;
         transform: translateY(0);
+      }}
+    }}
+    @keyframes footer-slide-in {{
+      from {{
+        opacity: 0;
+        transform: translateX(-18px);
+      }}
+      to {{
+        opacity: 1;
+        transform: translateX(0);
       }}
     }}
   </style>
@@ -1172,7 +1185,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         {recommendations_html}
       </section>
 
-      <div class="footer-note">Live executive dashboard for {brand} • Updated {date_str}</div>
+      <div class="footer-note">{brand}</div>
     </section>
   </main>
 </body>
