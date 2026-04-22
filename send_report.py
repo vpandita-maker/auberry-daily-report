@@ -122,10 +122,65 @@ def _truncate_text(text, limit=360):
     return value[: limit - 1].rstrip() + "…"
 
 
+def _normalize_term(text):
+    normalized = re.sub(r"[^a-z0-9]+", " ", str(text).lower()).strip()
+    replacements = {
+        "doughnut": "donut",
+        "doughnuts": "donuts",
+        "choco": "chocolate",
+    }
+    words = [replacements.get(word, word) for word in normalized.split()]
+    return " ".join(words)
+
+
+def _singularize(word):
+    if word.endswith("ies") and len(word) > 4:
+        return word[:-3] + "y"
+    if word.endswith("s") and not word.endswith("ss") and len(word) > 3:
+        return word[:-1]
+    return word
+
+
+def _item_aliases(item_name):
+    normalized = _normalize_term(item_name)
+    if not normalized:
+        return set()
+
+    aliases = {normalized}
+    compact = normalized.replace("(", " ").replace(")", " ")
+    aliases.add(compact)
+
+    tokens = [token for token in compact.split() if token]
+    singular_tokens = [_singularize(token) for token in tokens]
+    plural_tokens = [token if token.endswith("s") else f"{token}s" for token in singular_tokens]
+
+    aliases.add(" ".join(singular_tokens))
+    aliases.add(" ".join(plural_tokens))
+
+    for token in tokens + singular_tokens + plural_tokens:
+        if len(token) >= 5:
+            aliases.add(token)
+
+    for separator in ("/", " or ", " and "):
+        if separator in normalized:
+            for part in normalized.split(separator):
+                part = part.strip()
+                if part:
+                    aliases.add(part)
+
+    return {alias.strip() for alias in aliases if alias.strip()}
+
+
 def _review_mentions_item(review_text, item_name):
-    review_slug = re.sub(r"[^a-z0-9]+", " ", str(review_text).lower()).strip()
-    item_slug = re.sub(r"[^a-z0-9]+", " ", str(item_name).lower()).strip()
-    return bool(item_slug and item_slug in review_slug)
+    review_slug = f" {_normalize_term(review_text)} "
+    aliases = _item_aliases(item_name)
+    if not aliases:
+        return False
+
+    for alias in sorted(aliases, key=len, reverse=True):
+        if f" {alias} " in review_slug:
+            return True
+    return False
 
 
 def _should_hide_failed_outlet(error_message):
@@ -228,8 +283,6 @@ def build_combined_report(outlets):
 
     today_reviews = []
     for review in sorted(combined_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
-        if not _is_review_from_today(review):
-            continue
         source_label = str(review.get("source", "Google"))
         outlet_name = source_label.replace("Google - ", "", 1) if source_label.startswith("Google - ") else source_label
         today_reviews.append(
