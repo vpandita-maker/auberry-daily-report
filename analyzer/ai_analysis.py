@@ -49,7 +49,7 @@ Requirements:
     "top_3_urgent_issues": ["issue with outlet/location if identifiable", "issue2", "issue3"],
     "top_3_strengths": ["strength with outlet/location if identifiable", "strength2", "strength3"],
     "rating_risk": "low or medium or high",
-    "top_3_recommendations": [
+    "top_5_recommendations": [
         {{
             "title": "short strategic action",
             "location_focus": "specific outlet/location or portfolio-wide",

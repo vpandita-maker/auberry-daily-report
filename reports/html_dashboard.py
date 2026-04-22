@@ -415,6 +415,96 @@ def _render_recommendations(items):
     return "<div class='recommendations-grid'>{}</div>".format("".join(cards))
 
 
+def _recommendation_key(item):
+    return (
+        str(item.get("title", "")).strip().lower(),
+        str(item.get("location_focus", "")).strip().lower(),
+    )
+
+
+def _specific_recommendation_fallbacks(analysis):
+    fallbacks = []
+    issues = analysis.get("top_3_urgent_issues") or []
+    strengths = analysis.get("top_3_strengths") or []
+    items = analysis.get("most_mentioned_items") or []
+    brand = str(analysis.get("brand_name", "Auberry The Bake Shop - All Outlets"))
+
+    if any("coffee" in issue.lower() or "beverage" in issue.lower() for issue in issues):
+        fallbacks.append(
+            {
+                "title": "Run Beverage Feedback Recovery Sprint",
+                "location_focus": brand,
+                "action": "Add one beverage upsell prompt at billing, offer a coffee sample during peak hours, and ask every beverage buyer for a QR review before exit.",
+                "success_metric": "Collect at least 10 beverage-specific reviews and lift coffee mentions from 0 to 8+ within 14 days.",
+                "timeline": "Launch within 7 days",
+            }
+        )
+
+    if any("appearance" in issue.lower() or "staff" in issue.lower() for issue in issues):
+        fallbacks.append(
+            {
+                "title": "Correct Staff Conduct at Irrummanzil",
+                "location_focus": "Auberry The Bake Shop - Irrummanzil",
+                "action": "Coach front-of-house staff on guest-facing language, prohibit personal comments, and have the manager review the next 20 interactions during peak hours.",
+                "success_metric": "Reach 0 appearance-related complaints and 100% compliance on manager spot checks for the next 30 days.",
+                "timeline": "Implement within 48 hours",
+            }
+        )
+
+    donut_item = next((item for item in items if "donut" in str(item.get("item", "")).lower()), None)
+    if donut_item:
+        mentions = int(donut_item.get("mentions", 0) or 0)
+        fallbacks.append(
+            {
+                "title": "Standardize Donut Hero Display",
+                "location_focus": "Irrummanzil and Kukatpally first, then portfolio-wide",
+                "action": "Create one front-counter donut display standard, add hero signage, and require staff to recommend the featured donut in every qualifying order.",
+                "success_metric": f"Increase donut review mentions from {mentions} to at least {max(mentions + 3, 6)} per day and improve attach rate by 15% within 21 days.",
+                "timeline": "Roll out within 10 days",
+            }
+        )
+
+    if any("premchand" in strength.lower() or "arun" in strength.lower() for strength in strengths):
+        fallbacks.append(
+            {
+                "title": "Turn Named Staff Praise into a Training Script",
+                "location_focus": "Panjagutta and Kondapur as pilot outlets",
+                "action": "Record the exact greeting, recommendation, and checkout behaviors that earned named praise and train every cashier and floor staff member on that sequence.",
+                "success_metric": "Generate at least 5 named-staff mentions per week across the pilot outlets within 30 days.",
+                "timeline": "Complete training in 14 days",
+            }
+        )
+
+    if any("text" in issue.lower() or "detailed feedback" in issue.lower() for issue in issues):
+        fallbacks.append(
+            {
+                "title": "Replace Generic QR Prompts with Guided Review Questions",
+                "location_focus": "Auberry The Bake Shop - Kondapur",
+                "action": "Update the review ask to request one food comment and one service comment, and have staff mention those prompts verbally at handoff.",
+                "success_metric": "Cut text-less reviews below 10% and raise average review text length to 15+ words within 2 weeks.",
+                "timeline": "Deploy within 5 days",
+            }
+        )
+
+    return fallbacks
+
+
+def _normalize_recommendations(analysis):
+    existing = list(analysis.get("top_5_recommendations") or analysis.get("top_3_recommendations") or [])
+    seen = {_recommendation_key(item) for item in existing}
+
+    for item in _specific_recommendation_fallbacks(analysis):
+        key = _recommendation_key(item)
+        if key in seen:
+            continue
+        existing.append(item)
+        seen.add(key)
+        if len(existing) >= 5:
+            break
+
+    return existing[:5]
+
+
 def _render_review_references(items):
     if not items:
         return "<div class='empty-block'>No new reviews were captured today.</div>"
@@ -473,7 +563,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
 
     categories = analysis.get("categories") or {}
     items = analysis.get("most_mentioned_items") or []
-    recommendations = analysis.get("top_3_recommendations") or []
+    recommendations = _normalize_recommendations(analysis)
     review_references = analysis.get("new_reviews_today") or []
     mention_sources = analysis.get("mention_sources") or {}
     outlets = analysis.get("portfolio_outlets") or []
