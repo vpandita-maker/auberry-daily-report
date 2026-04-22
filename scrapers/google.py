@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -58,22 +58,32 @@ def get_google_reviews(place_id):
     print(f"Overall rating: {result.get('rating')}")
     print(f"Total ratings: {result.get('user_ratings_total')}")
     formatted_address = result.get("formatted_address", "")
+    place_name = result.get("name", "")
+    place_url = f"https://www.google.com/maps/search/?api=1&query_place_id={place_id}"
     
     reviews = []
     for r in result.get("reviews", []):
         timestamp = r.get("time")
         exact_date = ""
+        exact_datetime = ""
         if timestamp:
-            exact_date = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d")
+            review_dt = datetime.fromtimestamp(timestamp, UTC)
+            exact_date = review_dt.strftime("%Y-%m-%d")
+            exact_datetime = review_dt.strftime("%Y-%m-%d %H:%M UTC")
         reviews.append({
             "source": "Google",
             "rating": r.get("rating"),
             "text": r.get("text", ""),
             "author": r.get("author_name", ""),
+            "author_url": r.get("author_url", ""),
             "date": r.get("relative_time_description", ""),
             "date_exact": exact_date,
+            "date_time_exact": exact_datetime,
             "timestamp": timestamp,
             "outlet_address": formatted_address,
+            "place_name": place_name,
+            "place_id": place_id,
+            "source_url": place_url,
         })
     
     print(f"Reviews fetched: {len(reviews)}\n")

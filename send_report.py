@@ -17,7 +17,7 @@ from scrapers.google import extract_place_id_from_google_url, get_google_reviews
 
 load_dotenv()
 
-REPORT_WINDOW_DAYS = 7
+REPORT_WINDOW_DAYS = 1
 
 
 OUTLETS_FILE = Path(os.getenv("AUBERRY_OUTLETS_FILE", "outlets.json"))
@@ -104,6 +104,24 @@ def _is_recent_review(review, cutoff_timestamp):
     return any(marker in relative for marker in recent_markers)
 
 
+def _is_review_from_today(review):
+    timestamp = review.get("timestamp")
+    if timestamp:
+        review_dt = datetime.fromtimestamp(timestamp, UTC)
+        now_dt = datetime.now(UTC)
+        return review_dt.date() == now_dt.date()
+
+    relative = str(review.get("date", "")).strip().lower()
+    return relative == "today" or "hour ago" in relative or "hours ago" in relative
+
+
+def _truncate_text(text, limit=360):
+    value = str(text or "").strip()
+    if len(value) <= limit:
+        return value
+    return value[: limit - 1].rstrip() + "…"
+
+
 def _should_hide_failed_outlet(error_message):
     normalized = str(error_message).strip().lower()
     hidden_markers = (
@@ -143,7 +161,7 @@ def build_combined_report(outlets):
     visible_failed_outlets = []
     review_dates = []
     outlet_locations = []
-    cutoff = datetime.now(UTC).timestamp() - (REPORT_WINDOW_DAYS * 24 * 60 * 60)
+    cutoff = datetime.now(UTC).timestamp() - (24 * 60 * 60)
 
     for outlet in outlets:
         try:
@@ -194,13 +212,33 @@ def build_combined_report(outlets):
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
     analysis["review_dates"] = sorted(set(review_dates))
-    analysis["report_scope"] = f"Last {REPORT_WINDOW_DAYS} days only"
+    analysis["report_scope"] = "Today only"
     if analysis["review_dates"]:
         first_review = datetime.strptime(analysis["review_dates"][0], "%Y-%m-%d").strftime("%b %d, %Y")
         last_review = datetime.strptime(analysis["review_dates"][-1], "%Y-%m-%d").strftime("%b %d, %Y")
         analysis["review_window"] = f"{first_review} to {last_review}"
     else:
         analysis["review_window"] = "Dates unavailable"
+
+    today_reviews = []
+    for review in sorted(combined_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
+        if not _is_review_from_today(review):
+            continue
+        source_label = str(review.get("source", "Google"))
+        outlet_name = source_label.replace("Google - ", "", 1) if source_label.startswith("Google - ") else source_label
+        today_reviews.append(
+            {
+                "outlet": outlet_name,
+                "location": str(review.get("outlet_address", "")),
+                "author": str(review.get("author", "") or "Anonymous"),
+                "rating": review.get("rating"),
+                "date_time": str(review.get("date_time_exact") or review.get("date_exact") or review.get("date") or "Unknown"),
+                "text": _truncate_text(review.get("text", ""), 360),
+                "source_url": str(review.get("source_url", "")),
+                "author_url": str(review.get("author_url", "")),
+            }
+        )
+    analysis["new_reviews_today"] = today_reviews
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
     return Path(html_path), analysis, visible_failed_outlets
@@ -233,7 +271,7 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     recommendation_text = top_recommendation.get("title") or "a targeted corrective action plan"
     dashboard_url = DASHBOARD_URL or analysis.get("dashboard_url") or ""
     overview = (
-        f"Auberry's last-{REPORT_WINDOW_DAYS}-day review brief shows {analysis['overall_sentiment']} sentiment and a "
+        f"Auberry's daily review brief shows {analysis['overall_sentiment']} sentiment and a "
         f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
         f"Key themes include {top_issue.lower()} alongside strengths such as {top_strength.lower()}. "
         f"The report pinpoints outlet-specific issues, including Musarambagh and Kukatpally, and recommends {recommendation_text.lower()} "

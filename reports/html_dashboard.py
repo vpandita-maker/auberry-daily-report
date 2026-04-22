@@ -373,6 +373,53 @@ def _render_recommendations(items):
     return "<div class='recommendations-grid'>{}</div>".format("".join(cards))
 
 
+def _render_review_references(items):
+    if not items:
+        return "<div class='empty-block'>No new reviews were captured today.</div>"
+
+    cards = []
+    for item in items:
+        rating = item.get("rating")
+        rating_label = f"{float(rating):.1f}/5" if isinstance(rating, (int, float)) else "Unrated"
+        author_url = str(item.get("author_url", "")).strip()
+        source_url = str(item.get("source_url", "")).strip()
+        author = escape(str(item.get("author", "Anonymous")))
+        author_html = (
+            f'<a href="{escape(author_url)}" target="_blank" rel="noopener noreferrer">{author}</a>'
+            if author_url
+            else author
+        )
+        source_html = (
+            f'<a href="{escape(source_url)}" target="_blank" rel="noopener noreferrer">Open source</a>'
+            if source_url
+            else "Source unavailable"
+        )
+        cards.append(
+            """
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">{outlet}</div>
+                <span class="review-rating">{rating}</span>
+              </div>
+              <div class="review-detail">{location}</div>
+              <div class="review-detail">{date_time}</div>
+              <div class="review-author">Reviewer: {author_html}</div>
+              <p>{text}</p>
+              <div class="review-links">{source_html}</div>
+            </article>
+            """.format(
+                outlet=escape(str(item.get("outlet", "Unknown outlet"))),
+                rating=escape(rating_label),
+                location=escape(str(item.get("location", "Location unavailable"))),
+                date_time=escape(str(item.get("date_time", "Unknown date/time"))),
+                author_html=author_html,
+                text=escape(str(item.get("text", ""))),
+                source_html=source_html,
+            )
+        )
+    return "<div class='review-grid'>{}</div>".format("".join(cards))
+
+
 def generate_html_dashboard(analysis, output_dir="output"):
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -385,6 +432,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     categories = analysis.get("categories") or {}
     items = analysis.get("most_mentioned_items") or []
     recommendations = analysis.get("top_3_recommendations") or []
+    review_references = analysis.get("new_reviews_today") or []
     outlets = analysis.get("portfolio_outlets") or []
     top_items, underperforming = _derive_item_panels(items)
     heatmap_rows = _build_heatmap(analysis)
@@ -398,7 +446,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         sentiment_pct = round((positive_categories / len(categories)) * 100)
 
     review_window = str(analysis.get("review_window", "Dates unavailable"))
-    report_scope = str(analysis.get("report_scope", "Last 7 days"))
+    report_scope = str(analysis.get("report_scope", "Today only"))
     risk_level = str(analysis.get("rating_risk", "Unknown")).title()
     risk_tone = "low" if risk_level.lower() == "low" else "medium" if risk_level.lower() == "medium" else "high"
 
@@ -868,6 +916,77 @@ def generate_html_dashboard(analysis, output_dir="output"):
       gap: 16px;
       min-width: 0;
     }}
+    .reviews-panel {{
+      grid-column: 1 / -1;
+      padding: 20px;
+      height: max-content;
+    }}
+    .reviews-panel .panel-title {{
+      color: #8fc5ff;
+    }}
+    .review-grid {{
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }}
+    .review-card {{
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid rgba(111,167,255,0.16);
+      background: linear-gradient(180deg, rgba(48,58,94,0.95), rgba(39,47,77,0.95));
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }}
+    .review-meta {{
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }}
+    .review-outlet {{
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+    }}
+    .review-rating {{
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.14);
+      border: 1px solid rgba(111,167,255,0.18);
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }}
+    .review-detail, .review-author {{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
+    .review-author a, .review-links a {{
+      color: #b9d6ff;
+      text-decoration: none;
+      font-weight: 700;
+    }}
+    .review-author a:hover, .review-links a:hover {{
+      text-decoration: underline;
+    }}
+    .review-card p {{
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
+    .review-links {{
+      font-size: 13px;
+      line-height: 1.5;
+    }}
     .action-row {{
       display: grid;
       gap: 14px;
@@ -1008,6 +1127,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .recommendations-grid {{
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }}
+      .review-grid {{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }}
     }}
     @media (max-width: 1120px) {{
       .dashboard {{
@@ -1036,6 +1158,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
         justify-content: flex-start;
       }}
       .recommendations-grid {{
+        grid-template-columns: 1fr;
+      }}
+      .review-grid {{
         grid-template-columns: 1fr;
       }}
     }}
@@ -1210,6 +1335,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
         {recommendations_html}
       </section>
 
+      <section class="card reviews-panel" id="review-references">
+        <h3 class="panel-title">New Reviews Today</h3>
+        <div class="panel-subtitle">Exact review references used in today’s dashboard, including outlet, location, timestamp, and source link.</div>
+        {review_references_html}
+      </section>
+
       <div class="footer-note">{brand}</div>
     </section>
   </main>
@@ -1237,6 +1368,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         mentions_board_html=_render_mentions_board(items),
         alerts_html=_render_alerts(analysis),
         recommendations_html=_render_recommendations(recommendations),
+        review_references_html=_render_review_references(review_references),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
         date_str=escape(date_str),
         spark_green="""
