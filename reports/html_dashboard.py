@@ -336,6 +336,7 @@ def _render_recommendations(items):
         focus = str(item.get("location_focus", "Portfolio-wide"))
         metric = str(item.get("success_metric", "Set a measurable KPI before rollout"))
         timeline = str(item.get("timeline", "No timeline"))
+        next_steps = str(item.get("action", "Define owner, rollout steps, and follow-up review checkpoints."))
         cards.append(
             """
             <article class="action-row">
@@ -356,12 +357,17 @@ def _render_recommendations(items):
                   <span>{timeline}</span>
                 </span>
               </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>{next_steps}</p>
+              </div>
             </article>
             """.format(
                 title=escape(str(item.get("title", "Untitled recommendation"))),
                 focus=escape(focus),
                 metric=escape(metric),
                 timeline=escape(timeline),
+                next_steps=escape(next_steps),
             )
         )
     return "<div class='recommendations-grid'>{}</div>".format("".join(cards))
@@ -955,6 +961,28 @@ def generate_html_dashboard(analysis, output_dir="output"):
       transform: translateY(-4px);
       border-color: rgba(255,255,255,0.12);
       box-shadow: 0 22px 34px rgba(9, 11, 28, 0.24);
+    }}
+    .action-strategy {{
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+    }}
+    .action-strategy strong {{
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+    }}
+    .action-strategy p {{
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }}
     .empty-block {{
       color: var(--muted);
