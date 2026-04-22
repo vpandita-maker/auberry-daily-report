@@ -254,19 +254,12 @@ def _render_mentions_board(items, mention_sources=None):
         if sources:
             links = []
             for source_index, source in enumerate(sources, start=1):
-                url = str(source.get("source_url", "")).strip()
                 outlet = escape(str(source.get("outlet", "Outlet")))
                 location = escape(str(source.get("location", "")).strip())
                 author = escape(str(source.get("author", "Anonymous")))
                 rating = escape(str(source.get("rating", "N/A")))
                 date_time = escape(str(source.get("date_time", "Unknown time")))
                 review_text = escape(str(source.get("text", "")).strip() or "Review text unavailable.")
-                place_link = ""
-                if url:
-                    place_link = (
-                        f'<a class="mention-source-link" href="{escape(url)}" '
-                        'target="_blank" rel="noopener noreferrer">Open in Google Maps</a>'
-                    )
                 links.append(
                     """
                     <article class="mention-source-card">
@@ -274,7 +267,6 @@ def _render_mentions_board(items, mention_sources=None):
                       <div class="mention-source-meta">Reviewer: {author} · Rating: {rating} · {date_time}</div>
                       <div class="mention-source-meta">{location}</div>
                       <p>{review_text}</p>
-                      {place_link}
                     </article>
                     """.format(
                         index=source_index,
@@ -284,7 +276,6 @@ def _render_mentions_board(items, mention_sources=None):
                         date_time=date_time,
                         location=location,
                         review_text=review_text,
-                        place_link=place_link,
                     )
                 )
             source_html = (
@@ -959,16 +950,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: #f7f8ff;
       overflow-wrap: anywhere;
       word-break: break-word;
-    }}
-    .mention-source-link {{
-      color: #b9d6ff;
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.45;
-      text-decoration: none;
-    }}
-    .mention-source-link:hover {{
-      text-decoration: underline;
     }}
     .side-panel {{
       padding: 18px;
