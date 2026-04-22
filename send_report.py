@@ -137,6 +137,7 @@ def load_outlets():
 
 def build_combined_report(outlets):
     combined_reviews = []
+    configured_outlet_count = len(outlets)
     participating_outlets = []
     failed_outlets = []
     visible_failed_outlets = []
@@ -188,6 +189,7 @@ def build_combined_report(outlets):
 
     analysis = analyze_reviews(combined_reviews, "Auberry The Bake Shop - All Outlets")
     analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
+    analysis["configured_outlet_count"] = configured_outlet_count
     analysis["portfolio_outlets"] = participating_outlets
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
@@ -221,8 +223,9 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
         )
 
     target_recipient = recipient or REPORT_RECIPIENT
-    outlet_count = len(analysis.get("portfolio_outlets", []))
-    subject = f"Daily Review Intelligence Report - Auberry ({outlet_count} outlets combined)"
+    contributing_outlet_count = len(analysis.get("portfolio_outlets", []))
+    configured_outlet_count = int(analysis.get("configured_outlet_count", contributing_outlet_count) or contributing_outlet_count)
+    subject = f"Daily Review Intelligence Report - Auberry ({configured_outlet_count} outlets tracked)"
     greeting_name = _recipient_name(target_recipient)
     top_issue = (analysis.get("top_3_urgent_issues") or ["service and food consistency issues"])[0]
     top_strength = (analysis.get("top_3_strengths") or ["strong dessert quality across key outlets"])[0]
@@ -234,7 +237,7 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
         f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
         f"Key themes include {top_issue.lower()} alongside strengths such as {top_strength.lower()}. "
         f"The report pinpoints outlet-specific issues, including Musarambagh and Kukatpally, and recommends {recommendation_text.lower()} "
-        f"to reduce risk and stabilize guest experience across all {outlet_count} outlets."
+        f"to reduce risk and stabilize guest experience across all {configured_outlet_count} tracked outlets."
     )
     body_lines = [
         f"Hi {greeting_name},",
@@ -243,6 +246,8 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
         "",
         "View live dashboard:",
         dashboard_url or "Dashboard URL unavailable",
+        "",
+        f"Outlet coverage: {contributing_outlet_count} of {configured_outlet_count} outlets contributed review data in this cycle.",
     ]
 
     if failed_outlets:
