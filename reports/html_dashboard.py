@@ -477,9 +477,11 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .brand-copy h1 {{
       margin: 0;
-      font-size: clamp(34px, 3vw, 54px);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
+      font-size: 12px;
+      line-height: 1.4;
+      letter-spacing: 0;
+      font-weight: 700;
+      font-family: Arial, Helvetica, sans-serif;
     }}
     .brand-copy p {{
       margin: 6px 0 0;
@@ -964,7 +966,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .footer-note {{
       grid-column: 1 / -1;
-      text-align: left;
+      text-align: center;
       color: #d9ddf2;
       font-size: 12px;
       font-weight: 700;
