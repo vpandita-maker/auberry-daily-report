@@ -250,7 +250,6 @@ def _render_mentions_board(items, mention_sources=None):
         sentiment = _normalize_sentiment(item.get("sentiment"))
         item_name = str(item.get("item", "Unknown"))
         sources = mention_sources.get(item_name, [])[:3]
-        primary_url = str(sources[0].get("source_url", "")).strip() if sources else ""
         source_html = ""
         if sources:
             links = []
@@ -265,16 +264,15 @@ def _render_mentions_board(items, mention_sources=None):
                     )
                 else:
                     links.append(f"<span>Source {source_index}: {label}</span>")
-            source_html = f"<div class='mention-sources'>{''.join(links)}</div>"
-        tag = "a" if primary_url else "article"
-        attrs = (
-            f' class="mention-card mention-{escape(sentiment)} mention-linkable" href="{escape(primary_url)}" target="_blank" rel="noopener noreferrer"'
-            if primary_url
-            else f' class="mention-card mention-{escape(sentiment)}"'
-        )
+            source_html = (
+                "<div class='mention-sources'>"
+                "<div class='mention-sources-title'>Reviews mentioning this item</div>"
+                f"{''.join(links)}"
+                "</div>"
+            )
         cards.append(
             """
-            <{tag}{attrs}>
+            <article class="mention-card mention-{sentiment}">
               <div class="mention-rank">{rank}</div>
               <div class="mention-body">
                 <h4>{name}</h4>
@@ -284,10 +282,8 @@ def _render_mentions_board(items, mention_sources=None):
                 </div>
                 {source_html}
               </div>
-            </{tag}>
+            </article>
             """.format(
-                tag=tag,
-                attrs=attrs,
                 rank=index,
                 name=escape(item_name),
                 mentions=mentions,
@@ -817,6 +813,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-content: start;
     }}
     .mention-card {{
+      position: relative;
       border-radius: 16px;
       padding: 14px 16px;
       border: 1px solid rgba(255,255,255,0.08);
@@ -831,18 +828,11 @@ def generate_html_dashboard(analysis, output_dir="output"):
       box-shadow 180ms ease,
       filter 180ms ease;
     }}
-    .mention-card {{
-      color: inherit;
-      text-decoration: none;
-    }}
     .mention-card:hover {{
       transform: translateY(-5px);
       border-color: rgba(255,255,255,0.16);
       box-shadow: 0 18px 28px rgba(6, 9, 21, 0.24);
       filter: brightness(1.03);
-    }}
-    .mention-linkable {{
-      cursor: pointer;
     }}
     .mention-positive {{ background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }}
     .mention-neutral {{ background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }}
@@ -875,9 +865,30 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 13px;
     }}
     .mention-sources {{
-      margin-top: 12px;
-      display: grid;
+      position: absolute;
+      top: calc(100% - 8px);
+      left: 16px;
+      right: 16px;
+      z-index: 8;
+      display: none;
       gap: 6px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(111,167,255,0.18);
+      background: rgba(23, 27, 49, 0.96);
+      box-shadow: 0 18px 30px rgba(6, 9, 21, 0.32);
+      backdrop-filter: blur(8px);
+    }}
+    .mention-card:hover .mention-sources,
+    .mention-card:focus-within .mention-sources {{
+      display: grid;
+    }}
+    .mention-sources-title {{
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+      margin-bottom: 2px;
     }}
     .mention-sources a, .mention-sources span {{
       color: #b9d6ff;
@@ -889,6 +900,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .mention-sources a {{
       text-decoration: none;
       font-weight: 700;
+      padding: 4px 0;
     }}
     .mention-sources a:hover {{
       text-decoration: underline;
