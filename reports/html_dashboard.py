@@ -256,17 +256,40 @@ def _render_mentions_board(items, mention_sources=None):
             for source_index, source in enumerate(sources, start=1):
                 url = str(source.get("source_url", "")).strip()
                 outlet = escape(str(source.get("outlet", "Outlet")))
+                location = escape(str(source.get("location", "")).strip())
+                author = escape(str(source.get("author", "Anonymous")))
+                rating = escape(str(source.get("rating", "N/A")))
                 date_time = escape(str(source.get("date_time", "Unknown time")))
-                label = f"{outlet} · {date_time}"
+                review_text = escape(str(source.get("text", "")).strip() or "Review text unavailable.")
+                place_link = ""
                 if url:
-                    links.append(
-                        f'<a href="{escape(url)}" target="_blank" rel="noopener noreferrer">Source {source_index}: {label}</a>'
+                    place_link = (
+                        f'<a class="mention-source-link" href="{escape(url)}" '
+                        'target="_blank" rel="noopener noreferrer">Open in Google Maps</a>'
                     )
-                else:
-                    links.append(f"<span>Source {source_index}: {label}</span>")
+                links.append(
+                    """
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source {index}: {outlet}</div>
+                      <div class="mention-source-meta">Reviewer: {author} · Rating: {rating} · {date_time}</div>
+                      <div class="mention-source-meta">{location}</div>
+                      <p>{review_text}</p>
+                      {place_link}
+                    </article>
+                    """.format(
+                        index=source_index,
+                        outlet=outlet,
+                        author=author,
+                        rating=rating,
+                        date_time=date_time,
+                        location=location,
+                        review_text=review_text,
+                        place_link=place_link,
+                    )
+                )
             source_html = (
                 "<details class='mention-sources'>"
-                "<summary class='mention-sources-toggle'>View source reviews</summary>"
+                "<summary class='mention-sources-toggle'>View referenced reviews</summary>"
                 "<div class='mention-sources-panel'>"
                 "<div class='mention-sources-title'>Reviews mentioning this item</div>"
                 f"{''.join(links)}"
@@ -896,7 +919,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .mention-sources-panel {{
       display: grid;
-      gap: 6px;
+      gap: 10px;
       padding: 0 12px 12px;
       animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
     }}
@@ -907,19 +930,44 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: rgba(255,255,255,0.68);
       margin-bottom: 2px;
     }}
-    .mention-sources a, .mention-sources span {{
-      color: #b9d6ff;
-      font-size: 12px;
-      line-height: 1.45;
+    .mention-source-card {{
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }}
+    .mention-source-header {{
+      font-size: 13px;
+      font-weight: 700;
+      color: #f0f4ff;
       overflow-wrap: anywhere;
       word-break: break-word;
     }}
-    .mention-sources a {{
-      text-decoration: none;
-      font-weight: 700;
-      padding: 4px 0;
+    .mention-source-meta {{
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.72);
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }}
-    .mention-sources a:hover {{
+    .mention-source-card p {{
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #f7f8ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }}
+    .mention-source-link {{
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      text-decoration: none;
+    }}
+    .mention-source-link:hover {{
       text-decoration: underline;
     }}
     .side-panel {{

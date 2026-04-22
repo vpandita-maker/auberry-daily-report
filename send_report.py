@@ -122,6 +122,11 @@ def _truncate_text(text, limit=360):
     return value[: limit - 1].rstrip() + "…"
 
 
+def _strip_review_prefix(text):
+    value = str(text or "").strip()
+    return re.sub(r"^\[[^\]]+\]\s*", "", value).strip()
+
+
 def _normalize_term(text):
     normalized = re.sub(r"[^a-z0-9]+", " ", str(text).lower()).strip()
     replacements = {
@@ -292,7 +297,7 @@ def build_combined_report(outlets):
                 "author": str(review.get("author", "") or "Anonymous"),
                 "rating": review.get("rating"),
                 "date_time": str(review.get("date_time_exact") or review.get("date_exact") or review.get("date") or "Unknown"),
-                "text": _truncate_text(review.get("text", ""), 360),
+                "text": _truncate_text(_strip_review_prefix(review.get("text", "")), 360),
                 "source_url": str(review.get("source_url", "")),
                 "author_url": str(review.get("author_url", "")),
             }
@@ -311,7 +316,11 @@ def build_combined_report(outlets):
             sources.append(
                 {
                     "outlet": review["outlet"],
+                    "location": review["location"],
+                    "author": review["author"],
+                    "rating": review["rating"],
                     "date_time": review["date_time"],
+                    "text": review["text"],
                     "source_url": review["source_url"],
                 }
             )
