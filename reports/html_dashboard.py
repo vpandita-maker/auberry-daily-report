@@ -265,10 +265,13 @@ def _render_mentions_board(items, mention_sources=None):
                 else:
                     links.append(f"<span>Source {source_index}: {label}</span>")
             source_html = (
-                "<div class='mention-sources'>"
+                "<details class='mention-sources'>"
+                "<summary class='mention-sources-toggle'>View source reviews</summary>"
+                "<div class='mention-sources-panel'>"
                 "<div class='mention-sources-title'>Reviews mentioning this item</div>"
                 f"{''.join(links)}"
                 "</div>"
+                "</details>"
             )
         cards.append(
             """
@@ -813,7 +816,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-content: start;
     }}
     .mention-card {{
-      position: relative;
       border-radius: 16px;
       padding: 14px 16px;
       border: 1px solid rgba(255,255,255,0.08);
@@ -865,23 +867,38 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 13px;
     }}
     .mention-sources {{
-      position: absolute;
-      top: calc(100% - 8px);
-      left: 16px;
-      right: 16px;
-      z-index: 8;
-      display: none;
-      gap: 6px;
-      padding: 12px;
+      margin-top: 12px;
       border-radius: 14px;
       border: 1px solid rgba(111,167,255,0.18);
-      background: rgba(23, 27, 49, 0.96);
-      box-shadow: 0 18px 30px rgba(6, 9, 21, 0.32);
-      backdrop-filter: blur(8px);
+      background: rgba(23, 27, 49, 0.78);
+      overflow: hidden;
     }}
-    .mention-card:hover .mention-sources,
-    .mention-card:focus-within .mention-sources {{
+    .mention-sources-toggle {{
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      user-select: none;
+    }}
+    .mention-sources-toggle::-webkit-details-marker {{
+      display: none;
+    }}
+    .mention-sources-toggle::after {{
+      content: " +";
+      float: right;
+      color: rgba(255,255,255,0.7);
+    }}
+    .mention-sources[open] .mention-sources-toggle::after {{
+      content: " -";
+    }}
+    .mention-sources-panel {{
       display: grid;
+      gap: 6px;
+      padding: 0 12px 12px;
+      animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
     }}
     .mention-sources-title {{
       font-size: 11px;
@@ -1290,6 +1307,16 @@ def generate_html_dashboard(analysis, output_dir="output"):
       to {{
         opacity: 1;
         transform: translateX(0);
+      }}
+    }}
+    @keyframes mention-slide-down {{
+      from {{
+        opacity: 0;
+        transform: translateY(-8px);
+      }}
+      to {{
+        opacity: 1;
+        transform: translateY(0);
       }}
     }}
   </style>
