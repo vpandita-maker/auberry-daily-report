@@ -1424,14 +1424,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       </section>
 
       <div class="left-column">
-        <section class="card list-panel" id="top-items">
-          <div class="panel-header">
-            <h3 class="panel-title">Top Positive Items</h3>
-            <div class="panel-subtitle">Best-reviewed menu mentions</div>
-          </div>
-          <div class="list-body">{top_items_html}</div>
-        </section>
-
         <section class="card list-panel" id="underperforming-items">
           <div class="panel-header">
             <h3 class="panel-title">Underperforming Items</h3>
