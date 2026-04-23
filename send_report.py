@@ -87,6 +87,23 @@ def _sender_first_name():
     return sender.split()[0]
 
 
+def _build_email_summary(analysis, configured_outlet_count):
+    top_issue = (analysis.get("top_3_urgent_issues") or ["service consistency"])[0]
+    top_strength = (analysis.get("top_3_strengths") or ["strong product quality"])[0]
+    top_recommendation = (analysis.get("top_5_recommendations") or analysis.get("top_3_recommendations") or [{}])[0]
+    recommendation_text = top_recommendation.get("title") or "focused corrective action"
+    summary = (
+        f"Auberry's previous-day IST dashboard shows {analysis['overall_sentiment']} sentiment, "
+        f"{analysis['average_rating']:.1f}/5 rating, and {analysis['total_reviews_analyzed']} reviews across {configured_outlet_count} outlets. "
+        f"Main concern: {top_issue.lower()}. Strength: {top_strength.lower()}. "
+        f"Recommended action: {recommendation_text.lower()}."
+    )
+    words = summary.split()
+    if len(words) > 50:
+        summary = " ".join(words[:50]).rstrip(" ,.;") + "."
+    return summary
+
+
 def _is_review_from_ist_today(review):
     timestamp = review.get("timestamp")
     if timestamp:
@@ -389,18 +406,8 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
     configured_outlet_count = int(analysis.get("configured_outlet_count", contributing_outlet_count) or contributing_outlet_count)
     subject = f"Daily Review Intelligence Report - Auberry ({configured_outlet_count} outlets tracked)"
     greeting_name = _recipient_name(target_recipient)
-    top_issue = (analysis.get("top_3_urgent_issues") or ["service and food consistency issues"])[0]
-    top_strength = (analysis.get("top_3_strengths") or ["strong dessert quality across key outlets"])[0]
-    top_recommendation = (analysis.get("top_5_recommendations") or analysis.get("top_3_recommendations") or [{}])[0]
-    recommendation_text = top_recommendation.get("title") or "a targeted corrective action plan"
     dashboard_url = DASHBOARD_URL or analysis.get("dashboard_url") or ""
-    overview = (
-        f"Auberry's daily review brief shows {analysis['overall_sentiment']} sentiment and a "
-        f"{analysis['average_rating']:.1f}/5 average across {analysis['total_reviews_analyzed']} reviews. "
-        f"Key themes include {top_issue.lower()} alongside strengths such as {top_strength.lower()}. "
-        f"The report pinpoints outlet-specific issues, including Musarambagh and Kukatpally, and recommends {recommendation_text.lower()} "
-        f"to reduce risk and stabilize guest experience across all {configured_outlet_count} tracked outlets."
-    )
+    overview = _build_email_summary(analysis, configured_outlet_count)
     body_lines = [
         f"Hi {greeting_name},",
         "",

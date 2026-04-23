@@ -2,12 +2,12 @@ name: Auberry Daily Report
 
 on:
   schedule:
-    # 12:00 AM to 12:20 AM Asia/Kolkata
-    - cron: "30 18 * * *"
-    - cron: "40 18 * * *"
-    - cron: "50 18 * * *"
-    # 12:00 AM Asia/Kolkata (retry window)
-    - cron: "0 19 * * *"
+    # 9:00 AM to 9:20 AM Asia/Kolkata
+    - cron: "30 3 * * *"
+    - cron: "40 3 * * *"
+    - cron: "50 3 * * *"
+    # 9:30 AM Asia/Kolkata (retry window)
+    - cron: "0 4 * * *"
   workflow_dispatch:
 
 jobs:
@@ -53,10 +53,10 @@ jobs:
 
             const istParts = getKolkataParts(now);
             const currentMinutes = minutesFromMidnight(istParts);
-            const primaryWindowStart = 0;
-            const primaryWindowEnd = 20;
-            const backupWindowStart = 20;
-            const backupWindowEnd = 30;
+            const primaryWindowStart = 9 * 60;
+            const primaryWindowEnd = 9 * 60 + 20;
+            const backupWindowStart = 9 * 60 + 20;
+            const backupWindowEnd = 9 * 60 + 30;
 
             let slot = '';
             if (currentMinutes >= primaryWindowStart && currentMinutes <= primaryWindowEnd) {
