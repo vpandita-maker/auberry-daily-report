@@ -415,7 +415,7 @@
     }
     .mention-sources-panel {
       display: grid;
-      gap: 6px;
+      gap: 10px;
       padding: 0 12px 12px;
       animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
     }
@@ -866,7 +866,7 @@
         </div>
         <div class="filters">
           <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
-          <div class="filter-text"><strong>Window:</strong> 21/04/26 to 21/04/26</div>
+          <div class="filter-text"><strong>Window:</strong> 04/01/26 to 22/04/26</div>
         </div>
       </div>
 
@@ -875,8 +875,8 @@
           <div class="kpi-icon gold">★</div>
           <div>
             <div class="kpi-title">Overall Rating</div>
-            <div class="kpi-value">5.0 <span style="font-size:18px;font-weight:600;">/ 5</span></div>
-            <div class="kpi-sub positive">↑ +0.7 vs yesterday</div>
+            <div class="kpi-value">4.4 <span style="font-size:18px;font-weight:600;">/ 5</span></div>
+            <div class="kpi-sub positive">↑ -0.6 vs yesterday</div>
           </div>
           <div class="sparkline">
           <svg viewBox="0 0 100 36" fill="none"><path d="M0 24 L10 26 L20 18 L30 25 L40 20 L50 11 L60 14 L70 5 L80 8 L90 7 L100 3" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -886,8 +886,8 @@
           <div class="kpi-icon green">☺</div>
           <div>
             <div class="kpi-title">Positive Sentiment</div>
-            <div class="kpi-value">80%</div>
-            <div class="kpi-sub positive">↑ +20 vs yesterday</div>
+            <div class="kpi-value">100%</div>
+            <div class="kpi-sub positive">↑ No change</div>
           </div>
           <div class="sparkline">
           <svg viewBox="0 0 100 36" fill="none"><path d="M0 28 L10 18 L20 24 L30 26 L40 9 L50 20 L60 19 L70 8 L80 12 L90 11 L100 6" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -897,8 +897,8 @@
           <div class="kpi-icon red">⛨</div>
           <div>
             <div class="kpi-title">Risk Level</div>
-            <div class="kpi-value" style="color:#69dd74;">Low</div>
-            <div class="kpi-sub">Today only</div>
+            <div class="kpi-value" style="color:#f1bc2e;">Medium</div>
+            <div class="kpi-sub">April 23, 2026 only</div>
           </div>
           <div class="sparkline">
           <svg viewBox="0 0 100 36" fill="none"><path d="M0 29 L10 23 L20 24 L30 18 L40 21 L50 10 L60 7 L70 19 L80 16 L90 16 L100 20" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -908,8 +908,8 @@
           <div class="kpi-icon purple">◔</div>
           <div>
             <div class="kpi-title">Total Reviews</div>
-            <div class="kpi-value">16</div>
-            <div class="kpi-sub positive">↑ -2 vs yesterday</div>
+            <div class="kpi-value">26</div>
+            <div class="kpi-sub positive">↑ +16 vs yesterday</div>
           </div>
           <div class="sparkline">
           <svg viewBox="0 0 100 36" fill="none"><path d="M0 21 L10 10 L20 18 L30 7 L40 3 L50 15 L60 4 L70 21 L80 24 L90 22 L100 18" stroke="#b383ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -918,12 +918,32 @@
       </section>
 
       <div class="left-column">
-<section class="card list-panel" id="underperforming-items">
+        <section class="card list-panel" id="underperforming-items">
           <div class="panel-header">
             <h3 class="panel-title">Underperforming Items</h3>
           <div class="panel-subtitle">By Mentions</div>
           </div>
-          <div class="list-body"><div class='empty-block'>No underperforming items flagged yet.</div></div>
+          <div class="list-body">
+            <div class="list-row">
+              <div class="item-rank">1</div>
+              <div class="item-thumb">C</div>
+              <div class="item-copy">
+                <div class="item-name">Custard doughnuts</div>
+                <div class="item-meta">1 mention</div>
+              </div>
+              <span class="pill pill-negative">Negative</span>
+            </div>
+            
+            <div class="list-row">
+              <div class="item-rank">2</div>
+              <div class="item-thumb">M</div>
+              <div class="item-copy">
+                <div class="item-name">Muffins</div>
+                <div class="item-meta">1 mention</div>
+              </div>
+              <span class="pill pill-negative">Negative</span>
+            </div>
+            </div>
           <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
         </section>
       </div>
@@ -970,26 +990,51 @@
       </div>
       
             <div class="heat-row">
-              <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
+              <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with particular praise for donuts at Irrummanzil and Kukatpally, and chocolate brownie at Kondapur.">
+            <div class="heat-cell heat-negative" title="Stale/rock-hard muffins at Musarambagh">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Outstanding staff service with Mr. Premchand at Panjagutta and Arun at Kondapur receiving specific customer commendations.">
+            <div class="heat-cell heat-negative" title="Rude and dismissive staff when handling complaints at Musarambagh">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Pleasant atmosphere noted at Panjagutta and Kondapur outlets.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Kukatpally outlet specifically praised for budget-friendly prices with good product quality.">
+            <div class="heat-cell heat-negative" title="Premium pricing (comparable to Krispy Kreme) not justified by product quality at Musarambagh">
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-na" title="Not enough direct feedback">
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
               <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
+              
+            <div class="heat-cell heat-positive" title="Chocolate sprinkle donut and chocolate croissants praised as best-in-class at Musarambagh">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Budget-friendly prices with good quality at Kukatpally">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Good coffee options at Irrummanzil">
+              <span>C</span>
             </div>
             
             </div>
@@ -997,11 +1042,11 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with particular praise for donuts at Irrummanzil and Kukatpally, and chocolate brownie at Kondapur.">
+            <div class="heat-cell heat-positive" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
               <span>S</span>
             </div>
             
@@ -1009,11 +1054,11 @@
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Kukatpally outlet specifically praised for budget-friendly prices with good product quality.">
+            <div class="heat-cell heat-neutral" title="Budget-friendly pricing praised at Kukatpally and Irrummanzil, but Musarambagh criticized for premium pricing not matching product quality.">
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-na" title="Not enough direct feedback">
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
               <span>N/A</span>
             </div>
             
@@ -1022,23 +1067,23 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with particular praise for donuts at Irrummanzil and Kukatpally, and chocolate brownie at Kondapur.">
+            <div class="heat-cell heat-neutral" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Pleasant atmosphere noted at Panjagutta and Kondapur outlets.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Budget-friendly prices at Kukatpally">
+            <div class="heat-cell heat-positive" title="Budget-friendly prices with good quality at Kukatpally">
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-na" title="Not enough direct feedback">
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
               <span>N/A</span>
             </div>
             
@@ -1047,23 +1092,23 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with particular praise for donuts at Irrummanzil and Kukatpally, and chocolate brownie at Kondapur.">
+            <div class="heat-cell heat-positive" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Excellent service highlighted at Panjagutta (Mr. Premchand), Irrummanzil (Azeez), and Kukatpally, but rude counter staff reported at Musarambagh during a complaint handling situation.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Pleasant atmosphere at Panjagutta">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Kukatpally outlet specifically praised for budget-friendly prices with good product quality.">
+            <div class="heat-cell heat-neutral" title="Budget-friendly pricing praised at Kukatpally and Irrummanzil, but Musarambagh criticized for premium pricing not matching product quality.">
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-na" title="Not enough direct feedback">
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
               <span>N/A</span>
             </div>
             
@@ -1084,64 +1129,72 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">1</div>
               <div class="mention-body">
-                <h4>Donuts</h4>
+                <h4>Donuts (various)</h4>
                 <div class="mention-meta">
-                  <span>3 mentions</span>
+                  <span>12 mentions</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div><article class="mention-source-card"><div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div><div class="mention-source-meta">Reviewer: Mohammad Zubair · Rating: 5 · 21/04/26 07:13 PM IST</div><div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div><p>Good at the taste in donuts and all</p></article><article class="mention-source-card"><div class="mention-source-header">Source 2: Auberry The Bake Shop - Kukatpally</div><div class="mention-source-meta">Reviewer: Dannada Lokitha · Rating: 5 · 21/04/26 05:22 PM IST</div><div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div><p>Must try ,donuts are very delicious</p></article></div></details>
+                
               </div>
             </article>
             
             <article class="mention-card mention-positive">
               <div class="mention-rank">2</div>
               <div class="mention-body">
-                <h4>Chocolate Brownie</h4>
+                <h4>Chocolate croissants</h4>
                 <div class="mention-meta">
-                  <span>1 mention</span>
+                  <span>2 mentions</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div><article class="mention-source-card"><div class="mention-source-header">Source 1: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Salman Sam · Rating: 5 · 21/04/26 06:23 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>Excellent service given by Arun make me happy by making super choclate brownie 😊</p></article><article class="mention-source-card"><div class="mention-source-header">Source 2: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Raghava Raghava · Rating: 5 · 21/04/26 06:17 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I visited auberry amb mall. Ambience is good and friendly staff and good food.
-I especially like nutella croissant and death by chocolate</p></article><article class="mention-source-card"><div class="mention-source-header">Source 3: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Nikhil Bommarapu · Rating: 5 · 21/04/26 06:14 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I order vannilla choco chip. It&#x27;s very tasty and nice product</p></article></div></details>
+                
               </div>
             </article>
             
-            <article class="mention-card mention-positive">
+            <article class="mention-card mention-negative">
               <div class="mention-rank">3</div>
               <div class="mention-body">
-                <h4>Nutella Croissant</h4>
+                <h4>Muffins</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
+                  <span class="pill pill-negative">Negative</span>
                 </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div><article class="mention-source-card"><div class="mention-source-header">Source 1: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Raghava Raghava · Rating: 5 · 21/04/26 06:17 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I visited auberry amb mall. Ambience is good and friendly staff and good food.
-I especially like nutella croissant and death by chocolate</p></article></div></details>
+                
               </div>
             </article>
             
-            <article class="mention-card mention-positive">
+            <article class="mention-card mention-negative">
               <div class="mention-rank">4</div>
               <div class="mention-body">
-                <h4>Death by Chocolate</h4>
+                <h4>Custard doughnuts</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
+                  <span class="pill pill-negative">Negative</span>
                 </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div><article class="mention-source-card"><div class="mention-source-header">Source 1: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Raghava Raghava · Rating: 5 · 21/04/26 06:17 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I visited auberry amb mall. Ambience is good and friendly staff and good food.
-I especially like nutella croissant and death by chocolate</p></article><article class="mention-source-card"><div class="mention-source-header">Source 2: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Nikhil Bommarapu · Rating: 5 · 21/04/26 06:14 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I order vannilla choco chip. It&#x27;s very tasty and nice product</p></article></div></details>
+                
               </div>
             </article>
             
             <article class="mention-card mention-positive">
               <div class="mention-rank">5</div>
               <div class="mention-body">
-                <h4>Vanilla Choco Chip</h4>
+                <h4>Puffs</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div><article class="mention-source-card"><div class="mention-source-header">Source 1: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Raghava Raghava · Rating: 5 · 21/04/26 06:17 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I visited auberry amb mall. Ambience is good and friendly staff and good food.
-I especially like nutella croissant and death by chocolate</p></article><article class="mention-source-card"><div class="mention-source-header">Source 2: Auberry The Bake Shop - Kondapur</div><div class="mention-source-meta">Reviewer: Nikhil Bommarapu · Rating: 5 · 21/04/26 06:14 PM IST</div><div class="mention-source-meta">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div><p>I order vannilla choco chip. It&#x27;s very tasty and nice product</p></article></div></details>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">6</div>
+              <div class="mention-body">
+                <h4>Blueberry cheesecake</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
               </div>
             </article>
             </div>
@@ -1154,7 +1207,7 @@ I especially like nutella croissant and death by chocolate</p></article><article
           
             <div class="alert-card alert-urgent">
               <div class="alert-kicker">Urgent</div>
-              <h4>Limited detailed feedback from Kondapur outlet (3 of 5 reviews had no text)</h4>
+              <h4>Product freshness and quality control failure at Musarambagh outlet (stale muffins, underfilled donuts, disappointing custard doughnuts)</h4>
               <p>Highest-priority issue surfaced from the latest review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-high">High Impact</span>
@@ -1164,7 +1217,7 @@ I especially like nutella croissant and death by chocolate</p></article><article
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>No coffee quality mentions despite being a cafe brand</h4>
+              <h4>Rude counter staff and poor complaint handling at Musarambagh outlet</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1174,7 +1227,7 @@ I especially like nutella croissant and death by chocolate</p></article><article
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>One review contained inappropriate personal comments about staff appearance at Irrummanzil</h4>
+              <h4>Price-to-quality perception gap at Musarambagh with premium pricing not matching product delivery</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1193,60 +1246,86 @@ I especially like nutella croissant and death by chocolate</p></article><article
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Implement Staff Recognition Program</div>
-                  <div class="action-meta">Portfolio-wide, starting with Panjagutta and Kondapur</div>
+                  <div class="action-title">Urgent quality audit at Musarambagh outlet</div>
+                  <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Achieve 50% of reviews mentioning staff by name within 90 days</span>
+                  <span>Zero stale product complaints and increase outlet rating from 2.6 to 4.0+ within 60 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>30 days to launch</span>
+                  <span>Immediate - within 7 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Create a named-staff recognition board for Mr. Premchand and Arun, document their guest-handling scripts, and turn that into a weekly training module for every outlet manager.</p>
+                <p>Implement daily freshness checks, revise product rotation protocols, and ensure filling standards meet brand specifications for all donuts and baked goods</p>
               </div>
             </article>
+            
             <article class="action-row">
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Promote Donuts as Signature Product</div>
-                  <div class="action-meta">Portfolio-wide</div>
+                  <div class="action-title">Customer service retraining at Musarambagh</div>
+                  <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Increase donut mentions in reviews by 30% and donut sales by 20%</span>
+                  <span>Zero service-related complaints and 100% positive service mentions in next 30 reviews</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>60 days</span>
+                  <span>Within 14 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Put one hero donut display at the counter, add a staff upsell prompt, and run a 14-day offer first at Irrummanzil and Kukatpally where positive donut feedback is already showing up.</p>
+                <p>Conduct complaint handling workshop focusing on empathy, active listening, and resolution protocols; implement mystery shopper program</p>
               </div>
             </article>
+            
             <article class="action-row">
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Encourage Detailed Review Collection at Kondapur</div>
-                  <div class="action-meta">Auberry The Bake Shop - Kondapur</div>
+                  <div class="action-title">Recognize and replicate top performer behaviors</div>
+                  <div class="action-meta">Portfolio-wide (model from Panjagutta and Irrummanzil)</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Reduce empty/text-less reviews to below 10% of total</span>
+                  <span>Staff mentioned positively by name in 20% of reviews across all outlets</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>30 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Document best practices from Mr. Premchand and Azeez; create service excellence playbook and roll out training across all outlets</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Standardize donut filling specifications</div>
+                  <div class="action-meta">Portfolio-wide with focus on Musarambagh</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Zero underfilling complaints in next 90 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
@@ -1255,255 +1334,40 @@ I especially like nutella croissant and death by chocolate</p></article><article
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Replace the current QR prompt with guided questions, ask every guest for one food comment and one service comment, and review text-rate performance at the end of each shift.</p>
+                <p>Establish and enforce minimum filling weights for Nutella and custard donuts; implement visual portioning guides at all outlets</p>
               </div>
             </article>
+            
             <article class="action-row">
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Run Beverage Feedback Recovery Sprint</div>
-                  <div class="action-meta">Portfolio-wide</div>
+                  <div class="action-title">Leverage value positioning at high-performing outlets</div>
+                  <div class="action-meta">Kukatpally and Irrummanzil</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Collect at least 10 beverage-specific reviews and lift coffee mentions from 0 to 8+ within 14 days</span>
+                  <span>15% increase in footfall at Kukatpally and Irrummanzil within 45 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Launch within 7 days</span>
+                  <span>30 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Add a beverage sampling prompt at billing, ask every coffee buyer for a QR review before exit, and have store managers log beverage feedback separately at close every day.</p>
+                <p>Develop promotional campaigns highlighting budget-friendly quality positioning; use positive reviews in local marketing materials</p>
               </div>
             </article>
-            <article class="action-row">
-              <div class="action-topline">
-                <div class="action-icon">→</div>
-                <div class="action-copy">
-                  <div class="action-title">Correct Staff Conduct at Irrummanzil</div>
-                  <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
-                </div>
-              </div>
-              <div class="action-metrics">
-                <span class="action-chip metric-chip">
-                  <strong>Target</strong>
-                  <span>Reach 0 appearance-related complaints and 100% manager compliance checks for 30 straight days</span>
-                </span>
-                <span class="action-chip timeline-chip">
-                  <strong>Timeline</strong>
-                  <span>Implement within 48 hours</span>
-                </span>
-              </div>
-              <div class="action-strategy">
-                <strong>Next Steps</strong>
-                <p>Coach all front-of-house staff on guest-facing language, ban personal comments explicitly, and require the outlet manager to review the next 20 customer interactions during peak hours.</p>
-              </div>
-            </article>
-            </div></div>
+            </div>
       </section>
 
       <section class="card reviews-panel" id="review-references">
         <h3 class="panel-title">New Reviews Today</h3>
         <div class="panel-subtitle">Exact review references used in today’s dashboard, including outlet, location, timestamp, and source link.</div>
-        <div class='review-grid'>
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 08:18 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/100799745341409145492/reviews" target="_blank" rel="noopener noreferrer">Anilkumar vuthipally</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Panjagutta | Location: Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Mr. Premchand is very good at receiving customers and pretty sure in suggesting good food when a cust is in confusion. Thank you so much for a pleasant atmosphere.</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJW2iDgRqRyzsRFZT0C8_o0R0" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 08:00 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/106678232899963078676/reviews" target="_blank" rel="noopener noreferrer">Dimpy tandra</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Panjagutta | Location: Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Punjagutta Auberry is too good</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJW2iDgRqRyzsRFZT0C8_o0R0" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 07:19 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/116261661852004750344/reviews" target="_blank" rel="noopener noreferrer">Ayesha Saleem</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Irrummanzil | Location: Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Nice place to have tasty food</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJz-y_8UaRyzsRoomp8v1Qs14" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 07:13 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/113056543991727706259/reviews" target="_blank" rel="noopener noreferrer">Mohammad Zubair</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Irrummanzil | Location: Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Good at the taste in donuts and all</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJz-y_8UaRyzsRoomp8v1Qs14" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kondapur</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div>
-              <div class="review-detail">21/04/26 06:32 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/117085887784812181603/reviews" target="_blank" rel="noopener noreferrer">Munu Majhi</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kondapur | Location: Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India | Review date: 21/04/26]</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJtVnlYUyTyzsRqFxHmIIV7Sc" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kondapur</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div>
-              <div class="review-detail">21/04/26 06:29 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/102890651564298659567/reviews" target="_blank" rel="noopener noreferrer">Mehraj</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kondapur | Location: Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India | Review date: 21/04/26]</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJtVnlYUyTyzsRqFxHmIIV7Sc" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kondapur</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div>
-              <div class="review-detail">21/04/26 06:23 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/114868002498300292466/reviews" target="_blank" rel="noopener noreferrer">Salman Sam</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kondapur | Location: Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India | Review date: 21/04/26] Excellent service given by Arun make me happy by making super choclate brownie 😊</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJtVnlYUyTyzsRqFxHmIIV7Sc" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kondapur</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div>
-              <div class="review-detail">21/04/26 06:17 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/100069679990812139180/reviews" target="_blank" rel="noopener noreferrer">Raghava Raghava</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kondapur | Location: Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India | Review date: 21/04/26] I visited auberry amb mall. Ambience is good and friendly staff and good food.
-I especially like nutella croissant and death by chocolate</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJtVnlYUyTyzsRqFxHmIIV7Sc" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kondapur</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India</div>
-              <div class="review-detail">21/04/26 06:14 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/103170184207055102811/reviews" target="_blank" rel="noopener noreferrer">Nikhil Bommarapu</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kondapur | Location: Kondapur, Whitefields, Gachibowli, Rai Durg, Hyderabad, Telangana 500081, India | Review date: 21/04/26] I order vannilla choco chip. It&#x27;s very tasty and nice product</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJtVnlYUyTyzsRqFxHmIIV7Sc" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 05:58 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/100088502558410514161/reviews" target="_blank" rel="noopener noreferrer">Mohd Farhan</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Panjagutta | Location: Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Food aas delicious ,good service by staff..</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJW2iDgRqRyzsRFZT0C8_o0R0" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 05:47 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/106573476161400418015/reviews" target="_blank" rel="noopener noreferrer">BIJESH PATEL VACHANNI</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Panjagutta | Location: Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26]</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJW2iDgRqRyzsRFZT0C8_o0R0" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-              <div class="review-detail">21/04/26 05:31 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/112317597556705679967/reviews" target="_blank" rel="noopener noreferrer">siripuram vandhana</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kukatpally | Location: 3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India | Review date: 21/04/26] Good product and very friendly staff</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJKRltb6iRyzsRYMmEd2h6ulg" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-              <div class="review-detail">21/04/26 05:26 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/105621301711310392288/reviews" target="_blank" rel="noopener noreferrer">Harshini_ Pandu</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kukatpally | Location: 3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India | Review date: 21/04/26] Very good service by staff and budget friendly prices.good quality of product.</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJKRltb6iRyzsRYMmEd2h6ulg" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-              <div class="review-detail">21/04/26 05:22 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/103960031563196368075/reviews" target="_blank" rel="noopener noreferrer">Dannada Lokitha</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Kukatpally | Location: 3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India | Review date: 21/04/26] Must try ,donuts are very delicious</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJKRltb6iRyzsRYMmEd2h6ulg" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 03:33 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/102696666466464674676/reviews" target="_blank" rel="noopener noreferrer">Paramesh Daramalla</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Irrummanzil | Location: Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] Lady Worker is verry beautiful girls and pretty</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJz-y_8UaRyzsRoomp8v1Qs14" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            
-            <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
-                <span class="review-rating">5.0/5</span>
-              </div>
-              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-              <div class="review-detail">21/04/26 03:26 PM IST</div>
-              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/113736137861322521712/reviews" target="_blank" rel="noopener noreferrer">Mili Bepari</a></div>
-              <p>[Outlet: Auberry The Bake Shop - Panjagutta | Location: Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India | Review date: 21/04/26] The food is so delicious 🤤</p>
-              <div class="review-links"><a href="https://www.google.com/maps/search/?api=1&amp;query_place_id=ChIJW2iDgRqRyzsRFZT0C8_o0R0" target="_blank" rel="noopener noreferrer">Open source</a></div>
-            </article>
-            </div>
+        <div class='empty-block'>No new reviews were captured today.</div>
       </section>
 
       <div class="footer-note">Auberry The Bake Shop - All Outlets</div>
