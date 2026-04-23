@@ -58,7 +58,11 @@ def _format_display_date(value):
             return parsed.strftime("%A, %d %B %Y")
         except ValueError:
             continue
-    return text
+    try:
+        parsed = datetime.strptime(text, "%Y-%m-%d").astimezone(IST)
+        return parsed.strftime("%A, %d %B %Y")
+    except ValueError:
+        return text
 
 
 def _format_display_datetime(value):
