@@ -112,6 +112,15 @@ def _metric_delta(value, positive_suffix, negative_suffix):
     return "No change"
 
 
+def _comparison_value(analysis, key, fallback=0):
+    comparison = analysis.get("comparison") or {}
+    value = comparison.get(key, fallback)
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return float(fallback)
+
+
 def _extract_outlet_name(text, outlets):
     for outlet in outlets:
         if _text_mentions_outlet(text, outlet):
@@ -609,12 +618,16 @@ def generate_html_dashboard(analysis, output_dir="output"):
     heatmap_rows = _build_heatmap(analysis)
 
     avg_rating = float(analysis.get("average_rating", 0) or 0)
+    previous_avg_rating = _comparison_value(analysis, "average_rating", avg_rating)
     positive_categories = sum(
         1 for info in categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0
     )
     sentiment_pct = 0
     if categories:
         sentiment_pct = round((positive_categories / len(categories)) * 100)
+    previous_sentiment_pct = _comparison_value(analysis, "sentiment_pct", sentiment_pct)
+    total_reviews = int(analysis.get("total_reviews_analyzed", 0) or 0)
+    previous_total_reviews = int(_comparison_value(analysis, "total_reviews", total_reviews))
 
     review_window = _format_review_window(analysis.get("review_window", "Dates unavailable"))
     report_scope = str(analysis.get("report_scope", "Today only"))
@@ -1594,14 +1607,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
         brand=escape(brand),
         review_window=escape(review_window),
         avg_rating=avg_rating,
-        rating_delta=escape(_metric_delta(round(avg_rating - 4.3, 1), "vs yesterday", "vs yesterday")),
+        rating_delta=escape(_metric_delta(round(avg_rating - previous_avg_rating, 1), "vs yesterday", "vs yesterday")),
         sentiment_pct=sentiment_pct,
-        sentiment_delta=escape(_metric_delta(sentiment_pct - 60, "vs yesterday", "vs yesterday")),
+        sentiment_delta=escape(_metric_delta(sentiment_pct - previous_sentiment_pct, "vs yesterday", "vs yesterday")),
         risk_level=escape(risk_level),
         risk_color={"low": "#69dd74", "medium": "#f1bc2e", "high": "#ef6464"}.get(risk_tone, "#d9ddf2"),
         report_scope=escape(report_scope),
-        total_reviews=escape(str(int(analysis.get("total_reviews_analyzed", 0) or 0))),
-        review_delta=escape(_metric_delta(int(analysis.get("total_reviews_analyzed", 0) or 0) - 18, "vs yesterday", "vs yesterday")),
+        total_reviews=escape(str(total_reviews)),
+        review_delta=escape(_metric_delta(total_reviews - previous_total_reviews, "vs yesterday", "vs yesterday")),
         top_items_html=_render_item_rows(top_items, "No top items available yet.", "positive"),
         underperforming_html=_render_item_rows(
             underperforming,

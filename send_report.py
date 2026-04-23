@@ -3,7 +3,7 @@ import os
 import re
 import shutil
 import smtplib
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
 from email.utils import formataddr
 from pathlib import Path
@@ -87,34 +87,29 @@ def _sender_first_name():
     return sender.split()[0]
 
 
-def _is_recent_review(review, cutoff_timestamp):
+def _is_review_from_ist_today(review):
     timestamp = review.get("timestamp")
     if timestamp:
-        return timestamp >= cutoff_timestamp
-
-    relative = str(review.get("date", "")).strip().lower()
-    recent_markers = (
-        "today",
-        "yesterday",
-        "day ago",
-        "days ago",
-        "a week ago",
-        "weeks ago",
-        "a month ago",
-        "month ago",
-    )
-    return any(marker in relative for marker in recent_markers)
-
-
-def _is_review_from_today(review):
-    timestamp = review.get("timestamp")
-    if timestamp:
-        review_dt = datetime.fromtimestamp(timestamp, UTC)
-        now_dt = datetime.now(UTC)
+        review_dt = datetime.fromtimestamp(timestamp, UTC).astimezone(IST)
+        now_dt = datetime.now(IST)
         return review_dt.date() == now_dt.date()
 
     relative = str(review.get("date", "")).strip().lower()
     return relative == "today" or "hour ago" in relative or "hours ago" in relative
+
+
+def _review_ist_date(review):
+    timestamp = review.get("timestamp")
+    if timestamp:
+        return datetime.fromtimestamp(timestamp, UTC).astimezone(IST).date()
+
+    date_exact = str(review.get("date_exact", "")).strip()
+    if date_exact:
+        try:
+            return datetime.strptime(date_exact, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+    return None
 
 
 def _truncate_text(text, limit=360):
@@ -257,8 +252,6 @@ def build_combined_report(outlets):
     visible_failed_outlets = []
     review_dates = []
     outlet_locations = []
-    cutoff = datetime.now(UTC).timestamp() - (24 * 60 * 60)
-
     for outlet in outlets:
         try:
             place_id = outlet.get("place_id", "")
@@ -277,17 +270,16 @@ def build_combined_report(outlets):
 
             for review in reviews:
                 enriched = dict(review)
-                if not _is_recent_review(enriched, cutoff):
-                    continue
                 outlet_name = outlet["name"]
                 review_text = enriched.get("text", "").strip()
                 location = enriched.get("outlet_address", "")
                 review_date = enriched.get("date_exact") or enriched.get("date") or "Unknown"
-                if enriched.get("date_exact"):
-                    review_dates.append(enriched["date_exact"])
                 enriched["source"] = f"Google - {outlet_name}"
                 prefix = f"[Outlet: {outlet_name} | Location: {location} | Review date: {review_date}]"
                 enriched["text"] = f"{prefix} {review_text}" if review_text else prefix
+                review_day = _review_ist_date(enriched)
+                if review_day:
+                    review_dates.append(review_day.isoformat())
                 combined_reviews.append(enriched)
             if any(review.get("source") == f"Google - {outlet_name}" for review in combined_reviews):
                 participating_outlets.append(outlet["name"])
@@ -301,14 +293,18 @@ def build_combined_report(outlets):
     if not combined_reviews:
         raise RuntimeError("No outlet reviews were fetched successfully.")
 
-    analysis = analyze_reviews(combined_reviews, "Auberry The Bake Shop - All Outlets")
+    today_date = datetime.now(IST).date()
+    yesterday_date = today_date - timedelta(days=1)
+    today_reviews = [review for review in combined_reviews if _review_ist_date(review) == today_date]
+    yesterday_reviews = [review for review in combined_reviews if _review_ist_date(review) == yesterday_date]
+    analysis = analyze_reviews(today_reviews or combined_reviews, "Auberry The Bake Shop - All Outlets")
     analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
     analysis["configured_outlet_count"] = configured_outlet_count
     analysis["portfolio_outlets"] = participating_outlets
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
     analysis["review_dates"] = sorted(set(review_dates))
-    analysis["report_scope"] = "Today only"
+    analysis["report_scope"] = f"{today_date.strftime('%B %-d, %Y')} only"
     if analysis["review_dates"]:
         first_review = _format_display_date(analysis["review_dates"][0])
         last_review = _format_display_date(analysis["review_dates"][-1])
@@ -316,11 +312,11 @@ def build_combined_report(outlets):
     else:
         analysis["review_window"] = "Dates unavailable"
 
-    today_reviews = []
-    for review in sorted(combined_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
+    today_reviews_sorted = []
+    for review in sorted(today_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
         source_label = str(review.get("source", "Google"))
         outlet_name = source_label.replace("Google - ", "", 1) if source_label.startswith("Google - ") else source_label
-        today_reviews.append(
+        today_reviews_sorted.append(
             {
                 "outlet": outlet_name,
                 "location": str(review.get("outlet_address", "")),
@@ -332,7 +328,21 @@ def build_combined_report(outlets):
                 "author_url": str(review.get("author_url", "")),
             }
         )
-    analysis["new_reviews_today"] = today_reviews
+    analysis["new_reviews_today"] = today_reviews_sorted
+
+    if yesterday_reviews:
+        yesterday_analysis = analyze_reviews(yesterday_reviews, "Auberry The Bake Shop - Previous Day")
+        yesterday_categories = yesterday_analysis.get("categories") or {}
+        yesterday_positive_categories = sum(
+            1 for info in yesterday_categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0
+        )
+        analysis["comparison"] = {
+            "average_rating": float(yesterday_analysis.get("average_rating", 0) or 0),
+            "total_reviews": int(yesterday_analysis.get("total_reviews_analyzed", 0) or 0),
+            "sentiment_pct": round((yesterday_positive_categories / max(len(yesterday_categories), 1)) * 100),
+        }
+    else:
+        analysis["comparison"] = {}
 
     mention_sources = {}
     for item in analysis.get("most_mentioned_items", []) or []:
