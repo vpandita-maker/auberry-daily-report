@@ -310,6 +310,8 @@ def build_combined_report(outlets):
     comparison_date = report_date - timedelta(days=1)
     report_reviews = [review for review in combined_reviews if _review_ist_date(review) == report_date]
     comparison_reviews = [review for review in combined_reviews if _review_ist_date(review) == comparison_date]
+    if os.getenv("REQUIRE_REPORT_REVIEWS", "").strip() == "1" and not report_reviews:
+        raise RuntimeError(f"No reviews found for the IST report date {report_date.isoformat()}.")
     analysis = analyze_reviews(report_reviews or combined_reviews, "Auberry The Bake Shop - All Outlets")
     analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
     analysis["configured_outlet_count"] = configured_outlet_count
