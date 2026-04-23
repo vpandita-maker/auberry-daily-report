@@ -2,18 +2,12 @@ name: Auberry Daily Report
 
 on:
   schedule:
-    # 11:30 PM to 11:50 PM America/New_York during daylight saving time
-    - cron: "30 3 * * *"
-    - cron: "40 3 * * *"
-    - cron: "50 3 * * *"
-    # 12:00 AM America/New_York during daylight saving time (retry window)
-    - cron: "0 4 * * *"
-    # 11:30 PM to 11:50 PM America/New_York during standard time
-    - cron: "30 4 * * *"
-    - cron: "40 4 * * *"
-    - cron: "50 4 * * *"
-    # 12:00 AM America/New_York during standard time (retry window)
-    - cron: "0 5 * * *"
+    # 12:00 AM to 12:20 AM Asia/Kolkata
+    - cron: "30 18 * * *"
+    - cron: "40 18 * * *"
+    - cron: "50 18 * * *"
+    # 12:00 AM Asia/Kolkata (retry window)
+    - cron: "0 19 * * *"
   workflow_dispatch:
 
 jobs:
@@ -35,9 +29,9 @@ jobs:
             const workflowFile = '.github/workflows/daily-report.yml';
             const now = new Date();
 
-            function getNewYorkParts(date) {
+            function getKolkataParts(date) {
               const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/New_York',
+                timeZone: 'Asia/Kolkata',
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
@@ -57,12 +51,12 @@ jobs:
               return Number(parts.hour) * 60 + Number(parts.minute);
             }
 
-            const nyParts = getNewYorkParts(now);
-            const currentMinutes = minutesFromMidnight(nyParts);
-            const primaryWindowStart = 23 * 60 + 30;
-            const primaryWindowEnd = 23 * 60 + 59;
-            const backupWindowStart = 0;
-            const backupWindowEnd = 20;
+            const istParts = getKolkataParts(now);
+            const currentMinutes = minutesFromMidnight(istParts);
+            const primaryWindowStart = 0;
+            const primaryWindowEnd = 20;
+            const backupWindowStart = 20;
+            const backupWindowEnd = 30;
 
             let slot = '';
             if (currentMinutes >= primaryWindowStart && currentMinutes <= primaryWindowEnd) {
@@ -72,7 +66,7 @@ jobs:
             }
 
             if (!slot) {
-              core.notice(`Skipping off-window cron at New York time ${nyParts.hour}:${nyParts.minute}.`);
+              core.notice(`Skipping off-window cron at Kolkata time ${istParts.hour}:${istParts.minute}.`);
               core.setOutput('should_send', 'false');
               return;
             }
@@ -102,7 +96,7 @@ jobs:
               return;
             }
 
-            core.notice(`Proceeding with ${slot} send window at New York time ${nyParts.hour}:${nyParts.minute}.`);
+            core.notice(`Proceeding with ${slot} send window at Kolkata time ${istParts.hour}:${istParts.minute}.`);
             core.setOutput('should_send', 'true');
 
       - name: Check out repository
