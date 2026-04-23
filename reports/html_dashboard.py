@@ -55,7 +55,7 @@ def _format_display_date(value):
     for fmt in ("%Y-%m-%d", "%b %d, %Y"):
         try:
             parsed = datetime.strptime(text, fmt)
-            return parsed.strftime("%d/%m/%y")
+            return parsed.strftime("%A, %d %B %Y")
         except ValueError:
             continue
     return text
