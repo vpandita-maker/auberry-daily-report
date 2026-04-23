@@ -2,12 +2,8 @@ name: Auberry Daily Report
 
 on:
   schedule:
-    # 9:00 AM to 9:20 AM Asia/Kolkata
-    - cron: "30 3 * * *"
-    - cron: "40 3 * * *"
-    - cron: "50 3 * * *"
-    # 9:30 AM Asia/Kolkata (retry window)
-    - cron: "0 4 * * *"
+    # Every 5 minutes during the 9 AM Asia/Kolkata send window
+    - cron: "30,35,40,45,50,55 3 * * *"
   workflow_dispatch:
 
 jobs:
@@ -54,15 +50,10 @@ jobs:
             const istParts = getKolkataParts(now);
             const currentMinutes = minutesFromMidnight(istParts);
             const primaryWindowStart = 9 * 60;
-            const primaryWindowEnd = 9 * 60 + 20;
-            const backupWindowStart = 9 * 60 + 20;
-            const backupWindowEnd = 9 * 60 + 30;
-
+            const primaryWindowEnd = 9 * 60 + 55;
             let slot = '';
             if (currentMinutes >= primaryWindowStart && currentMinutes <= primaryWindowEnd) {
               slot = 'primary';
-            } else if (currentMinutes >= backupWindowStart && currentMinutes <= backupWindowEnd) {
-              slot = 'backup';
             }
 
             if (!slot) {
