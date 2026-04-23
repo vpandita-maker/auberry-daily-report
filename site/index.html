@@ -606,6 +606,22 @@
       font-size: 13px;
       line-height: 1.5;
     }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.18);
+      border: 1px solid rgba(111,167,255,0.28);
+      color: #d8e8ff !important;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .source-pill:hover {
+      background: rgba(111,167,255,0.26);
+      text-decoration: none;
+    }
     .action-row {
       display: grid;
       gap: 14px;
@@ -866,7 +882,7 @@
         </div>
         <div class="filters">
           <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
-          <div class="filter-text"><strong>Window:</strong> 04/01/26 to 22/04/26</div>
+          <div class="filter-text"><strong>Window:</strong> Dates unavailable</div>
         </div>
       </div>
 
@@ -926,16 +942,6 @@
           <div class="list-body">
             <div class="list-row">
               <div class="item-rank">1</div>
-              <div class="item-thumb">C</div>
-              <div class="item-copy">
-                <div class="item-name">Custard doughnuts</div>
-                <div class="item-meta">1 mention</div>
-              </div>
-              <span class="pill pill-negative">Negative</span>
-            </div>
-            
-            <div class="list-row">
-              <div class="item-rank">2</div>
               <div class="item-thumb">M</div>
               <div class="item-copy">
                 <div class="item-name">Muffins</div>
@@ -992,15 +998,15 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
               
-            <div class="heat-cell heat-negative" title="Stale/rock-hard muffins at Musarambagh">
+            <div class="heat-cell heat-negative" title="Stale/rock hard muffins at Musarambagh">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-negative" title="Rude and dismissive staff when handling complaints at Musarambagh">
+            <div class="heat-cell heat-negative" title="Rude and dismissive staff response to complaints at Musarambagh">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no negative ambiance feedback received.">
               <span>A</span>
             </div>
             
@@ -1017,15 +1023,15 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
               
-            <div class="heat-cell heat-positive" title="Chocolate sprinkle donut and chocolate croissants praised as best-in-class at Musarambagh">
+            <div class="heat-cell heat-positive" title="Soft and spongy donuts at Irrummanzil">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil helpful in selecting donuts">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no negative ambiance feedback received.">
               <span>A</span>
             </div>
             
@@ -1033,7 +1039,7 @@
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Good coffee options at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Better coffee options than competitors at Irrummanzil">
               <span>C</span>
             </div>
             
@@ -1042,11 +1048,11 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
               
-            <div class="heat-cell heat-positive" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
+            <div class="heat-cell heat-positive" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, inadequate fillings, and freshness issues.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil helpful in selecting donuts">
               <span>S</span>
             </div>
             
@@ -1054,7 +1060,7 @@
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Budget-friendly pricing praised at Kukatpally and Irrummanzil, but Musarambagh criticized for premium pricing not matching product quality.">
+            <div class="heat-cell heat-neutral" title="Kukatpally and Irrummanzil praised for budget-friendly pricing with good quality, but Musarambagh criticized for premium pricing not matching product quality.">
               <span>V</span>
             </div>
             
@@ -1067,15 +1073,15 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
               
-            <div class="heat-cell heat-neutral" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
+            <div class="heat-cell heat-neutral" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, inadequate fillings, and freshness issues.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Mr. Premchand&#x27;s excellent customer guidance at Panjagutta">
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil helpful in selecting donuts">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no negative ambiance feedback received.">
               <span>A</span>
             </div>
             
@@ -1092,19 +1098,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
               
-            <div class="heat-cell heat-positive" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, Kondapur, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, underfilled Nutella donuts, and disappointing custard doughnuts.">
+            <div class="heat-cell heat-neutral" title="Strong praise for donuts and croissants at Irrummanzil, Panjagutta, and Uppal outlets, but Musarambagh faces recurring complaints about stale muffins, inadequate fillings, and freshness issues.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Excellent service highlighted at Panjagutta (Mr. Premchand), Irrummanzil (Azeez), and Kukatpally, but rude counter staff reported at Musarambagh during a complaint handling situation.">
+            <div class="heat-cell heat-positive" title="Staff at Irrummanzil (Azeez) and Panjagutta (Premchand) received specific praise for helpful and polite service, while Musarambagh had a complaint about rude counter staff.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no significant ambiance complaints across portfolio.">
+            <div class="heat-cell heat-neutral" title="Pleasant atmosphere noted at Panjagutta outlet; no negative ambiance feedback received.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-neutral" title="Budget-friendly pricing praised at Kukatpally and Irrummanzil, but Musarambagh criticized for premium pricing not matching product quality.">
+            <div class="heat-cell heat-neutral" title="Kukatpally and Irrummanzil praised for budget-friendly pricing with good quality, but Musarambagh criticized for premium pricing not matching product quality.">
               <span>V</span>
             </div>
             
@@ -1129,9 +1135,9 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">1</div>
               <div class="mention-body">
-                <h4>Donuts (various)</h4>
+                <h4>Donuts (general)</h4>
                 <div class="mention-meta">
-                  <span>12 mentions</span>
+                  <span>10 mentions</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
                 
@@ -1141,7 +1147,19 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">2</div>
               <div class="mention-body">
-                <h4>Chocolate croissants</h4>
+                <h4>Chocolate donut/Chocolate sprinkle donut</h4>
+                <div class="mention-meta">
+                  <span>4 mentions</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">3</div>
+              <div class="mention-body">
+                <h4>Croissants</h4>
                 <div class="mention-meta">
                   <span>2 mentions</span>
                   <span class="pill pill-positive">Positive</span>
@@ -1151,21 +1169,9 @@
             </article>
             
             <article class="mention-card mention-negative">
-              <div class="mention-rank">3</div>
-              <div class="mention-body">
-                <h4>Muffins</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-negative">Negative</span>
-                </div>
-                
-              </div>
-            </article>
-            
-            <article class="mention-card mention-negative">
               <div class="mention-rank">4</div>
               <div class="mention-body">
-                <h4>Custard doughnuts</h4>
+                <h4>Muffins</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
                   <span class="pill pill-negative">Negative</span>
@@ -1177,7 +1183,7 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">5</div>
               <div class="mention-body">
-                <h4>Puffs</h4>
+                <h4>Biscoff donut</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
                   <span class="pill pill-positive">Positive</span>
@@ -1189,7 +1195,7 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">6</div>
               <div class="mention-body">
-                <h4>Blueberry cheesecake</h4>
+                <h4>Puffs</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
                   <span class="pill pill-positive">Positive</span>
@@ -1207,7 +1213,7 @@
           
             <div class="alert-card alert-urgent">
               <div class="alert-kicker">Urgent</div>
-              <h4>Product freshness and quality control failure at Musarambagh outlet (stale muffins, underfilled donuts, disappointing custard doughnuts)</h4>
+              <h4>Product freshness and quality control failures at Musarambagh outlet (stale muffins, inadequate fillings reported Jan-Apr 2026)</h4>
               <p>Highest-priority issue surfaced from the latest review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-high">High Impact</span>
@@ -1217,7 +1223,7 @@
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>Rude counter staff and poor complaint handling at Musarambagh outlet</h4>
+              <h4>Rude customer service and poor complaint handling at Musarambagh outlet (Jan 2026)</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1227,7 +1233,7 @@
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>Price-to-quality perception gap at Musarambagh with premium pricing not matching product delivery</h4>
+              <h4>Price-quality mismatch perception at Musarambagh with premium pricing but substandard products (Apr 2026)</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1246,23 +1252,23 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Urgent quality audit at Musarambagh outlet</div>
+                  <div class="action-title">Urgent Quality Audit at Musarambagh</div>
                   <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Zero stale product complaints and increase outlet rating from 2.6 to 4.0+ within 60 days</span>
+                  <span>Zero freshness complaints and achieve 4.0+ average rating at Musarambagh within 60 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Immediate - within 7 days</span>
+                  <span>Immediate start, 8-week turnaround</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Implement daily freshness checks, revise product rotation protocols, and ensure filling standards meet brand specifications for all donuts and baked goods</p>
+                <p>Conduct immediate freshness and quality control audit; implement twice-daily product freshness checks; remove stale items from display; retrain staff on filling standards for filled donuts</p>
               </div>
             </article>
             
@@ -1270,23 +1276,23 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Customer service retraining at Musarambagh</div>
+                  <div class="action-title">Customer Service Retraining at Musarambagh</div>
                   <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Zero service-related complaints and 100% positive service mentions in next 30 reviews</span>
+                  <span>Zero service-related complaints and 100% complaint resolution satisfaction within 30 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 14 days</span>
+                  <span>Complete training within 2 weeks</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Conduct complaint handling workshop focusing on empathy, active listening, and resolution protocols; implement mystery shopper program</p>
+                <p>Implement mandatory complaint handling and de-escalation training for all Musarambagh counter staff; establish customer recovery protocol with empowered resolution options</p>
               </div>
             </article>
             
@@ -1294,23 +1300,23 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Recognize and replicate top performer behaviors</div>
-                  <div class="action-meta">Portfolio-wide (model from Panjagutta and Irrummanzil)</div>
+                  <div class="action-title">Recognize and Replicate Top Performer Practices</div>
+                  <div class="action-meta">Portfolio-wide (model from Irrummanzil and Panjagutta)</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Staff mentioned positively by name in 20% of reviews across all outlets</span>
+                  <span>Increase service-related positive mentions by 25% across all outlets within 90 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>30 days</span>
+                  <span>4 weeks for documentation, 8 weeks for rollout</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Document best practices from Mr. Premchand and Azeez; create service excellence playbook and roll out training across all outlets</p>
+                <p>Formally recognize Azeez (Irrummanzil) and Premchand (Panjagutta) as service champions; document their customer engagement techniques and create training module for all outlets</p>
               </div>
             </article>
             
@@ -1318,23 +1324,23 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Standardize donut filling specifications</div>
-                  <div class="action-meta">Portfolio-wide with focus on Musarambagh</div>
+                  <div class="action-title">Standardize Product Quality Across Outlets</div>
+                  <div class="action-meta">Portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Zero underfilling complaints in next 90 days</span>
+                  <span>Achieve less than 5% variance in product quality scores across outlets within 90 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>14 days</span>
+                  <span>12 weeks</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Establish and enforce minimum filling weights for Nutella and custard donuts; implement visual portioning guides at all outlets</p>
+                <p>Establish centralized quality standards with photo references for filling quantities; implement mystery shopper program focusing on product consistency across all outlets</p>
               </div>
             </article>
             
@@ -1342,23 +1348,23 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Leverage value positioning at high-performing outlets</div>
-                  <div class="action-meta">Kukatpally and Irrummanzil</div>
+                  <div class="action-title">Leverage Competitive Positioning at High-Performing Outlets</div>
+                  <div class="action-meta">Irrummanzil and Kukatpally</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>15% increase in footfall at Kukatpally and Irrummanzil within 45 days</span>
+                  <span>20% increase in footfall at Irrummanzil and Kukatpally; 15% increase in new customer acquisition within 60 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>30 days</span>
+                  <span>6 weeks</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Develop promotional campaigns highlighting budget-friendly quality positioning; use positive reviews in local marketing materials</p>
+                <p>Amplify marketing messaging around being a superior alternative to Krispy Kreme, Mad Over Donuts, and Dunkin Donuts based on customer testimonials; promote value-for-money positioning</p>
               </div>
             </article>
             </div>

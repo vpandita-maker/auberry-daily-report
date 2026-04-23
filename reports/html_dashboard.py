@@ -584,7 +584,7 @@ def _render_review_references(items):
               <div class="review-detail">{date_time}</div>
               <div class="review-author">Reviewer: {author_html}</div>
               <p>{text}</p>
-              <div class="review-links">{source_html}</div>
+              <div class="review-links"><a class="source-pill" href="{source_href}" target="_blank" rel="noopener noreferrer">Open source review</a></div>
             </article>
             """.format(
                 outlet=escape(str(item.get("outlet", "Unknown outlet"))),
@@ -593,7 +593,7 @@ def _render_review_references(items):
                 date_time=escape(_format_display_datetime(item.get("date_time", "Unknown date/time"))),
                 author_html=author_html,
                 text=escape(str(item.get("text", ""))),
-                source_html=source_html,
+                source_href=escape(source_url) if source_url else "#",
             )
         )
     return "<div class='review-grid'>{}</div>".format("".join(cards))
@@ -1241,6 +1241,22 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .review-links {{
       font-size: 13px;
       line-height: 1.5;
+    }}
+    .source-pill {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.18);
+      border: 1px solid rgba(111,167,255,0.28);
+      color: #d8e8ff !important;
+      text-decoration: none;
+      font-weight: 700;
+    }}
+    .source-pill:hover {{
+      background: rgba(111,167,255,0.26);
+      text-decoration: none;
     }}
     .action-row {{
       display: grid;

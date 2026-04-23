@@ -250,7 +250,6 @@ def build_combined_report(outlets):
     participating_outlets = []
     failed_outlets = []
     visible_failed_outlets = []
-    review_dates = []
     outlet_locations = []
     for outlet in outlets:
         try:
@@ -277,9 +276,6 @@ def build_combined_report(outlets):
                 enriched["source"] = f"Google - {outlet_name}"
                 prefix = f"[Outlet: {outlet_name} | Location: {location} | Review date: {review_date}]"
                 enriched["text"] = f"{prefix} {review_text}" if review_text else prefix
-                review_day = _review_ist_date(enriched)
-                if review_day:
-                    review_dates.append(review_day.isoformat())
                 combined_reviews.append(enriched)
             if any(review.get("source") == f"Google - {outlet_name}" for review in combined_reviews):
                 participating_outlets.append(outlet["name"])
@@ -303,7 +299,7 @@ def build_combined_report(outlets):
     analysis["portfolio_outlets"] = participating_outlets
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
-    analysis["review_dates"] = sorted(set(review_dates))
+    analysis["review_dates"] = sorted({review_day.isoformat() for review_day in ( _review_ist_date(review) for review in today_reviews ) if review_day})
     analysis["report_scope"] = f"{today_date.strftime('%B %-d, %Y')} only"
     if analysis["review_dates"]:
         first_review = _format_display_date(analysis["review_dates"][0])
