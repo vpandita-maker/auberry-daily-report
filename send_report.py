@@ -299,12 +299,10 @@ def build_combined_report(outlets):
     analysis["portfolio_outlets"] = participating_outlets
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
-    analysis["review_dates"] = sorted({review_day.isoformat() for review_day in ( _review_ist_date(review) for review in today_reviews ) if review_day})
+    analysis["review_dates"] = [today_date.isoformat()] if today_reviews else []
     analysis["report_scope"] = f"{today_date.strftime('%B %-d, %Y')} only"
     if analysis["review_dates"]:
-        first_review = _format_display_date(analysis["review_dates"][0])
-        last_review = _format_display_date(analysis["review_dates"][-1])
-        analysis["review_window"] = f"{first_review} to {last_review}"
+        analysis["review_window"] = _format_display_date(analysis["review_dates"][0])
     else:
         analysis["review_window"] = "Dates unavailable"
 
