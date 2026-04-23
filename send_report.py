@@ -289,28 +289,28 @@ def build_combined_report(outlets):
     if not combined_reviews:
         raise RuntimeError("No outlet reviews were fetched successfully.")
 
-    today_date = datetime.now(IST).date()
-    yesterday_date = today_date - timedelta(days=1)
-    today_reviews = [review for review in combined_reviews if _review_ist_date(review) == today_date]
-    yesterday_reviews = [review for review in combined_reviews if _review_ist_date(review) == yesterday_date]
-    analysis = analyze_reviews(today_reviews or combined_reviews, "Auberry The Bake Shop - All Outlets")
+    report_date = datetime.now(IST).date() - timedelta(days=1)
+    comparison_date = report_date - timedelta(days=1)
+    report_reviews = [review for review in combined_reviews if _review_ist_date(review) == report_date]
+    comparison_reviews = [review for review in combined_reviews if _review_ist_date(review) == comparison_date]
+    analysis = analyze_reviews(report_reviews or combined_reviews, "Auberry The Bake Shop - All Outlets")
     analysis["brand_name"] = "Auberry The Bake Shop - All Outlets"
     analysis["configured_outlet_count"] = configured_outlet_count
     analysis["portfolio_outlets"] = participating_outlets
     analysis["portfolio_failed_outlets"] = visible_failed_outlets
     analysis["portfolio_locations"] = outlet_locations
-    analysis["review_dates"] = [today_date.isoformat()] if today_reviews else []
-    analysis["report_scope"] = f"{today_date.strftime('%B %-d, %Y')} only"
+    analysis["review_dates"] = [report_date.isoformat()] if report_reviews else []
+    analysis["report_scope"] = f"{report_date.strftime('%B %-d, %Y')} only"
     if analysis["review_dates"]:
         analysis["review_window"] = _format_display_date(analysis["review_dates"][0])
     else:
         analysis["review_window"] = "Dates unavailable"
 
-    today_reviews_sorted = []
-    for review in sorted(today_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
+    report_reviews_sorted = []
+    for review in sorted(report_reviews, key=lambda item: item.get("timestamp") or 0, reverse=True):
         source_label = str(review.get("source", "Google"))
         outlet_name = source_label.replace("Google - ", "", 1) if source_label.startswith("Google - ") else source_label
-        today_reviews_sorted.append(
+        report_reviews_sorted.append(
             {
                 "outlet": outlet_name,
                 "location": str(review.get("outlet_address", "")),
@@ -322,10 +322,10 @@ def build_combined_report(outlets):
                 "author_url": str(review.get("author_url", "")),
             }
         )
-    analysis["new_reviews_today"] = today_reviews_sorted
+    analysis["new_reviews_today"] = report_reviews_sorted
 
-    if yesterday_reviews:
-        yesterday_analysis = analyze_reviews(yesterday_reviews, "Auberry The Bake Shop - Previous Day")
+    if comparison_reviews:
+        yesterday_analysis = analyze_reviews(comparison_reviews, "Auberry The Bake Shop - Previous Day")
         yesterday_categories = yesterday_analysis.get("categories") or {}
         yesterday_positive_categories = sum(
             1 for info in yesterday_categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0
@@ -344,7 +344,7 @@ def build_combined_report(outlets):
         if not item_name:
             continue
         sources = []
-        for review in today_reviews:
+        for review in report_reviews_sorted:
             if not _review_mentions_item(review.get("text", ""), item_name):
                 continue
             sources.append(
