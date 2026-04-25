@@ -304,6 +304,13 @@
       align-self: start;
       height: max-content;
     }
+    .signals-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(560px, 0.9fr) minmax(0, 1.1fr);
+      gap: 16px;
+      align-items: start;
+    }
     .panel-title {
       margin: 0;
       font-size: 18px;
@@ -418,7 +425,7 @@
     }
     .heat-head, .heat-row {
       display: grid;
-      grid-template-columns: 160px repeat(5, minmax(0, 1fr));
+      grid-template-columns: minmax(210px, 1.45fr) repeat(5, minmax(62px, 0.7fr));
       gap: 8px;
       align-items: stretch;
     }
@@ -442,14 +449,15 @@
     .heat-outlet {
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.25;
       overflow-wrap: anywhere;
       word-break: break-word;
+      font-size: 14px;
     }
     .heat-cell {
-      min-height: 48px;
+      min-height: 46px;
       border-radius: 10px;
       display: grid;
       place-items: center;
@@ -485,13 +493,13 @@
     }
     .mention-card {
       border-radius: 16px;
-      padding: 14px 16px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.08);
       display: grid;
-      grid-template-columns: 36px minmax(0, 1fr);
-      gap: 12px;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
       align-items: start;
-      min-height: 92px;
+      min-height: 112px;
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         border-color 180ms ease,
@@ -505,6 +513,38 @@
       filter: brightness(1.03);
     }
     .mention-positive { background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }
+    .mention-neutral { background: linear-gradient(180deg, rgba(219,169,35,0.20), rgba(145,113,35,0.16)); }
+    .mention-negative { background: linear-gradient(180deg, rgba(232,95,104,0.20), rgba(140,58,72,0.16)); }
+    .mention-na { background: rgba(255,255,255,0.045); }
+    .mention-rank {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .mention-body {
+      min-width: 0;
+    }
+    .mention-body h4 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.18;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      hyphens: auto;
+    }
+    .mention-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
     .mention-neutral { background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }
     .mention-negative { background: linear-gradient(180deg, rgba(214,101,101,0.22), rgba(187,79,79,0.18)); }
     .mention-na { background: linear-gradient(180deg, rgba(107,115,139,0.22), rgba(83,90,113,0.18)); }
@@ -633,6 +673,7 @@
     .alert-urgent { background: #3b2633; border-color: #8a3c56; }
     .alert-warning { background: #3a3423; border-color: #8d7235; }
     .alert-info { background: #2e2942; border-color: #715ca6; }
+    .alert-clear { background: rgba(66, 118, 80, 0.22); border-color: rgba(99,216,95,0.42); }
     .alert-kicker {
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -908,6 +949,9 @@
       .intelligence-grid {
         grid-template-columns: 1fr;
       }
+      .signals-row {
+        grid-template-columns: 1fr;
+      }
     }
     @media (max-width: 1120px) {
       .dashboard {
@@ -930,7 +974,7 @@
         display: none;
       }
       .heat-head, .heat-row {
-        grid-template-columns: 120px repeat(5, minmax(54px, 1fr));
+        grid-template-columns: minmax(150px, 1.2fr) repeat(5, minmax(48px, 0.7fr));
       }
       .filters {
         justify-content: flex-start;
@@ -1188,7 +1232,7 @@
         </div>
       </section>
 
-      <div class="center-column">
+      <div class="signals-row">
         <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
           <div class="legend">
@@ -1232,19 +1276,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture at Musarambagh">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Staff service received specific praise at Irrummanzil (Azeez mentioned by name) and Kukatpally outlets.">
+            <div class="heat-cell heat-positive" title="Staff service highlighted positively at Irrummanzil (Azeez specifically named), Kukatpally, and Panjagutta outlets.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
+            <div class="heat-cell heat-positive" title="Neat and clean at Musarambagh">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Customers indicate items are worth visiting for, suggesting strong perceived value across outlets.">
+            <div class="heat-cell heat-positive" title="Customers indicate products are worth visiting for at Panjagutta, suggesting strong perceived value.">
               <span>V</span>
             </div>
             
@@ -1257,7 +1301,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with perfect sweetness, great texture, and freshness highlighted consistently.">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with consistent feedback on freshness, perfect sweetness, and great textures.">
               <span>F</span>
             </div>
             
@@ -1265,11 +1309,11 @@
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Clean environment noted at Musarambagh and good environment praised at Kukatpally.">
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh and Kukatpally outlets.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Customers indicate items are worth visiting for, suggesting strong perceived value across outlets.">
+            <div class="heat-cell heat-positive" title="Customers indicate products are worth visiting for at Panjagutta, suggesting strong perceived value.">
               <span>V</span>
             </div>
             
@@ -1282,7 +1326,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture at Musarambagh">
               <span>F</span>
             </div>
             
@@ -1290,7 +1334,7 @@
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Clean environment noted at Musarambagh and good environment praised at Kukatpally.">
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh and Kukatpally outlets.">
               <span>A</span>
             </div>
             
@@ -1307,7 +1351,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture at Musarambagh">
               <span>F</span>
             </div>
             
@@ -1315,11 +1359,11 @@
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
+            <div class="heat-cell heat-positive" title="Neat and clean at Musarambagh">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Customers indicate items are worth visiting for, suggesting strong perceived value across outlets.">
+            <div class="heat-cell heat-positive" title="Customers indicate products are worth visiting for at Panjagutta, suggesting strong perceived value.">
               <span>V</span>
             </div>
             
@@ -1332,19 +1376,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with perfect sweetness, great texture, and freshness highlighted consistently.">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with consistent feedback on freshness, perfect sweetness, and great textures.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Staff service received specific praise at Irrummanzil (Azeez mentioned by name) and Kukatpally outlets.">
+            <div class="heat-cell heat-positive" title="Staff service highlighted positively at Irrummanzil (Azeez specifically named), Kukatpally, and Panjagutta outlets.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Clean environment noted at Musarambagh and good environment praised at Kukatpally.">
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh and Kukatpally outlets.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Customers indicate items are worth visiting for, suggesting strong perceived value across outlets.">
+            <div class="heat-cell heat-positive" title="Customers indicate products are worth visiting for at Panjagutta, suggesting strong perceived value.">
               <span>V</span>
             </div>
             
@@ -1358,6 +1402,43 @@
     
         </section>
 
+        <section class="card side-panel danger">
+          <h3 class="panel-title">Urgent &amp; Important</h3>
+          
+            <div class="alert-card alert-clear">
+              <div class="alert-kicker">Clear</div>
+              <h4>No urgent issues identified - all 17 reviews are 5-star ratings</h4>
+              <p>No immediate corrective action is required from the latest review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-low">Low Risk</span>
+                <span class="status-chip">Stable</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>Limited product diversity in customer feedback (donut-centric)</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>No coffee or beverage mentions indicating potential upsell gap</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+        </section>
+      </div>
+
+      <div class="center-column">
         <section class="card bubbles-panel" id="items-overview">
           <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">(All Outlets)</span></h3>
           <div class="legend">
@@ -1369,9 +1450,9 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">1</div>
               <div class="mention-body">
-                <h4>Donuts (general)</h4>
+                <h4>Donuts</h4>
                 <div class="mention-meta">
-                  <span>9 mentions</span>
+                  <span>10 mentions</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
                 <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
@@ -1402,7 +1483,7 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">2</div>
               <div class="mention-body">
-                <h4>Chocolate Croissant</h4>
+                <h4>Croissant (Chocolate)</h4>
                 <div class="mention-meta">
                   <span>2 mentions</span>
                   <span class="pill pill-positive">Positive</span>
@@ -1428,6 +1509,37 @@ My favorite double chocolate donut</p>
             
             <article class="mention-card mention-positive">
               <div class="mention-rank">3</div>
+              <div class="mention-body">
+                <h4>Cheesecake</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">4</div>
+              <div class="mention-body">
+                <h4>Vanilla Cupcake</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Panjagutta</div>
+                      <div class="mention-source-meta">Reviewer: Megha Sen · Rating: 5 · 24/04/26 06:09 PM IST</div>
+                      <div class="mention-source-meta">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Vanilla Cupcake testii🤤🤤</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">5</div>
               <div class="mention-body">
                 <h4>Biscoff Donut</h4>
                 <div class="mention-meta">
@@ -1458,174 +1570,7 @@ My favorite double chocolate donut</p>
                     </div></details>
               </div>
             </article>
-            
-            <article class="mention-card mention-positive">
-              <div class="mention-rank">4</div>
-              <div class="mention-body">
-                <h4>Nutella Donut</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
-                </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Donuts are very tasty and good staff</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Filled donuts are good.</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
-                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
-                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-                      <p>Must try Nutella donut and had good quality food</p>
-                    </article>
-                    </div></details>
-              </div>
-            </article>
-            
-            <article class="mention-card mention-positive">
-              <div class="mention-rank">5</div>
-              <div class="mention-body">
-                <h4>Double Chocolate Donut</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
-                </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Donuts are very tasty and good staff</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Filled donuts are good.</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
-                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
-                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-                      <p>Must try Nutella donut and had good quality food</p>
-                    </article>
-                    </div></details>
-              </div>
-            </article>
-            
-            <article class="mention-card mention-positive">
-              <div class="mention-rank">6</div>
-              <div class="mention-body">
-                <h4>Filled Donuts</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
-                </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Donuts are very tasty and good staff</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
-                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
-                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Filled donuts are good.</p>
-                    </article>
-                    
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
-                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
-                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
-                      <p>Must try Nutella donut and had good quality food</p>
-                    </article>
-                    </div></details>
-              </div>
-            </article>
-            
-            <article class="mention-card mention-positive">
-              <div class="mention-rank">7</div>
-              <div class="mention-body">
-                <h4>Cheesecake</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
-                </div>
-                
-              </div>
-            </article>
-            
-            <article class="mention-card mention-positive">
-              <div class="mention-rank">8</div>
-              <div class="mention-body">
-                <h4>Vanilla Cupcake</h4>
-                <div class="mention-meta">
-                  <span>1 mention</span>
-                  <span class="pill pill-positive">Positive</span>
-                </div>
-                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
-                    <article class="mention-source-card">
-                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Panjagutta</div>
-                      <div class="mention-source-meta">Reviewer: Megha Sen · Rating: 5 · 24/04/26 06:09 PM IST</div>
-                      <div class="mention-source-meta">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
-                      <p>Vanilla Cupcake testii🤤🤤</p>
-                    </article>
-                    </div></details>
-              </div>
-            </article>
             </div>
-        </section>
-      </div>
-
-      <div class="right-column">
-        <section class="card side-panel danger">
-          <h3 class="panel-title">Urgent &amp; Important</h3>
-          
-            <div class="alert-card alert-urgent">
-              <div class="alert-kicker">Urgent</div>
-              <h4>No urgent issues identified - all 17 reviews are 5-star ratings</h4>
-              <p>Highest-priority issue surfaced from the latest review cycle.</p>
-              <div class="alert-meta">
-                <span class="impact impact-high">High Impact</span>
-                <span class="status-chip">In Progress</span>
-              </div>
-            </div>
-            
-            <div class="alert-card alert-warning">
-              <div class="alert-kicker">Watchlist</div>
-              <h4>Coffee/beverage offerings not mentioned, potential gap in customer engagement</h4>
-              <p>Keep this under observation in the next review cycle.</p>
-              <div class="alert-meta">
-                <span class="impact impact-medium">Medium Impact</span>
-                <span class="status-chip">Monitoring</span>
-              </div>
-            </div>
-            
-            <div class="alert-card alert-warning">
-              <div class="alert-kicker">Watchlist</div>
-              <h4>Limited detailed feedback makes identifying improvement areas challenging</h4>
-              <p>Keep this under observation in the next review cycle.</p>
-              <div class="alert-meta">
-                <span class="impact impact-medium">Medium Impact</span>
-                <span class="status-chip">Monitoring</span>
-              </div>
-            </div>
-            
         </section>
       </div>
 
@@ -1637,23 +1582,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Recognize and reward top-performing staff</div>
+                  <div class="action-title">Recognize and replicate Azeez&#x27;s service model</div>
                   <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Increase staff-specific positive mentions to 5+ per week across all outlets</span>
+                  <span>Increase staff name mentions in reviews by 25% across portfolio</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 2 weeks</span>
+                  <span>30 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Formally recognize Azeez for customer service excellence and use as training benchmark for other outlets</p>
+                <p>Document Azeez&#x27;s customer engagement approach and create a service training module for all outlets based on his methods</p>
               </div>
             </article>
             
@@ -1661,23 +1606,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Amplify donut signature status in marketing</div>
+                  <div class="action-title">Launch donut-focused loyalty program</div>
                   <div class="action-meta">Portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>15% increase in donut category sales within 30 days</span>
+                  <span>15% increase in repeat donut transactions within 60 days</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 1 month</span>
+                  <span>45 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Launch a &#x27;Donut of the Month&#x27; campaign highlighting Biscoff, Nutella, and Double Chocolate varieties that received praise</p>
+                <p>Capitalize on donut popularity by introducing a &#x27;Donut Dozen Club&#x27; punch card rewarding repeat purchases</p>
               </div>
             </article>
             
@@ -1685,23 +1630,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Gather coffee and beverage feedback</div>
+                  <div class="action-title">Promote beverage pairings to increase ticket size</div>
                   <div class="action-meta">Portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Collect 20+ beverage-specific reviews within 30 days</span>
+                  <span>Achieve 20% beverage attachment rate on donut orders</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 1 month</span>
+                  <span>30 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Implement feedback prompts specifically for beverage items to identify gaps or opportunities</p>
+                <p>Create combo deals pairing donuts with coffee/beverages since zero coffee mentions indicate upsell opportunity</p>
               </div>
             </article>
             
@@ -1709,23 +1654,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Maintain cleanliness standards at high-traffic outlets</div>
+                  <div class="action-title">Expand family-friendly positioning at Musarambagh</div>
                   <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Achieve cleanliness praise in 10% of reviews portfolio-wide</span>
+                  <span>Book 10 party packages per month</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 6 weeks</span>
+                  <span>60 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Document and replicate Musarambagh&#x27;s cleanliness protocols to other outlets as a best practice</p>
+                <p>Leverage positive family feedback by introducing kids&#x27; birthday party packages featuring variety donuts</p>
               </div>
             </article>
             
@@ -1733,23 +1678,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Encourage detailed customer reviews</div>
+                  <div class="action-title">Diversify highlighted menu items in customer communications</div>
                   <div class="action-meta">Portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Increase average review word count by 50% within 60 days</span>
+                  <span>Increase non-donut product mentions in reviews to 40% of total</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Within 2 months</span>
+                  <span>45 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Introduce QR-based review prompts with specific questions about items tried to generate richer feedback for continuous improvement</p>
+                <p>Promote cheesecake, croissants, and cupcakes through in-store sampling at Panjagutta and Uppal where these items received praise</p>
               </div>
             </article>
             </div>

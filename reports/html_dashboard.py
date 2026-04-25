@@ -368,11 +368,20 @@ def _render_alerts(analysis):
     issues = analysis.get("top_3_urgent_issues") or []
     failed_outlets = analysis.get("portfolio_failed_outlets") or []
     alerts = []
+    no_issue_phrases = (
+        "no urgent",
+        "no negative",
+        "no issues",
+        "all 17 reviews are 5-star",
+        "all reviews are 5-star",
+    )
 
     for index, issue in enumerate(issues):
-        kicker = "Urgent" if index == 0 else "Watchlist"
-        impact = "impact-high" if index == 0 else "impact-medium"
-        status = "In Progress" if index == 0 else "Monitoring"
+        normalized_issue = str(issue).strip().lower()
+        is_positive_status = index == 0 and any(phrase in normalized_issue for phrase in no_issue_phrases)
+        kicker = "Clear" if is_positive_status else "Urgent" if index == 0 else "Watchlist"
+        impact = "impact-low" if is_positive_status else "impact-high" if index == 0 else "impact-medium"
+        status = "Stable" if is_positive_status else "In Progress" if index == 0 else "Monitoring"
         alerts.append(
             """
             <div class="alert-card {tone}">
@@ -385,16 +394,18 @@ def _render_alerts(analysis):
               </div>
             </div>
             """.format(
-                tone="alert-urgent" if index == 0 else "alert-warning",
+                tone="alert-clear" if is_positive_status else "alert-urgent" if index == 0 else "alert-warning",
                 kicker=escape(kicker),
                 title=escape(issue),
                 body=escape(
-                    "Highest-priority issue surfaced from the latest review cycle."
+                    "No immediate corrective action is required from the latest review cycle."
+                    if is_positive_status
+                    else "Highest-priority issue surfaced from the latest review cycle."
                     if index == 0
                     else "Keep this under observation in the next review cycle."
                 ),
                 impact=impact,
-                impact_label="High Impact" if index == 0 else "Medium Impact",
+                impact_label="Low Risk" if is_positive_status else "High Impact" if index == 0 else "Medium Impact",
                 status=escape(status),
             )
         )
@@ -1055,6 +1066,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-self: start;
       height: max-content;
     }}
+    .signals-row {{
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(560px, 0.9fr) minmax(0, 1.1fr);
+      gap: 16px;
+      align-items: start;
+    }}
     .panel-title {{
       margin: 0;
       font-size: 18px;
@@ -1169,7 +1187,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .heat-head, .heat-row {{
       display: grid;
-      grid-template-columns: 160px repeat(5, minmax(0, 1fr));
+      grid-template-columns: minmax(210px, 1.45fr) repeat(5, minmax(62px, 0.7fr));
       gap: 8px;
       align-items: stretch;
     }}
@@ -1193,14 +1211,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .heat-outlet {{
       display: flex;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 10px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.25;
       overflow-wrap: anywhere;
       word-break: break-word;
+      font-size: 14px;
     }}
     .heat-cell {{
-      min-height: 48px;
+      min-height: 46px;
       border-radius: 10px;
       display: grid;
       place-items: center;
@@ -1236,13 +1255,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .mention-card {{
       border-radius: 16px;
-      padding: 14px 16px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.08);
       display: grid;
-      grid-template-columns: 36px minmax(0, 1fr);
-      gap: 12px;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
       align-items: start;
-      min-height: 92px;
+      min-height: 112px;
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         border-color 180ms ease,
@@ -1256,6 +1275,38 @@ def generate_html_dashboard(analysis, output_dir="output"):
       filter: brightness(1.03);
     }}
     .mention-positive {{ background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }}
+    .mention-neutral {{ background: linear-gradient(180deg, rgba(219,169,35,0.20), rgba(145,113,35,0.16)); }}
+    .mention-negative {{ background: linear-gradient(180deg, rgba(232,95,104,0.20), rgba(140,58,72,0.16)); }}
+    .mention-na {{ background: rgba(255,255,255,0.045); }}
+    .mention-rank {{
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }}
+    .mention-body {{
+      min-width: 0;
+    }}
+    .mention-body h4 {{
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.18;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      hyphens: auto;
+    }}
+    .mention-meta {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }}
     .mention-neutral {{ background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }}
     .mention-negative {{ background: linear-gradient(180deg, rgba(214,101,101,0.22), rgba(187,79,79,0.18)); }}
     .mention-na {{ background: linear-gradient(180deg, rgba(107,115,139,0.22), rgba(83,90,113,0.18)); }}
@@ -1384,6 +1435,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .alert-urgent {{ background: #3b2633; border-color: #8a3c56; }}
     .alert-warning {{ background: #3a3423; border-color: #8d7235; }}
     .alert-info {{ background: #2e2942; border-color: #715ca6; }}
+    .alert-clear {{ background: rgba(66, 118, 80, 0.22); border-color: rgba(99,216,95,0.42); }}
     .alert-kicker {{
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -1659,6 +1711,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .intelligence-grid {{
         grid-template-columns: 1fr;
       }}
+      .signals-row {{
+        grid-template-columns: 1fr;
+      }}
     }}
     @media (max-width: 1120px) {{
       .dashboard {{
@@ -1681,7 +1736,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         display: none;
       }}
       .heat-head, .heat-row {{
-        grid-template-columns: 120px repeat(5, minmax(54px, 1fr));
+        grid-template-columns: minmax(150px, 1.2fr) repeat(5, minmax(48px, 0.7fr));
       }}
       .filters {{
         justify-content: flex-start;
@@ -1864,7 +1919,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </div>
       </section>
 
-      <div class="center-column">
+      <div class="signals-row">
         <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
           <div class="legend">
@@ -1876,6 +1931,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
           {heatmap_html}
         </section>
 
+        <section class="card side-panel danger">
+          <h3 class="panel-title">Urgent &amp; Important</h3>
+          {alerts_html}
+        </section>
+      </div>
+
+      <div class="center-column">
         <section class="card bubbles-panel" id="items-overview">
           <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">({outlet_scope})</span></h3>
           <div class="legend">
@@ -1884,13 +1946,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <span><i style="background:#e85f68;"></i> Negative</span>
           </div>
           <div class="bubble-wrap">{mentions_board_html}</div>
-        </section>
-      </div>
-
-      <div class="right-column">
-        <section class="card side-panel danger">
-          <h3 class="panel-title">Urgent &amp; Important</h3>
-          {alerts_html}
         </section>
       </div>
 
