@@ -1283,6 +1283,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: start;
     }}
     .mention-card {{
+      position: relative;
       border-radius: 16px;
       padding: 14px;
       border: 1px solid rgba(255,255,255,0.08);
@@ -1338,12 +1339,17 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 13px;
     }}
     .mention-sources {{
+      position: relative;
       grid-column: 1 / -1;
       margin-top: 12px;
       border-radius: 14px;
       border: 1px solid rgba(111,167,255,0.18);
       background: rgba(23, 27, 49, 0.78);
-      overflow: hidden;
+      overflow: visible;
+      z-index: 1;
+    }}
+    .mention-sources[open] {{
+      z-index: 30;
     }}
     .mention-sources-toggle {{
       list-style: none;
@@ -1367,12 +1373,21 @@ def generate_html_dashboard(analysis, output_dir="output"):
       content: " -";
     }}
     .mention-sources-panel {{
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 100%;
+      min-width: 260px;
       display: grid;
       gap: 10px;
-      max-height: 240px;
+      max-height: 300px;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding: 0 12px 12px;
+      padding: 12px;
+      border: 1px solid rgba(111,167,255,0.22);
+      border-radius: 14px;
+      background: rgba(21, 26, 48, 0.98);
+      box-shadow: 0 24px 48px rgba(5, 8, 18, 0.44);
       animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
     }}
     .mention-sources-panel::-webkit-scrollbar {{
@@ -1806,6 +1821,18 @@ def generate_html_dashboard(analysis, output_dir="output"):
       }}
       .bubble-wrap {{
         grid-template-columns: 1fr;
+      }}
+      .mention-sources-panel {{
+        position: static;
+        width: auto;
+        min-width: 0;
+        max-height: 240px;
+        margin-top: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        padding: 0 12px 12px;
       }}
       .action-metrics {{
         grid-template-columns: 1fr;
