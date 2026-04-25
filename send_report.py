@@ -25,6 +25,7 @@ REPORT_WINDOW_DAYS = 1
 
 
 OUTLETS_FILE = Path(os.getenv("AUBERRY_OUTLETS_FILE", "outlets.json"))
+COMPETITORS_FILE = Path(os.getenv("AUBERRY_COMPETITORS_FILE", "competitors.json"))
 PLACE_ID = os.getenv("AUBERRY_PLACE_ID", "ChIJtVnlYUyTyzsRqFxHmIIV7Sc")
 BRAND_NAME = os.getenv("AUBERRY_BRAND_NAME", "Auberry The Bake Shop - Kondapur")
 REPORT_RECIPIENT = os.getenv("REPORT_RECIPIENT", "rahul.pandita.rp@gmail.com")
@@ -217,6 +218,14 @@ def _infer_review_categories(text):
     return categories or ["general"]
 
 
+def _redact_secrets(text):
+    value = str(text or "")
+    if not value:
+        return value
+    # Avoid leaking credentials in exception strings (e.g., request URLs with `key=`).
+    return re.sub(r"(?i)([?&](?:key|api_key|token)=)([^&\\s]+)", r"\1***", value)
+
+
 def _analytics_reviews(reviews):
     analytics = []
     for index, review in enumerate(reviews or []):
@@ -334,12 +343,27 @@ def _build_empty_analysis(report_date, comparison_date, configured_outlet_count,
         "complaint_spikes": [],
         "outlet_ranking": {"ranked_outlets": [], "summary": {}},
         "root_cause_patterns": [],
+        "competitor_benchmarks": {},
         "html_dashboard_path": "",
         "report_fallback_reason": (
             "Google review data was unavailable for both the report date "
             f"({report_date.isoformat()}) and comparison date ({comparison_date.isoformat()})."
         ),
     }
+
+
+def load_competitors():
+    if not COMPETITORS_FILE.exists():
+        return []
+    with COMPETITORS_FILE.open("r", encoding="utf-8") as config_file:
+        competitors = json.load(config_file)
+    if not isinstance(competitors, list):
+        return []
+    return [
+        {"name": str(c.get("name", "")).strip(), "place_id": str(c.get("place_id", "")).strip()}
+        for c in competitors
+        if str(c.get("name", "")).strip() and str(c.get("place_id", "")).strip()
+    ]
 
 
 def load_outlets():
@@ -400,11 +424,12 @@ def build_combined_report(outlets):
             if any(review.get("source") == f"Google - {outlet_name}" for review in combined_reviews):
                 participating_outlets.append(outlet["name"])
         except Exception as exc:
-            failed = {"name": outlet["name"], "error": str(exc)}
+            redacted_error = _redact_secrets(exc)
+            failed = {"name": outlet["name"], "error": str(redacted_error)}
             failed_outlets.append(failed)
             if not _should_hide_failed_outlet(failed["error"]):
                 visible_failed_outlets.append(failed)
-            print(f"Skipped {outlet['name']}: {exc}")
+            print(f"Skipped {outlet['name']}: {redacted_error}")
 
     report_date = datetime.now(IST).date() - timedelta(days=1)
     comparison_date = report_date - timedelta(days=1)
@@ -491,6 +516,19 @@ def build_combined_report(outlets):
     analysis["complaint_spikes"] = get_complaint_spikes(analytics_reviews)
     analysis["outlet_ranking"] = get_outlet_ranking(analytics_reviews, report_date.isoformat())
     analysis["root_cause_patterns"] = get_root_cause_patterns(_analytics_reviews(report_reviews))
+
+    competitor_benchmarks = {}
+    try:
+        from analyzer.competitor_analysis import analyze_competitive_position, get_competitor_snapshots
+        competitors = load_competitors()
+        if competitors:
+            snapshots = get_competitor_snapshots(competitors)
+            if snapshots:
+                gap_analysis = analyze_competitive_position(analysis, snapshots)
+                competitor_benchmarks = {"snapshots": snapshots, "gap_analysis": gap_analysis}
+    except Exception as exc:
+        print(f"Competitor benchmarking skipped: {_redact_secrets(exc)}")
+    analysis["competitor_benchmarks"] = competitor_benchmarks
 
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())

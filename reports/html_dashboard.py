@@ -726,6 +726,129 @@ def _render_outlet_ranking(outlet_ranking):
     return summary_html + "<div class='ranking-list'>{}</div>".format("".join(rows))
 
 
+def _render_competitor_section(competitor_benchmarks, auberry_avg_rating):
+    if not competitor_benchmarks:
+        return ""
+    snapshots = competitor_benchmarks.get("snapshots") or []
+    gap = competitor_benchmarks.get("gap_analysis") or {}
+    if not snapshots or not gap:
+        return ""
+
+    summary = escape(str(gap.get("summary", "")))
+    strategic = escape(str(gap.get("strategic_implication", "")))
+
+    auberry_advantages = gap.get("auberry_advantages") or []
+    competitor_advantages = gap.get("competitor_advantages") or []
+
+    advantage_items = "".join(
+        f"<li>{escape(str(item))}</li>" for item in auberry_advantages[:4]
+    )
+    gap_items = "".join(
+        f"<li>{escape(str(item))}</li>" for item in competitor_advantages[:4]
+    )
+
+    snapshot_cards = []
+    for snap in snapshots:
+        avg = float(snap.get("avg_rating", 0) or 0)
+        sentiment = int(snap.get("sentiment_pct", 0) or 0)
+        count = int(snap.get("review_count", 0) or 0)
+        rating_color = "#67dd69" if avg >= auberry_avg_rating else "#ef6464"
+        snapshot_cards.append(
+            """
+            <div class="comp-card">
+              <div class="comp-name">{name}</div>
+              <div class="comp-rating" style="color:{color};">{avg}</div>
+              <div class="comp-meta">{sentiment}% positive · {count} review{plural}</div>
+            </div>
+            """.format(
+                name=escape(str(snap.get("name", "Competitor"))),
+                color=rating_color,
+                avg=f"{avg:.1f}",
+                sentiment=sentiment,
+                count=count,
+                plural="" if count == 1 else "s",
+            )
+        )
+
+    category_comparison = gap.get("category_comparison") or {}
+    category_labels = {
+        "food_quality": "Food Quality",
+        "service": "Service",
+        "value_for_money": "Value for Money",
+        "coffee_quality": "Coffee Quality",
+    }
+    comparison_rows = []
+    for key, label in category_labels.items():
+        data = category_comparison.get(key) or {}
+        auberry_score = float(data.get("auberry_score", 0) or 0)
+        comp_avg = float(data.get("competitor_avg", 0) or 0)
+        gap_value = str(data.get("gap", "tied")).lower()
+        note = escape(str(data.get("note", "")))
+        gap_pill_class = "pill-positive" if gap_value == "ahead" else "pill-negative" if gap_value == "behind" else "pill-neutral"
+        gap_label = gap_value.title()
+        comparison_rows.append(
+            """
+            <div class="comp-compare-row">
+              <div class="comp-compare-label">{label}</div>
+              <div class="comp-compare-scores">
+                <span class="comp-score-auberry">{auberry_score:.1f}</span>
+                <span class="comp-score-sep">vs</span>
+                <span class="comp-score-comp">{comp_avg:.1f}</span>
+                <span class="pill {pill_class}">{gap_label}</span>
+              </div>
+              <div class="comp-compare-note">{note}</div>
+            </div>
+            """.format(
+                label=escape(label),
+                auberry_score=auberry_score,
+                comp_avg=comp_avg,
+                pill_class=gap_pill_class,
+                gap_label=gap_label,
+                note=note,
+            )
+        )
+
+    return """
+    <section class="card competitor-panel" id="competitor-benchmarking">
+      <h3 class="panel-title">Competitor Benchmarking</h3>
+      <p class="panel-subtitle">{summary}</p>
+      <div class="comp-snapshot-row">
+        <div class="comp-card comp-card-auberry">
+          <div class="comp-name">Auberry (You)</div>
+          <div class="comp-rating" style="color:#67dd69;">{auberry_avg:.1f}</div>
+          <div class="comp-meta">Your current avg rating</div>
+        </div>
+        {snapshot_cards}
+      </div>
+      <div class="comp-body">
+        <div class="comp-category-block">
+          <h4>Category Comparison</h4>
+          <div class="comp-compare-grid">{comparison_rows}</div>
+        </div>
+        <div class="comp-gaps-block">
+          <div class="comp-gap-col">
+            <div class="comp-gap-title comp-gap-positive">Where Auberry Leads</div>
+            <ul class="comp-gap-list">{advantage_items}</ul>
+          </div>
+          <div class="comp-gap-col">
+            <div class="comp-gap-title comp-gap-negative">Where Competitors Lead</div>
+            <ul class="comp-gap-list">{gap_items}</ul>
+          </div>
+        </div>
+      </div>
+      <div class="comp-strategic">{strategic}</div>
+    </section>
+    """.format(
+        summary=summary,
+        auberry_avg=auberry_avg_rating,
+        snapshot_cards="".join(snapshot_cards),
+        comparison_rows="".join(comparison_rows),
+        advantage_items=advantage_items or "<li>No clear advantages identified yet.</li>",
+        gap_items=gap_items or "<li>No competitive gaps identified yet.</li>",
+        strategic=strategic,
+    )
+
+
 def _render_root_cause_patterns(patterns):
     if not patterns:
         return "<div class='empty-block'>No repeating root-cause pattern detected yet.</div>"
@@ -771,8 +894,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
     complaint_spikes = analysis.get("complaint_spikes") or []
     outlet_ranking = analysis.get("outlet_ranking") or {}
     root_cause_patterns = analysis.get("root_cause_patterns") or []
+    competitor_benchmarks = analysis.get("competitor_benchmarks") or {}
 
     avg_rating = float(analysis.get("average_rating", 0) or 0)
+    competitor_section_html = _render_competitor_section(competitor_benchmarks, avg_rating)
     previous_avg_rating = _comparison_value(analysis, "average_rating", avg_rating)
     positive_categories = sum(
         1 for info in categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0
@@ -1717,6 +1842,151 @@ def generate_html_dashboard(analysis, output_dir="output"):
       overflow-wrap: anywhere;
       word-break: break-word;
     }}
+    .competitor-panel {{
+      grid-column: 1 / -1;
+      padding: 24px;
+    }}
+    .comp-snapshot-row {{
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }}
+    .comp-card {{
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 16px 20px;
+      min-width: 150px;
+      flex: 1;
+      max-width: 220px;
+    }}
+    .comp-card-auberry {{
+      border-color: rgba(103,221,105,0.30);
+      background: rgba(103,221,105,0.07);
+    }}
+    .comp-name {{
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      overflow-wrap: anywhere;
+    }}
+    .comp-rating {{
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+    }}
+    .comp-meta {{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }}
+    .comp-body {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+      margin-top: 4px;
+    }}
+    .comp-category-block h4 {{
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--text);
+    }}
+    .comp-compare-grid {{
+      display: grid;
+      gap: 10px;
+    }}
+    .comp-compare-row {{
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }}
+    .comp-compare-label {{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }}
+    .comp-compare-scores {{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }}
+    .comp-score-auberry {{
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--green);
+    }}
+    .comp-score-sep {{
+      font-size: 12px;
+      color: var(--muted);
+    }}
+    .comp-score-comp {{
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+    }}
+    .comp-compare-note {{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }}
+    .comp-gaps-block {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }}
+    .comp-gap-col {{
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }}
+    .comp-gap-title {{
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }}
+    .comp-gap-positive {{ color: var(--green); }}
+    .comp-gap-negative {{ color: var(--red); }}
+    .comp-gap-list {{
+      margin: 0;
+      padding: 0 0 0 16px;
+      display: grid;
+      gap: 8px;
+    }}
+    .comp-gap-list li {{
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }}
+    .comp-strategic {{
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 14px;
+      background: rgba(171,125,244,0.08);
+      border: 1px solid rgba(171,125,244,0.18);
+      font-size: 14px;
+      line-height: 1.6;
+      color: #e8e2ff;
+    }}
+    @media (max-width: 980px) {{
+      .comp-body {{
+        grid-template-columns: 1fr;
+      }}
+      .comp-gaps-block {{
+        grid-template-columns: 1fr;
+      }}
+    }}
     .empty-block {{
       color: var(--muted);
       padding: 18px 0 6px;
@@ -2016,6 +2286,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </section>
       </div>
 
+      {competitor_section_html}
+
       <section class="card recommendations-panel" id="recommendations">
         <h3 class="panel-title">Top 6 Recommendations</h3>
         <div class="panel-subtitle">Specific action plans with measurable targets and timing included in the next-step strategy.</div>
@@ -2057,6 +2329,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         complaint_spikes_html=_render_complaint_spikes(complaint_spikes),
         outlet_ranking_html=_render_outlet_ranking(outlet_ranking),
         root_cause_patterns_html=_render_root_cause_patterns(root_cause_patterns),
+        competitor_section_html=competitor_section_html,
         recommendations_html=_render_recommendations(recommendations),
         review_references_html=_render_review_references(review_references),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
