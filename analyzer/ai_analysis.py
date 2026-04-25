@@ -28,7 +28,9 @@ Requirements:
 - Keep the output concise, strategic, and executive-friendly.
 - Whenever praise or criticism clearly belongs to a specific outlet, mention the exact outlet and/or location in the wording.
 - Use the review dates provided to ground the analysis in time; do not invent dates.
-- Give strategic recommendations with measurable success metrics.
+- Give exactly 6 highly specific recommendations with measurable success metrics.
+- Each recommendation must name the exact outlet, item, category, staff behavior, or review pattern that triggered it when available.
+- Do not give generic advice like "improve service" or "promote products"; specify the action, target location/item, owner behavior, and timing inside the action text.
 - Do not use vague phrases like "some outlets" when an outlet/location is identifiable from the input.
 
 {{
@@ -49,13 +51,12 @@ Requirements:
     "top_3_urgent_issues": ["issue with outlet/location if identifiable", "issue2", "issue3"],
     "top_3_strengths": ["strength with outlet/location if identifiable", "strength2", "strength3"],
     "rating_risk": "low or medium or high",
-    "top_5_recommendations": [
+    "top_6_recommendations": [
         {{
             "title": "short strategic action",
             "location_focus": "specific outlet/location or portfolio-wide",
-            "action": "what to do",
-            "success_metric": "numeric target or measurable KPI",
-            "timeline": "specific time horizon"
+            "action": "specific next steps including timing, owner behavior, and rollout detail",
+            "success_metric": "numeric target or measurable KPI"
         }}
     ]
 }}
@@ -67,7 +68,7 @@ Reviews to analyze:
     
     response = client.messages.create(
         model="claude-opus-4-5",
-        max_tokens=2000,
+        max_tokens=2800,
         messages=[{"role": "user", "content": prompt}]
     )
     

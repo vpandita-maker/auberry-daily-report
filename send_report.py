@@ -93,7 +93,12 @@ def _sender_first_name():
 def _build_email_summary(analysis, configured_outlet_count):
     top_issue = (analysis.get("top_3_urgent_issues") or ["service consistency"])[0]
     top_strength = (analysis.get("top_3_strengths") or ["strong product quality"])[0]
-    top_recommendation = (analysis.get("top_5_recommendations") or analysis.get("top_3_recommendations") or [{}])[0]
+    top_recommendation = (
+        analysis.get("top_6_recommendations")
+        or analysis.get("top_5_recommendations")
+        or analysis.get("top_3_recommendations")
+        or [{}]
+    )[0]
     recommendation_text = top_recommendation.get("title") or "focused corrective action"
     summary = (
         f"Auberry's previous-day IST dashboard shows {analysis['overall_sentiment']} sentiment, "
@@ -308,13 +313,12 @@ def _build_empty_analysis(report_date, comparison_date, configured_outlet_count,
         "top_3_urgent_issues": ["Fresh review data could not be fetched from Google."],
         "top_3_strengths": ["Historical report generation is still available."],
         "rating_risk": "medium",
-        "top_5_recommendations": [
+        "top_6_recommendations": [
             {
                 "title": "Restore Google review access",
                 "location_focus": "portfolio-wide",
-                "action": "Resolve DNS or network access to Google Places/Maps so the daily review scrape can run again.",
+                "action": "Immediately resolve DNS or network access to Google Places/Maps, then run one manual dashboard refresh and verify all configured outlets return review payloads before the next 9 AM IST report.",
                 "success_metric": "Daily report runs without Google fetch errors for 7 consecutive days",
-                "timeline": "immediately",
             }
         ],
         "configured_outlet_count": configured_outlet_count,

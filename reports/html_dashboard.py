@@ -436,11 +436,13 @@ def _render_recommendations(items):
         return "<div class='empty-block'>No recommendations available.</div>"
 
     cards = []
-    for item in items:
+    for item in items[:6]:
         focus = str(item.get("location_focus", "Portfolio-wide"))
         metric = str(item.get("success_metric", "Set a measurable KPI before rollout"))
-        timeline = str(item.get("timeline", "No timeline"))
         next_steps = str(item.get("action", "Define owner, rollout steps, and follow-up review checkpoints."))
+        timeline = str(item.get("timeline", "")).strip()
+        if timeline and timeline.lower() not in next_steps.lower():
+            next_steps = f"{next_steps} Timing: {timeline}."
         cards.append(
             """
             <article class="action-row">
@@ -456,10 +458,6 @@ def _render_recommendations(items):
                   <strong>Target</strong>
                   <span>{metric}</span>
                 </span>
-                <span class="action-chip timeline-chip">
-                  <strong>Timeline</strong>
-                  <span>{timeline}</span>
-                </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
@@ -470,7 +468,6 @@ def _render_recommendations(items):
                 title=escape(str(item.get("title", "Untitled recommendation"))),
                 focus=escape(focus),
                 metric=escape(metric),
-                timeline=escape(timeline),
                 next_steps=escape(next_steps),
             )
         )
@@ -496,9 +493,8 @@ def _specific_recommendation_fallbacks(analysis):
             {
                 "title": "Run Beverage Feedback Recovery Sprint",
                 "location_focus": brand,
-                "action": "Add one beverage upsell prompt at billing, offer a coffee sample during peak hours, and ask every beverage buyer for a QR review before exit.",
+                "action": "Within 7 days, add one beverage upsell prompt at billing, offer a coffee sample during peak hours, and ask every beverage buyer for a QR review before exit.",
                 "success_metric": "Collect at least 10 beverage-specific reviews and lift coffee mentions from 0 to 8+ within 14 days.",
-                "timeline": "Launch within 7 days",
             }
         )
 
@@ -507,9 +503,8 @@ def _specific_recommendation_fallbacks(analysis):
             {
                 "title": "Correct Staff Conduct at Irrummanzil",
                 "location_focus": "Auberry The Bake Shop - Irrummanzil",
-                "action": "Coach front-of-house staff on guest-facing language, prohibit personal comments, and have the manager review the next 20 interactions during peak hours.",
+                "action": "Within 48 hours, coach front-of-house staff on guest-facing language, prohibit personal comments, and have the manager review the next 20 interactions during peak hours.",
                 "success_metric": "Reach 0 appearance-related complaints and 100% compliance on manager spot checks for the next 30 days.",
-                "timeline": "Implement within 48 hours",
             }
         )
 
@@ -520,9 +515,8 @@ def _specific_recommendation_fallbacks(analysis):
             {
                 "title": "Standardize Donut Hero Display",
                 "location_focus": "Irrummanzil and Kukatpally first, then portfolio-wide",
-                "action": "Create one front-counter donut display standard, add hero signage, and require staff to recommend the featured donut in every qualifying order.",
+                "action": "Within 10 days, create one front-counter donut display standard, add hero signage, and require staff to recommend the featured donut in every qualifying order.",
                 "success_metric": f"Increase donut review mentions from {mentions} to at least {max(mentions + 3, 6)} per day and improve attach rate by 15% within 21 days.",
-                "timeline": "Roll out within 10 days",
             }
         )
 
@@ -531,9 +525,8 @@ def _specific_recommendation_fallbacks(analysis):
             {
                 "title": "Turn Named Staff Praise into a Training Script",
                 "location_focus": "Panjagutta and Kondapur as pilot outlets",
-                "action": "Record the exact greeting, recommendation, and checkout behaviors that earned named praise and train every cashier and floor staff member on that sequence.",
+                "action": "Within 14 days, record the exact greeting, recommendation, and checkout behaviors that earned named praise and train every cashier and floor staff member on that sequence.",
                 "success_metric": "Generate at least 5 named-staff mentions per week across the pilot outlets within 30 days.",
-                "timeline": "Complete training in 14 days",
             }
         )
 
@@ -542,17 +535,53 @@ def _specific_recommendation_fallbacks(analysis):
             {
                 "title": "Replace Generic QR Prompts with Guided Review Questions",
                 "location_focus": "Auberry The Bake Shop - Kondapur",
-                "action": "Update the review ask to request one food comment and one service comment, and have staff mention those prompts verbally at handoff.",
+                "action": "Within 5 days, update the review ask to request one food comment and one service comment, and have staff mention those prompts verbally at handoff.",
                 "success_metric": "Cut text-less reviews below 10% and raise average review text length to 15+ words within 2 weeks.",
-                "timeline": "Deploy within 5 days",
             }
         )
+
+    top_item = items[0] if items else {}
+    top_item_name = str(top_item.get("item", "")).strip()
+    top_item_mentions = int(top_item.get("mentions", 0) or 0) if top_item else 0
+    if top_item_name:
+        fallbacks.append(
+            {
+                "title": f"Turn {top_item_name} Praise into a Counter Script",
+                "location_focus": brand,
+                "action": f"Within 7 days, give every cashier a one-line prompt for {top_item_name}: mention the exact item at checkout, point to the display, and ask buyers to name it in their Google review.",
+                "success_metric": f"Lift {top_item_name} review mentions from {top_item_mentions} to at least {max(top_item_mentions + 4, 6)} in the next 14 days.",
+            }
+        )
+
+    if any("coffee" not in issue.lower() and "beverage" not in issue.lower() for issue in issues) or not issues:
+        fallbacks.append(
+            {
+                "title": "Add Beverage Attach Prompts to Donut Orders",
+                "location_focus": "portfolio-wide",
+                "action": "Within 10 days, require staff to offer one coffee or cold beverage pairing on every donut order and track whether the customer accepts, declines, or asks for a recommendation.",
+                "success_metric": "Generate at least 8 beverage mentions and reach a 20% beverage attach rate on donut orders within 30 days.",
+            }
+        )
+
+    fallbacks.append(
+        {
+            "title": "Create a Daily Outlet Review Quality Scorecard",
+            "location_focus": "all participating outlets",
+            "action": "Starting tomorrow, have each outlet manager log review count, named item mentions, named staff mentions, and text-less reviews before closing, then share the lowest-scoring outlet in the morning huddle.",
+            "success_metric": "Reach at least 3 text reviews per outlet per day and reduce text-less reviews below 15% within 21 days.",
+        }
+    )
 
     return fallbacks
 
 
 def _normalize_recommendations(analysis):
-    existing = list(analysis.get("top_5_recommendations") or analysis.get("top_3_recommendations") or [])
+    existing = list(
+        analysis.get("top_6_recommendations")
+        or analysis.get("top_5_recommendations")
+        or analysis.get("top_3_recommendations")
+        or []
+    )
     seen = {_recommendation_key(item) for item in existing}
 
     for item in _specific_recommendation_fallbacks(analysis):
@@ -561,10 +590,10 @@ def _normalize_recommendations(analysis):
             continue
         existing.append(item)
         seen.add(key)
-        if len(existing) >= 5:
+        if len(existing) >= 6:
             break
 
-    return existing[:5]
+    return existing[:6]
 
 
 def _render_review_references(items):
@@ -1574,7 +1603,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .action-metrics {{
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 12px;
     }}
     .action-chip {{
@@ -1603,10 +1632,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .metric-chip {{
       background: linear-gradient(180deg, rgba(111,167,255,0.14), rgba(111,167,255,0.06));
       border-color: rgba(111,167,255,0.18);
-    }}
-    .timeline-chip {{
-      background: linear-gradient(180deg, rgba(171,125,244,0.14), rgba(171,125,244,0.06));
-      border-color: rgba(171,125,244,0.18);
     }}
     .action-row:hover {{
       filter: brightness(1.05);
@@ -1923,8 +1948,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       </div>
 
       <section class="card recommendations-panel" id="recommendations">
-        <h3 class="panel-title">Recommendations</h3>
-        <div class="panel-subtitle">Action plans with measurable targets and timelines across the full portfolio.</div>
+        <h3 class="panel-title">Top 6 Recommendations</h3>
+        <div class="panel-subtitle">Specific action plans with measurable targets and timing included in the next-step strategy.</div>
         {recommendations_html}
       </section>
 
