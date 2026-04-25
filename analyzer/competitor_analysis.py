@@ -27,8 +27,32 @@ def _compute_snapshot(reviews, competitor_name):
     }
 
 
+def _brand_from_name(name):
+    return name.split(" - ")[0].strip()
+
+
+def _aggregate_by_brand(location_snapshots):
+    brands = {}
+    for snap in location_snapshots:
+        brand = _brand_from_name(snap["name"])
+        if brand not in brands:
+            brands[brand] = {"reviews": [], "outlet_names": []}
+        brands[brand]["reviews"].extend(snap["reviews"])
+        brands[brand]["outlet_names"].append(snap["name"])
+
+    aggregated = []
+    for brand, data in brands.items():
+        reviews = data["reviews"]
+        outlet_count = len(data["outlet_names"])
+        snap = _compute_snapshot(reviews, brand)
+        if snap:
+            snap["outlet_count"] = outlet_count
+            aggregated.append(snap)
+    return aggregated
+
+
 def get_competitor_snapshots(competitors):
-    snapshots = []
+    location_snapshots = []
     for competitor in competitors:
         name = competitor.get("name", "")
         place_id = competitor.get("place_id", "").strip()
@@ -40,11 +64,11 @@ def get_competitor_snapshots(competitors):
             reviews = get_google_reviews(place_id)
             snapshot = _compute_snapshot(reviews, name)
             if snapshot:
-                snapshots.append(snapshot)
+                location_snapshots.append(snapshot)
                 print(f"Competitor snapshot ready: {name} — {snapshot['avg_rating']}/5 from {snapshot['review_count']} reviews")
         except Exception as exc:
             print(f"Skipped competitor {name!r}: {exc}")
-    return snapshots
+    return _aggregate_by_brand(location_snapshots)
 
 
 def analyze_competitive_position(auberry_analysis, competitor_snapshots):

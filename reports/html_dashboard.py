@@ -752,21 +752,23 @@ def _render_competitor_section(competitor_benchmarks, auberry_avg_rating):
         avg = float(snap.get("avg_rating", 0) or 0)
         sentiment = int(snap.get("sentiment_pct", 0) or 0)
         count = int(snap.get("review_count", 0) or 0)
+        outlet_count = int(snap.get("outlet_count", 1) or 1)
         rating_color = "#67dd69" if avg >= auberry_avg_rating else "#ef6464"
+        outlet_label = f"{outlet_count} outlet{'s' if outlet_count != 1 else ''} · " if outlet_count > 1 else ""
         snapshot_cards.append(
             """
             <div class="comp-card">
               <div class="comp-name">{name}</div>
               <div class="comp-rating" style="color:{color};">{avg}</div>
-              <div class="comp-meta">{sentiment}% positive · {count} review{plural}</div>
+              <div class="comp-meta">{outlet_label}{sentiment}% positive · {count} reviews sampled</div>
             </div>
             """.format(
                 name=escape(str(snap.get("name", "Competitor"))),
                 color=rating_color,
                 avg=f"{avg:.1f}",
+                outlet_label=outlet_label,
                 sentiment=sentiment,
                 count=count,
-                plural="" if count == 1 else "s",
             )
         )
 
