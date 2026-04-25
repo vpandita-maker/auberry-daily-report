@@ -239,6 +239,50 @@ def _should_hide_failed_outlet(error_message):
     return any(marker in normalized for marker in hidden_markers)
 
 
+def _build_empty_analysis(report_date, comparison_date, configured_outlet_count, failed_outlets, outlet_locations):
+    return {
+        "brand_name": "Auberry The Bake Shop - All Outlets",
+        "overall_sentiment": "neutral",
+        "average_rating": 0.0,
+        "total_reviews_analyzed": 0,
+        "categories": {
+            "food_quality": {"score": 0.0, "summary": "No fresh review data was available.", "top_issues": [], "top_praises": []},
+            "service": {"score": 0.0, "summary": "No fresh review data was available.", "top_issues": [], "top_praises": []},
+            "ambiance": {"score": 0.0, "summary": "No fresh review data was available.", "top_issues": [], "top_praises": []},
+            "value_for_money": {"score": 0.0, "summary": "No fresh review data was available.", "top_issues": [], "top_praises": []},
+            "coffee_quality": {"score": 0.0, "summary": "No fresh review data was available.", "top_issues": [], "top_praises": []},
+        },
+        "most_mentioned_items": [],
+        "top_3_urgent_issues": ["Fresh review data could not be fetched from Google."],
+        "top_3_strengths": ["Historical report generation is still available."],
+        "rating_risk": "medium",
+        "top_5_recommendations": [
+            {
+                "title": "Restore Google review access",
+                "location_focus": "portfolio-wide",
+                "action": "Resolve DNS or network access to Google Places/Maps so the daily review scrape can run again.",
+                "success_metric": "Daily report runs without Google fetch errors for 7 consecutive days",
+                "timeline": "immediately",
+            }
+        ],
+        "configured_outlet_count": configured_outlet_count,
+        "portfolio_outlets": [],
+        "portfolio_failed_outlets": failed_outlets,
+        "portfolio_locations": outlet_locations,
+        "review_dates": [],
+        "report_scope": f"{report_date.strftime('%B %-d, %Y')} only",
+        "review_window": "Dates unavailable",
+        "new_reviews_today": [],
+        "comparison": {},
+        "mention_sources": {},
+        "html_dashboard_path": "",
+        "report_fallback_reason": (
+            "Google review data was unavailable for both the report date "
+            f"({report_date.isoformat()}) and comparison date ({comparison_date.isoformat()})."
+        ),
+    }
+
+
 def load_outlets():
     if OUTLETS_FILE.exists():
         with OUTLETS_FILE.open("r", encoding="utf-8") as config_file:
@@ -303,11 +347,14 @@ def build_combined_report(outlets):
                 visible_failed_outlets.append(failed)
             print(f"Skipped {outlet['name']}: {exc}")
 
-    if not combined_reviews:
-        raise RuntimeError("No outlet reviews were fetched successfully.")
-
     report_date = datetime.now(IST).date() - timedelta(days=1)
     comparison_date = report_date - timedelta(days=1)
+    if not combined_reviews:
+        analysis = _build_empty_analysis(report_date, comparison_date, configured_outlet_count, visible_failed_outlets, outlet_locations)
+        html_path = generate_html_dashboard(analysis)
+        analysis["html_dashboard_path"] = str(Path(html_path).resolve())
+        return Path(html_path), analysis, visible_failed_outlets
+
     report_reviews = [review for review in combined_reviews if _review_ist_date(review) == report_date]
     comparison_reviews = [review for review in combined_reviews if _review_ist_date(review) == comparison_date]
     if os.getenv("REQUIRE_REPORT_REVIEWS", "").strip() == "1" and not report_reviews:
