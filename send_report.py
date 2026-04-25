@@ -12,6 +12,9 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 
 from analyzer.ai_analysis import analyze_reviews
+from analyzer.complaint_spikes import get_complaint_spikes
+from analyzer.outlet_ranking import get_outlet_ranking
+from analyzer.root_cause_patterns import get_root_cause_patterns
 from reports.html_dashboard import generate_html_dashboard
 from scrapers.google import extract_place_id_from_google_url, get_google_reviews
 
@@ -180,6 +183,55 @@ def _normalize_term(text):
     return " ".join(words)
 
 
+def _infer_sentiment_from_rating(rating):
+    try:
+        value = float(rating)
+    except (TypeError, ValueError):
+        return "neutral"
+    if value >= 4:
+        return "positive"
+    if value <= 3:
+        return "negative"
+    return "neutral"
+
+
+def _infer_review_categories(text):
+    normalized = _normalize_term(text)
+    category_terms = {
+        "service": ("service", "staff", "cashier", "rude", "slow", "wait", "billing", "manager"),
+        "food_quality": ("taste", "food", "donut", "croissant", "cake", "pastry", "bread", "stale", "fresh", "quality"),
+        "ambiance": ("ambiance", "ambience", "clean", "dirty", "seating", "music", "atmosphere"),
+        "value_for_money": ("price", "prices", "cost", "expensive", "value", "worth", "medium"),
+        "coffee_quality": ("coffee", "latte", "cappuccino", "beverage", "drink"),
+    }
+    categories = [
+        category
+        for category, terms in category_terms.items()
+        if any(term in normalized for term in terms)
+    ]
+    return categories or ["general"]
+
+
+def _analytics_reviews(reviews):
+    analytics = []
+    for index, review in enumerate(reviews or []):
+        source_label = str(review.get("source", "Google"))
+        outlet_name = source_label.replace("Google - ", "", 1) if source_label.startswith("Google - ") else source_label
+        review_text = _strip_review_prefix(review.get("text", ""))
+        analytics.append(
+            {
+                "review_id": str(review.get("source_url") or f"{outlet_name}-{review.get('timestamp') or index}"),
+                "outlet_id": outlet_name,
+                "timestamp": review.get("date_time_exact") or review.get("date_exact"),
+                "rating": review.get("rating"),
+                "sentiment": _infer_sentiment_from_rating(review.get("rating")),
+                "categories": _infer_review_categories(review_text),
+                "text": review_text,
+            }
+        )
+    return analytics
+
+
 def _singularize(word):
     if word.endswith("ies") and len(word) > 4:
         return word[:-3] + "y"
@@ -275,6 +327,9 @@ def _build_empty_analysis(report_date, comparison_date, configured_outlet_count,
         "new_reviews_today": [],
         "comparison": {},
         "mention_sources": {},
+        "complaint_spikes": [],
+        "outlet_ranking": {"ranked_outlets": [], "summary": {}},
+        "root_cause_patterns": [],
         "html_dashboard_path": "",
         "report_fallback_reason": (
             "Google review data was unavailable for both the report date "
@@ -428,6 +483,10 @@ def build_combined_report(outlets):
                 break
         mention_sources[item_name] = sources
     analysis["mention_sources"] = mention_sources
+    analytics_reviews = _analytics_reviews(combined_reviews)
+    analysis["complaint_spikes"] = get_complaint_spikes(analytics_reviews)
+    analysis["outlet_ranking"] = get_outlet_ranking(analytics_reviews, report_date.isoformat())
+    analysis["root_cause_patterns"] = get_root_cause_patterns(_analytics_reviews(report_reviews))
 
     html_path = generate_html_dashboard(analysis)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())

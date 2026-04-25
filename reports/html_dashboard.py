@@ -601,6 +601,116 @@ def _render_review_references(items):
     return "<div class='review-grid'>{}</div>".format("".join(cards))
 
 
+def _render_complaint_spikes(spikes):
+    if not spikes:
+        return "<div class='empty-block'>No complaint velocity spikes detected for this cycle.</div>"
+
+    cards = []
+    for spike in spikes[:6]:
+        severity = str(spike.get("severity", "medium")).lower()
+        cards.append(
+            """
+            <article class="insight-card insight-{severity}">
+              <div class="insight-kicker">{severity_label} Spike</div>
+              <h4>{category}</h4>
+              <p>{outlet} recorded {today_count} negative mention{plural}, versus a {baseline_avg} seven-day baseline.</p>
+              <div class="insight-meta">
+                <span>{spike_percent}% vs baseline</span>
+                <span>{trend}</span>
+              </div>
+            </article>
+            """.format(
+                severity=escape(severity),
+                severity_label=escape(severity.title()),
+                category=escape(str(spike.get("category", "general")).replace("_", " ").title()),
+                outlet=escape(str(spike.get("outlet_id", "Unknown outlet"))),
+                today_count=int(spike.get("today_count", 0) or 0),
+                plural="" if int(spike.get("today_count", 0) or 0) == 1 else "s",
+                baseline_avg=escape(str(spike.get("baseline_avg", 0))),
+                spike_percent=escape(str(spike.get("spike_percent", 0))),
+                trend=escape(str(spike.get("trend", "stable")).title()),
+            )
+        )
+    return "<div class='insight-grid'>{}</div>".format("".join(cards))
+
+
+def _render_outlet_ranking(outlet_ranking):
+    ranked = (outlet_ranking or {}).get("ranked_outlets") or []
+    summary = (outlet_ranking or {}).get("summary") or {}
+    if not ranked:
+        return "<div class='empty-block'>No outlet ranking available for this cycle.</div>"
+
+    rows = []
+    for outlet in ranked:
+        status = str(outlet.get("status", "middle")).lower()
+        confidence = "Low confidence" if outlet.get("low_confidence") else "Normal confidence"
+        rows.append(
+            """
+            <div class="ranking-row ranking-{status}">
+              <div class="ranking-rank">#{rank}</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">{outlet}</div>
+                <div class="ranking-meta">{reviews} review{plural} · {confidence}</div>
+              </div>
+              <div class="ranking-score">
+                <strong>{score}</strong>
+                <span>{rating}★ · {positive_ratio}% positive</span>
+              </div>
+            </div>
+            """.format(
+                status=escape(status),
+                rank=int(outlet.get("rank", 0) or 0),
+                outlet=escape(str(outlet.get("outlet_id", "Unknown outlet"))),
+                reviews=int(outlet.get("review_count", 0) or 0),
+                plural="" if int(outlet.get("review_count", 0) or 0) == 1 else "s",
+                confidence=escape(confidence),
+                score=escape(str(outlet.get("score", 0))),
+                rating=escape(str(outlet.get("avg_rating", 0))),
+                positive_ratio=round(float(outlet.get("positive_ratio", 0) or 0) * 100),
+            )
+        )
+
+    summary_html = """
+    <div class="gap-summary">
+      <div><span>Best</span><strong>{best}</strong></div>
+      <div><span>Worst</span><strong>{worst}</strong></div>
+      <div><span>Rating Gap</span><strong>{rating_gap}★</strong></div>
+      <div><span>Score Gap</span><strong>{score_gap}</strong></div>
+    </div>
+    """.format(
+        best=escape(str(summary.get("best_outlet") or "N/A")),
+        worst=escape(str(summary.get("worst_outlet") or "N/A")),
+        rating_gap=escape(str(summary.get("rating_gap", 0))),
+        score_gap=escape(str(summary.get("score_gap", 0))),
+    )
+    return summary_html + "<div class='ranking-list'>{}</div>".format("".join(rows))
+
+
+def _render_root_cause_patterns(patterns):
+    if not patterns:
+        return "<div class='empty-block'>No repeating root-cause pattern detected yet.</div>"
+
+    cards = []
+    for pattern in patterns[:5]:
+        severity = str(pattern.get("severity", "medium")).lower()
+        cards.append(
+            """
+            <article class="pattern-card pattern-{severity}">
+              <div class="pattern-type">{pattern_type}</div>
+              <p>{message}</p>
+              <span>{count} signal{plural}</span>
+            </article>
+            """.format(
+                severity=escape(severity),
+                pattern_type=escape(str(pattern.get("pattern_type", "pattern")).replace("_", " ").title()),
+                message=escape(str(pattern.get("message", "Pattern detected."))),
+                count=int(pattern.get("count", 0) or 0),
+                plural="" if int(pattern.get("count", 0) or 0) == 1 else "s",
+            )
+        )
+    return "<div class='pattern-grid'>{}</div>".format("".join(cards))
+
+
 def generate_html_dashboard(analysis, output_dir="output"):
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -618,6 +728,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
     outlets = analysis.get("portfolio_outlets") or []
     top_items, underperforming = _derive_item_panels(items)
     heatmap_rows = _build_heatmap(analysis)
+    complaint_spikes = analysis.get("complaint_spikes") or []
+    outlet_ranking = analysis.get("outlet_ranking") or {}
+    root_cause_patterns = analysis.get("root_cause_patterns") or []
 
     avg_rating = float(analysis.get("average_rating", 0) or 0)
     previous_avg_rating = _comparison_value(analysis, "average_rating", avg_rating)
@@ -745,6 +858,143 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
+    }}
+    .intelligence-panel {{
+      grid-column: 1 / -1;
+      padding: 18px;
+    }}
+    .intelligence-grid {{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }}
+    .intelligence-section {{
+      background: rgba(20, 25, 43, 0.52);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+      min-width: 0;
+    }}
+    .intelligence-section h4 {{
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.35;
+      color: var(--text);
+    }}
+    .insight-grid,
+    .pattern-grid,
+    .ranking-list {{
+      display: grid;
+      gap: 10px;
+    }}
+    .insight-card,
+    .pattern-card,
+    .ranking-row {{
+      border-radius: 12px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px;
+    }}
+    .insight-card h4 {{
+      margin: 4px 0 6px;
+      font-size: 16px;
+    }}
+    .insight-card p,
+    .pattern-card p {{
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }}
+    .insight-kicker,
+    .pattern-type {{
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }}
+    .insight-meta {{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }}
+    .insight-meta span,
+    .pattern-card span {{
+      color: var(--text);
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 12px;
+      display: inline-flex;
+      margin-top: 10px;
+    }}
+    .gap-summary {{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }}
+    .gap-summary div {{
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px;
+    }}
+    .gap-summary span,
+    .ranking-meta,
+    .ranking-score span {{
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }}
+    .gap-summary strong {{
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }}
+    .ranking-row {{
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }}
+    .ranking-rank {{
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--purple-bg);
+      color: var(--text);
+      font-weight: 800;
+    }}
+    .ranking-outlet {{
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }}
+    .ranking-score {{
+      text-align: right;
+      min-width: 78px;
+    }}
+    .ranking-score strong {{
+      display: block;
+      font-size: 18px;
+    }}
+    .ranking-top .ranking-rank {{
+      background: var(--green-bg);
+      color: var(--green);
+    }}
+    .ranking-underperforming .ranking-rank {{
+      background: var(--red-bg);
+      color: var(--red);
     }}
     .kpi-card {{
       padding: 18px 18px 14px;
@@ -1383,6 +1633,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .review-grid {{
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }}
+      .intelligence-grid {{
+        grid-template-columns: 1fr;
+      }}
     }}
     @media (max-width: 1120px) {{
       .dashboard {{
@@ -1414,6 +1667,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
         grid-template-columns: 1fr;
       }}
       .review-grid {{
+        grid-template-columns: 1fr;
+      }}
+      .gap-summary {{
         grid-template-columns: 1fr;
       }}
     }}
@@ -1455,6 +1711,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
       }}
       .action-row {{
         padding: 16px;
+      }}
+      .ranking-row {{
+        grid-template-columns: 38px minmax(0, 1fr);
+      }}
+      .ranking-score {{
+        grid-column: 2 / -1;
+        text-align: left;
       }}
     }}
     @keyframes page-fade {{
@@ -1554,6 +1817,25 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </section>
       </div>
 
+      <section class="card intelligence-panel" id="operational-intelligence">
+        <h3 class="panel-title">Operational Intelligence</h3>
+        <div class="panel-subtitle">Deterministic signals from review volume, outlet performance, and root-cause patterns.</div>
+        <div class="intelligence-grid">
+          <div class="intelligence-section">
+            <h4>Complaint Velocity Spikes</h4>
+            {complaint_spikes_html}
+          </div>
+          <div class="intelligence-section">
+            <h4>Outlet Performance Ranking</h4>
+            {outlet_ranking_html}
+          </div>
+          <div class="intelligence-section">
+            <h4>Root Cause Patterns</h4>
+            {root_cause_patterns_html}
+          </div>
+        </div>
+      </section>
+
       <div class="center-column">
         <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
@@ -1622,6 +1904,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
         heatmap_html=_render_heatmap(heatmap_rows),
         mentions_board_html=_render_mentions_board(items, mention_sources),
         alerts_html=_render_alerts(analysis),
+        complaint_spikes_html=_render_complaint_spikes(complaint_spikes),
+        outlet_ranking_html=_render_outlet_ranking(outlet_ranking),
+        root_cause_patterns_html=_render_root_cause_patterns(root_cause_patterns),
         recommendations_html=_render_recommendations(recommendations),
         review_references_html=_render_review_references(review_references),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),

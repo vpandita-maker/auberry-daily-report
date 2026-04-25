@@ -108,6 +108,143 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
     }
+    .intelligence-panel {
+      grid-column: 1 / -1;
+      padding: 18px;
+    }
+    .intelligence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .intelligence-section {
+      background: rgba(20, 25, 43, 0.52);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px;
+      min-width: 0;
+    }
+    .intelligence-section h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.35;
+      color: var(--text);
+    }
+    .insight-grid,
+    .pattern-grid,
+    .ranking-list {
+      display: grid;
+      gap: 10px;
+    }
+    .insight-card,
+    .pattern-card,
+    .ranking-row {
+      border-radius: 12px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px;
+    }
+    .insight-card h4 {
+      margin: 4px 0 6px;
+      font-size: 16px;
+    }
+    .insight-card p,
+    .pattern-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .insight-kicker,
+    .pattern-type {
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .insight-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .insight-meta span,
+    .pattern-card span {
+      color: var(--text);
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 12px;
+      display: inline-flex;
+      margin-top: 10px;
+    }
+    .gap-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .gap-summary div {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .gap-summary span,
+    .ranking-meta,
+    .ranking-score span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .gap-summary strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .ranking-rank {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--purple-bg);
+      color: var(--text);
+      font-weight: 800;
+    }
+    .ranking-outlet {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .ranking-score {
+      text-align: right;
+      min-width: 78px;
+    }
+    .ranking-score strong {
+      display: block;
+      font-size: 18px;
+    }
+    .ranking-top .ranking-rank {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .ranking-underperforming .ranking-rank {
+      background: var(--red-bg);
+      color: var(--red);
+    }
     .kpi-card {
       padding: 18px 18px 14px;
       display: grid;
@@ -745,6 +882,9 @@
       .review-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+      .intelligence-grid {
+        grid-template-columns: 1fr;
+      }
     }
     @media (max-width: 1120px) {
       .dashboard {
@@ -776,6 +916,9 @@
         grid-template-columns: 1fr;
       }
       .review-grid {
+        grid-template-columns: 1fr;
+      }
+      .gap-summary {
         grid-template-columns: 1fr;
       }
     }
@@ -817,6 +960,13 @@
       }
       .action-row {
         padding: 16px;
+      }
+      .ranking-row {
+        grid-template-columns: 38px minmax(0, 1fr);
+      }
+      .ranking-score {
+        grid-column: 2 / -1;
+        text-align: left;
       }
     }
     @keyframes page-fade {
@@ -924,6 +1074,92 @@
         </section>
       </div>
 
+      <section class="card intelligence-panel" id="operational-intelligence">
+        <h3 class="panel-title">Operational Intelligence</h3>
+        <div class="panel-subtitle">Deterministic signals from review volume, outlet performance, and root-cause patterns.</div>
+        <div class="intelligence-grid">
+          <div class="intelligence-section">
+            <h4>Complaint Velocity Spikes</h4>
+            <div class='empty-block'>No complaint velocity spikes detected for this cycle.</div>
+          </div>
+          <div class="intelligence-section">
+            <h4>Outlet Performance Ranking</h4>
+            
+    <div class="gap-summary">
+      <div><span>Best</span><strong>Auberry The Bake Shop - Panjagutta</strong></div>
+      <div><span>Worst</span><strong>AUBERRY - Uppal</strong></div>
+      <div><span>Rating Gap</span><strong>0.0★</strong></div>
+      <div><span>Score Gap</span><strong>0.0</strong></div>
+    </div>
+    <div class='ranking-list'>
+            <div class="ranking-row ranking-top">
+              <div class="ranking-rank">#1</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <div class="ranking-meta">5 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#2</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <div class="ranking-meta">4 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#3</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <div class="ranking-meta">4 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#4</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Musarambagh</div>
+                <div class="ranking-meta">3 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-underperforming">
+              <div class="ranking-rank">#5</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">AUBERRY - Uppal</div>
+                <div class="ranking-meta">1 review · Low confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            </div>
+          </div>
+          <div class="intelligence-section">
+            <h4>Root Cause Patterns</h4>
+            <div class='empty-block'>No repeating root-cause pattern detected yet.</div>
+          </div>
+        </div>
+      </section>
+
       <div class="center-column">
         <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
@@ -968,19 +1204,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture of donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with emphasis on freshness, perfect sweetness, and texture at Musarambagh, Panjagutta, and Uppal.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Staff service praised specifically at Irrummanzil (Azeez mentioned by name) and Kukatpally, with good staff behavior noted at Panjagutta.">
+            <div class="heat-cell heat-positive" title="Staff service specifically praised at Irrummanzil (staff member Azeez mentioned by name), Panjagutta, and Kukatpally outlets.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Neat and clean environment at Musarambagh">
+            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly noted as worth visiting, indicating good perceived value across the brand.">
+            <div class="heat-cell heat-positive" title="Products deemed worth visiting for at Panjagutta outlet, with quality matching expectations.">
               <span>V</span>
             </div>
             
@@ -993,19 +1229,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture of donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with emphasis on freshness, perfect sweetness, and texture at Musarambagh, Panjagutta, and Uppal.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Good service by Azeez at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Good staff behavior at Panjagutta">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for being neat and clean; Kukatpally noted for good environment.">
+            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for cleanliness; Kukatpally outlet noted for good environment.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly noted as worth visiting, indicating good perceived value across the brand.">
+            <div class="heat-cell heat-positive" title="Products deemed worth visiting for at Panjagutta outlet, with quality matching expectations.">
               <span>V</span>
             </div>
             
@@ -1018,19 +1254,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
               
-            <div class="heat-cell heat-positive" title="Perfect sweetness and texture of donuts at Musarambagh">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with emphasis on freshness, perfect sweetness, and texture at Musarambagh, Panjagutta, and Uppal.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Good service by Azeez at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Good staff behavior at Panjagutta">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for being neat and clean; Kukatpally noted for good environment.">
+            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for cleanliness; Kukatpally outlet noted for good environment.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Worth visiting at Panjagutta">
+            <div class="heat-cell heat-positive" title="Products deemed worth visiting for at Panjagutta outlet, with quality matching expectations.">
               <span>V</span>
             </div>
             
@@ -1043,19 +1279,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with donuts receiving unanimous praise for perfect sweetness, great texture, and delicious taste.">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with emphasis on freshness, perfect sweetness, and texture at Musarambagh, Panjagutta, and Uppal.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Good service by Azeez at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Good staff behavior at Panjagutta">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Neat and clean environment at Musarambagh">
+            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly noted as worth visiting, indicating good perceived value across the brand.">
+            <div class="heat-cell heat-positive" title="Products deemed worth visiting for at Panjagutta outlet, with quality matching expectations.">
               <span>V</span>
             </div>
             
@@ -1068,19 +1304,19 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
               
-            <div class="heat-cell heat-positive" title="Exceptional food quality across all outlets with donuts receiving unanimous praise for perfect sweetness, great texture, and delicious taste.">
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with emphasis on freshness, perfect sweetness, and texture at Musarambagh, Panjagutta, and Uppal.">
               <span>F</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Staff service praised specifically at Irrummanzil (Azeez mentioned by name) and Kukatpally, with good staff behavior noted at Panjagutta.">
+            <div class="heat-cell heat-positive" title="Staff service specifically praised at Irrummanzil (staff member Azeez mentioned by name), Panjagutta, and Kukatpally outlets.">
               <span>S</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for being neat and clean; Kukatpally noted for good environment.">
+            <div class="heat-cell heat-positive" title="Musarambagh outlet praised for cleanliness; Kukatpally outlet noted for good environment.">
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly noted as worth visiting, indicating good perceived value across the brand.">
+            <div class="heat-cell heat-positive" title="Products deemed worth visiting for at Panjagutta outlet, with quality matching expectations.">
               <span>V</span>
             </div>
             
@@ -1107,7 +1343,7 @@
               <div class="mention-body">
                 <h4>Donuts</h4>
                 <div class="mention-meta">
-                  <span>9 mentions</span>
+                  <span>10 mentions</span>
                   <span class="pill pill-positive">Positive</span>
                 </div>
                 <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
@@ -1138,7 +1374,7 @@
             <article class="mention-card mention-positive">
               <div class="mention-rank">2</div>
               <div class="mention-body">
-                <h4>Croissant/Chocolate Croissant</h4>
+                <h4>Chocolate Croissant</h4>
                 <div class="mention-meta">
                   <span>2 mentions</span>
                   <span class="pill pill-positive">Positive</span>
@@ -1245,7 +1481,7 @@ My favorite double chocolate donut</p>
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>Coffee and beverage offerings not mentioned, potential gap in customer engagement</h4>
+              <h4>Coffee/beverage offerings not generating any customer feedback or mentions</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1255,7 +1491,7 @@ My favorite double chocolate donut</p>
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>Limited feedback on variety beyond donuts may indicate narrow product awareness</h4>
+              <h4>Limited variety feedback beyond donuts may indicate narrow product awareness</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1274,38 +1510,14 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Implement Staff Recognition Program</div>
-                  <div class="action-meta">Irrummanzil (expand portfolio-wide)</div>
+                  <div class="action-title">Leverage Donut Excellence for Marketing Campaign</div>
+                  <div class="action-meta">portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Achieve 20% increase in service-related positive mentions within 60 days</span>
-                </span>
-                <span class="action-chip timeline-chip">
-                  <strong>Timeline</strong>
-                  <span>Launch within 2 weeks</span>
-                </span>
-              </div>
-              <div class="action-strategy">
-                <strong>Next Steps</strong>
-                <p>Recognize Azeez at Irrummanzil as a service champion and create a monthly &#x27;Star Staff&#x27; program to replicate this excellence across all outlets</p>
-              </div>
-            </article>
-            
-            <article class="action-row">
-              <div class="action-topline">
-                <div class="action-icon">→</div>
-                <div class="action-copy">
-                  <div class="action-title">Leverage Donut Hero Product Marketing</div>
-                  <div class="action-meta">Portfolio-wide</div>
-                </div>
-              </div>
-              <div class="action-metrics">
-                <span class="action-chip metric-chip">
-                  <strong>Target</strong>
-                  <span>Increase donut category sales by 15% and social media engagement by 25%</span>
+                  <span>Increase donut category sales by 15% within campaign period</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
@@ -1314,7 +1526,7 @@ My favorite double chocolate donut</p>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Create a &#x27;Donut of the Month&#x27; campaign highlighting Nutella, Double Chocolate, Biscoff, and Filled variants mentioned in reviews</p>
+                <p>Launch &#x27;Donut of the Month&#x27; campaign highlighting top-mentioned variants (Nutella, Biscoff, Double Chocolate, Filled Donuts) with social media promotion</p>
               </div>
             </article>
             
@@ -1322,18 +1534,42 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Expand Beverage Awareness</div>
-                  <div class="action-meta">Portfolio-wide</div>
+                  <div class="action-title">Recognize and Replicate Irrummanzil Service Model</div>
+                  <div class="action-meta">Irrummanzil outlet</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Achieve at least 5 coffee-related positive mentions in reviews within 45 days</span>
+                  <span>Achieve named staff mentions in reviews at 2+ additional outlets</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Next 45 days</span>
+                  <span>Next 60 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Formally recognize staff member Azeez and document his service approach as a training standard for other outlets</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Boost Beverage Awareness and Sales</div>
+                  <div class="action-meta">portfolio-wide</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Generate at least 5 coffee/beverage mentions in customer reviews within 30 days</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>Next 30 days</span>
                 </span>
               </div>
               <div class="action-strategy">
@@ -1346,23 +1582,23 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Family-Friendly Marketing at Musarambagh</div>
-                  <div class="action-meta">Musarambagh</div>
+                  <div class="action-title">Expand Product Awareness Beyond Donuts</div>
+                  <div class="action-meta">Panjagutta outlet</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Increase weekend family footfall by 20% at Musarambagh</span>
+                  <span>Increase non-donut product mentions in reviews by 25%</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
-                  <span>Next 30 days</span>
+                  <span>Next 45 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Capitalize on kids&#x27; appeal feedback by introducing a &#x27;Kids Donut Box&#x27; with variety styles and cleanliness messaging for families</p>
+                <p>Highlight cheesecake and cupcake offerings through in-store sampling and signage, leveraging Panjagutta&#x27;s positive mentions</p>
               </div>
             </article>
             
@@ -1370,14 +1606,14 @@ My favorite double chocolate donut</p>
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Maintain Perfect Rating Momentum</div>
-                  <div class="action-meta">Portfolio-wide</div>
+                  <div class="action-title">Maintain Perfect Rating Streak with Proactive Review Collection</div>
+                  <div class="action-meta">portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Maintain average rating above 4.8 with 25% increase in review volume over next quarter</span>
+                  <span>Maintain 4.9+ average rating with 50+ reviews per week across all outlets</span>
                 </span>
                 <span class="action-chip timeline-chip">
                   <strong>Timeline</strong>
@@ -1386,7 +1622,7 @@ My favorite double chocolate donut</p>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Implement post-purchase review request system to sustain 5-star feedback volume and proactively address any emerging issues</p>
+                <p>Implement consistent review request protocol at checkout to sustain high review volume and 5-star momentum</p>
               </div>
             </article>
             </div>
