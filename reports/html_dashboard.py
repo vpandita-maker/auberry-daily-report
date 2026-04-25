@@ -1280,6 +1280,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       gap: 14px;
       padding-top: 14px;
       align-content: start;
+      align-items: start;
     }}
     .mention-card {{
       border-radius: 16px;
@@ -1289,7 +1290,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       grid-template-columns: 34px minmax(0, 1fr);
       gap: 10px;
       align-items: start;
-      min-height: 112px;
+      align-self: start;
+      min-height: 150px;
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         border-color 180ms ease,
@@ -1336,6 +1338,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 13px;
     }}
     .mention-sources {{
+      grid-column: 1 / -1;
       margin-top: 12px;
       border-radius: 14px;
       border: 1px solid rgba(111,167,255,0.18);
@@ -1366,8 +1369,18 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .mention-sources-panel {{
       display: grid;
       gap: 10px;
+      max-height: 240px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       padding: 0 12px 12px;
       animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
+    }}
+    .mention-sources-panel::-webkit-scrollbar {{
+      width: 8px;
+    }}
+    .mention-sources-panel::-webkit-scrollbar-thumb {{
+      background: rgba(185,214,255,0.22);
+      border-radius: 999px;
     }}
     .mention-sources-title {{
       font-size: 11px;
@@ -1398,6 +1411,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
       overflow-wrap: anywhere;
       word-break: break-word;
     }}
+    .mention-source-meta:nth-child(3) {{
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }}
     .mention-source-card p {{
       margin: 0;
       font-size: 13px;
@@ -1405,6 +1424,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: #f7f8ff;
       overflow-wrap: anywhere;
       word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }}
     .side-panel {{
       padding: 24px;
