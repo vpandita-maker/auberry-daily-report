@@ -1219,11 +1219,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
       margin-top: 22px;
       display: grid;
       gap: 10px;
+      overflow-x: auto;
     }}
     .heat-head, .heat-row {{
       display: grid;
-      grid-template-columns: minmax(250px, 1.35fr) repeat(5, minmax(92px, 1fr));
-      gap: 10px;
+      grid-template-columns: minmax(150px, 1.35fr) repeat(5, minmax(68px, 1fr));
+      gap: 8px;
       align-items: stretch;
     }}
     .heat-header-cell {{
