@@ -908,7 +908,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
       grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
       gap: 16px;
       margin-top: 16px;
-      align-items: start;
+      align-items: stretch;
     }}
     .intelligence-section {{
       background: rgba(20, 25, 43, 0.52);
@@ -916,15 +916,21 @@ def generate_html_dashboard(analysis, output_dir="output"):
       border-radius: 14px;
       padding: 16px;
       min-width: 0;
+      min-height: 100%;
     }}
     .ranking-section {{
       background: linear-gradient(180deg, rgba(35,42,68,0.82), rgba(24,30,52,0.72));
     }}
     .signal-stack {{
       display: grid;
+      grid-template-rows: repeat(2, minmax(0, 1fr));
       gap: 16px;
+      height: 100%;
+      min-height: 100%;
     }}
     .signal-section {{
+      display: flex;
+      flex-direction: column;
       min-height: 0;
     }}
     .intelligence-section h4 {{
@@ -1727,6 +1733,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .intelligence-section .empty-block {{
       min-height: 86px;
+      flex: 1;
       display: flex;
       align-items: center;
       padding: 14px;
