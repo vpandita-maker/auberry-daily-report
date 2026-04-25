@@ -799,20 +799,20 @@ def generate_html_dashboard(analysis, output_dir="output"):
       animation: page-fade 700ms cubic-bezier(.22,1,.36,1);
     }}
     .page {{
-      max-width: 1536px;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 24px;
     }}
     .dashboard {{
       display: grid;
-      grid-template-columns: 350px minmax(0, 1fr) 320px;
-      gap: 16px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
       align-items: stretch;
     }}
     .card {{
       background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
       transition:
         transform 220ms cubic-bezier(.22,1,.36,1),
@@ -868,15 +868,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
+      gap: 16px;
     }}
     .intelligence-panel {{
       grid-column: 1 / -1;
-      padding: 20px;
+      padding: 24px;
     }}
     .intelligence-grid {{
       display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.85fr);
+      grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
       gap: 16px;
       margin-top: 16px;
       align-items: start;
@@ -1051,27 +1051,25 @@ def generate_html_dashboard(analysis, output_dir="output"):
       justify-content: center;
     }}
     .sparkline svg {{ width: 100%; height: 44px; }}
-    .left-column, .right-column {{
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-width: 0;
-      align-self: stretch;
-    }}
-    .center-column {{
-      display: grid;
-      gap: 16px;
-      align-content: start;
-      min-width: 0;
-      align-self: start;
-      height: max-content;
-    }}
+    .items-row,
     .signals-row {{
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(560px, 0.9fr) minmax(0, 1.1fr);
-      gap: 16px;
-      align-items: start;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }}
+    .items-row .list-panel {{
+      grid-column: span 4;
+    }}
+    .items-row .bubbles-panel {{
+      grid-column: span 8;
+    }}
+    .signals-row .heatmap-panel {{
+      grid-column: span 7;
+    }}
+    .signals-row .side-panel {{
+      grid-column: span 5;
     }}
     .panel-title {{
       margin: 0;
@@ -1084,27 +1082,29 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-size: 14px;
     }}
     .panel-header {{
-      padding: 18px 18px 0;
+      padding: 0;
     }}
     .list-panel {{
-      padding-bottom: 14px;
-      height: max-content;
-    }}
-    .left-column .list-panel:last-child {{
-      flex: 1 1 auto;
-      min-height: 0;
+      padding: 24px;
+      min-height: 100%;
     }}
     .list-body {{
-      padding: 8px 14px 14px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 0 0;
       min-width: 0;
     }}
     .list-row {{
       display: grid;
-      grid-template-columns: 24px 48px 1fr auto;
-      gap: 12px;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
       align-items: center;
-      padding: 10px 10px;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      min-height: 118px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         background 180ms ease,
@@ -1119,21 +1119,16 @@ def generate_html_dashboard(analysis, output_dir="output"):
       min-width: 0;
     }}
     .item-rank {{
-      color: #d4d8ea;
-      font-weight: 700;
-      text-align: center;
-    }}
-    .item-thumb {{
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #9a6b42, #c99762);
-      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: #eef1ff;
       display: grid;
       place-items: center;
       font-weight: 800;
-      font-size: 20px;
     }}
+    .item-thumb {{ display: none; }}
     .item-name {{
       font-weight: 700;
       line-height: 1.25;
@@ -1141,6 +1136,11 @@ def generate_html_dashboard(analysis, output_dir="output"):
       word-break: break-word;
     }}
     .item-meta {{ color: var(--muted); font-size: 13px; margin-top: 2px; }}
+    .list-row .pill {{
+      grid-column: 2 / -1;
+      width: max-content;
+      margin-top: 6px;
+    }}
     .pill {{
       padding: 6px 10px;
       border-radius: 999px;
@@ -1152,14 +1152,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .pill-neutral {{ background: var(--yellow-bg); color: var(--yellow); }}
     .pill-na {{ background: rgba(170,177,204,0.18); color: #c3c8db; }}
     .list-footer {{
-      padding: 0 18px 14px;
+      padding: 12px 0 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
     }}
     .heatmap-panel {{
-      padding: 18px;
-      height: max-content;
+      padding: 24px;
+      min-height: 100%;
     }}
     .legend {{
       display: flex;
@@ -1242,14 +1242,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .heat-negative {{ background: #e85f68; color: white; }}
     .heat-na {{ background: #5a637d; color: #eef2ff; }}
     .bubbles-panel {{
-      padding: 18px;
-      height: max-content;
+      padding: 24px;
+      min-height: 100%;
     }}
     .bubble-wrap {{
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 14px;
-      min-height: 270px;
       padding-top: 14px;
       align-content: start;
     }}
@@ -1265,8 +1264,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       transition:
         transform 180ms cubic-bezier(.22,1,.36,1),
         border-color 180ms ease,
-      box-shadow 180ms ease,
-      filter 180ms ease;
+        box-shadow 180ms ease,
+        filter 180ms ease;
     }}
     .mention-card:hover {{
       transform: translateY(-5px);
@@ -1305,35 +1304,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       flex-wrap: wrap;
       margin-top: 10px;
       color: var(--muted);
-      font-size: 13px;
-    }}
-    .mention-neutral {{ background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }}
-    .mention-negative {{ background: linear-gradient(180deg, rgba(214,101,101,0.22), rgba(187,79,79,0.18)); }}
-    .mention-na {{ background: linear-gradient(180deg, rgba(107,115,139,0.22), rgba(83,90,113,0.18)); }}
-    .mention-rank {{
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.08);
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      color: #eef1ff;
-    }}
-    .mention-body h4 {{
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.1;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }}
-    .mention-meta {{
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      color: rgba(255,255,255,0.86);
       font-size: 13px;
     }}
     .mention-sources {{
@@ -1408,12 +1378,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       word-break: break-word;
     }}
     .side-panel {{
-      padding: 18px;
-      height: max-content;
-    }}
-    .right-column .side-panel {{
-      flex: 1 1 auto;
-      min-height: 0;
+      padding: 24px;
+      min-height: 100%;
     }}
     .side-panel.danger h3 {{ color: #ff6d6d; }}
     .alert-card {{
@@ -1674,6 +1640,17 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: var(--muted);
       padding: 18px 0 6px;
     }}
+    .list-body .empty-block,
+    .bubble-wrap .empty-block {{
+      grid-column: 1 / -1;
+      min-height: 118px;
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.035);
+    }}
     .intelligence-section .empty-block {{
       min-height: 86px;
       display: flex;
@@ -1696,12 +1673,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       animation: footer-slide-in 900ms cubic-bezier(.22,1,.36,1) 120ms both;
     }}
     @media (max-width: 1360px) {{
-      .dashboard {{
-        grid-template-columns: 320px minmax(0, 1fr);
-      }}
-      .right-column {{
-        grid-column: 1 / -1;
-      }}
       .recommendations-grid {{
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }}
@@ -1711,18 +1682,18 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .intelligence-grid {{
         grid-template-columns: 1fr;
       }}
-      .signals-row {{
-        grid-template-columns: 1fr;
+      .signals-row .heatmap-panel,
+      .signals-row .side-panel {{
+        grid-column: 1 / -1;
       }}
     }}
     @media (max-width: 1120px) {{
       .dashboard {{
-        grid-template-columns: 1fr;
+        gap: 20px;
       }}
-      .left-column, .center-column, .right-column {{
-        display: grid;
-        grid-template-columns: 1fr;
-        align-self: start;
+      .items-row .list-panel,
+      .items-row .bubbles-panel {{
+        grid-column: 1 / -1;
       }}
     }}
     @media (max-width: 980px) {{
@@ -1765,11 +1736,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
         white-space: normal;
       }}
       .list-row {{
-        grid-template-columns: 24px 44px minmax(0, 1fr);
+        grid-template-columns: 36px minmax(0, 1fr);
       }}
       .list-row .pill {{
         grid-column: 2 / -1;
         justify-self: start;
+      }}
+      .items-row,
+      .signals-row {{
+        gap: 16px;
       }}
       .heat-header-cell {{
         font-size: 11px;
@@ -1887,17 +1862,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </article>
       </section>
 
-      <div class="left-column">
-        <section class="card list-panel" id="underperforming-items">
-          <div class="panel-header">
-            <h3 class="panel-title">Underperforming Items</h3>
-          <div class="panel-subtitle">By Mentions</div>
-          </div>
-          <div class="list-body">{underperforming_html}</div>
-          <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
-        </section>
-      </div>
-
       <section class="card intelligence-panel" id="operational-intelligence">
         <h3 class="panel-title">Operational Intelligence</h3>
         <div class="panel-subtitle">Deterministic signals from review volume, outlet performance, and root-cause patterns.</div>
@@ -1919,6 +1883,27 @@ def generate_html_dashboard(analysis, output_dir="output"):
         </div>
       </section>
 
+      <div class="items-row">
+        <section class="card list-panel" id="underperforming-items">
+          <div class="panel-header">
+            <h3 class="panel-title">Underperforming Items</h3>
+            <div class="panel-subtitle">By Mentions</div>
+          </div>
+          <div class="list-body">{underperforming_html}</div>
+          <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
+        </section>
+
+        <section class="card bubbles-panel" id="items-overview">
+          <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">({outlet_scope})</span></h3>
+          <div class="legend">
+            <span><i style="background:#58b958;"></i> Positive</span>
+            <span><i style="background:#dba923;"></i> Neutral</span>
+            <span><i style="background:#e85f68;"></i> Negative</span>
+          </div>
+          <div class="bubble-wrap">{mentions_board_html}</div>
+        </section>
+      </div>
+
       <div class="signals-row">
         <section class="card heatmap-panel" id="outlet-heatmap">
           <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
@@ -1934,18 +1919,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <section class="card side-panel danger">
           <h3 class="panel-title">Urgent &amp; Important</h3>
           {alerts_html}
-        </section>
-      </div>
-
-      <div class="center-column">
-        <section class="card bubbles-panel" id="items-overview">
-          <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">({outlet_scope})</span></h3>
-          <div class="legend">
-            <span><i style="background:#58b958;"></i> Positive</span>
-            <span><i style="background:#dba923;"></i> Neutral</span>
-            <span><i style="background:#e85f68;"></i> Negative</span>
-          </div>
-          <div class="bubble-wrap">{mentions_board_html}</div>
         </section>
       </div>
 
