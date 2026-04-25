@@ -1,4 +1,5 @@
 anthropic
+pandas
 python-dotenv
 reportlab
 requests
