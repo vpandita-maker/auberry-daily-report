@@ -861,20 +861,31 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .intelligence-panel {{
       grid-column: 1 / -1;
-      padding: 18px;
+      padding: 20px;
     }}
     .intelligence-grid {{
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 14px;
+      grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.85fr);
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
     }}
     .intelligence-section {{
       background: rgba(20, 25, 43, 0.52);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
-      padding: 14px;
+      padding: 16px;
       min-width: 0;
+    }}
+    .ranking-section {{
+      background: linear-gradient(180deg, rgba(35,42,68,0.82), rgba(24,30,52,0.72));
+    }}
+    .signal-stack {{
+      display: grid;
+      gap: 16px;
+    }}
+    .signal-section {{
+      min-height: 0;
     }}
     .intelligence-section h4 {{
       margin: 0 0 10px;
@@ -933,15 +944,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .gap-summary {{
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
     }}
     .gap-summary div {{
       background: rgba(255,255,255,0.045);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 10px;
-      padding: 10px;
+      padding: 10px 12px;
     }}
     .gap-summary span,
     .ranking-meta,
@@ -960,9 +971,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .ranking-row {{
       display: grid;
-      grid-template-columns: 42px minmax(0, 1fr) auto;
-      gap: 10px;
+      grid-template-columns: 44px minmax(0, 1fr) 124px;
+      gap: 12px;
       align-items: center;
+      min-height: 66px;
     }}
     .ranking-rank {{
       width: 34px;
@@ -982,7 +994,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .ranking-score {{
       text-align: right;
-      min-width: 78px;
+      min-width: 112px;
     }}
     .ranking-score strong {{
       display: block;
@@ -1610,6 +1622,17 @@ def generate_html_dashboard(analysis, output_dir="output"):
       color: var(--muted);
       padding: 18px 0 6px;
     }}
+    .intelligence-section .empty-block {{
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.035);
+      font-size: 14px;
+      line-height: 1.45;
+    }}
     .footer-note {{
       grid-column: 1 / -1;
       text-align: center;
@@ -1670,7 +1693,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         grid-template-columns: 1fr;
       }}
       .gap-summary {{
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }}
     }}
     @media (max-width: 720px) {{
@@ -1718,6 +1741,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .ranking-score {{
         grid-column: 2 / -1;
         text-align: left;
+      }}
+      .gap-summary {{
+        grid-template-columns: 1fr;
       }}
     }}
     @keyframes page-fade {{
@@ -1821,17 +1847,19 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <h3 class="panel-title">Operational Intelligence</h3>
         <div class="panel-subtitle">Deterministic signals from review volume, outlet performance, and root-cause patterns.</div>
         <div class="intelligence-grid">
-          <div class="intelligence-section">
-            <h4>Complaint Velocity Spikes</h4>
-            {complaint_spikes_html}
-          </div>
-          <div class="intelligence-section">
+          <div class="intelligence-section ranking-section">
             <h4>Outlet Performance Ranking</h4>
             {outlet_ranking_html}
           </div>
-          <div class="intelligence-section">
-            <h4>Root Cause Patterns</h4>
-            {root_cause_patterns_html}
+          <div class="signal-stack">
+            <div class="intelligence-section signal-section">
+              <h4>Complaint Velocity Spikes</h4>
+              {complaint_spikes_html}
+            </div>
+            <div class="intelligence-section signal-section">
+              <h4>Root Cause Patterns</h4>
+              {root_cause_patterns_html}
+            </div>
           </div>
         </div>
       </section>
