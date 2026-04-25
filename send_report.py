@@ -600,10 +600,20 @@ def send_email(html_path, analysis, failed_outlets, recipient=None):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--send", action="store_true", help="Send the report email after generating")
+    args = parser.parse_args()
+
     html_path, analysis, failed_outlets = build_combined_report(load_outlets())
-    test_recipient = os.getenv("REPORT_RECIPIENT_OVERRIDE", "").strip() or None
-    send_email(html_path, analysis, failed_outlets, recipient=test_recipient)
-    print(f"Sent combined report to {test_recipient or REPORT_RECIPIENT}")
+    print(f"Dashboard saved: {analysis['html_dashboard_path']}")
+
+    if args.send:
+        test_recipient = os.getenv("REPORT_RECIPIENT_OVERRIDE", "").strip() or None
+        send_email(html_path, analysis, failed_outlets, recipient=test_recipient)
+        print(f"Sent report to {test_recipient or REPORT_RECIPIENT}")
+    else:
+        print("Email not sent. Run with --send to send.")
 
 
 if __name__ == "__main__":

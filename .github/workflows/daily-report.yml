@@ -127,4 +127,4 @@ jobs:
         if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         env:
           REQUIRE_REPORT_REVIEWS: "0"
-        run: python send_report.py
+        run: python send_report.py --send
