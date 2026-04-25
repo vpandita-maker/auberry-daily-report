@@ -1284,6 +1284,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     }}
     .mention-card {{
       position: relative;
+      z-index: 0;
       border-radius: 16px;
       padding: 14px;
       border: 1px solid rgba(255,255,255,0.08);
@@ -1300,10 +1301,20 @@ def generate_html_dashboard(analysis, output_dir="output"):
         filter 180ms ease;
     }}
     .mention-card:hover {{
+      z-index: 2;
       transform: translateY(-5px);
       border-color: rgba(255,255,255,0.16);
       box-shadow: 0 18px 28px rgba(6, 9, 21, 0.24);
       filter: brightness(1.03);
+    }}
+    .mention-card:has(.mention-sources[open]) {{
+      z-index: 60;
+      transform: none;
+      filter: none;
+    }}
+    .mention-card:has(.mention-sources[open]):hover {{
+      transform: none;
+      filter: none;
     }}
     .mention-positive {{ background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }}
     .mention-neutral {{ background: linear-gradient(180deg, rgba(219,169,35,0.20), rgba(145,113,35,0.16)); }}
@@ -1386,8 +1397,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
       padding: 12px;
       border: 1px solid rgba(111,167,255,0.22);
       border-radius: 14px;
-      background: rgba(21, 26, 48, 0.98);
-      box-shadow: 0 24px 48px rgba(5, 8, 18, 0.44);
+      background: #151a30;
+      box-shadow: 0 28px 64px rgba(5, 8, 18, 0.68);
       animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
     }}
     .mention-sources-panel::-webkit-scrollbar {{
