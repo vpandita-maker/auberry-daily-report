@@ -1095,10 +1095,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       grid-column: span 8;
     }}
     .signals-row .heatmap-panel {{
-      grid-column: span 7;
+      grid-column: span 8;
     }}
     .signals-row .side-panel {{
-      grid-column: span 5;
+      grid-column: span 4;
     }}
     .panel-title {{
       margin: 0;
@@ -1210,28 +1210,28 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: inline-block;
     }}
     .heat-grid {{
-      margin-top: 18px;
+      margin-top: 22px;
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }}
     .heat-head, .heat-row {{
       display: grid;
-      grid-template-columns: minmax(210px, 1.45fr) repeat(5, minmax(62px, 0.7fr));
-      gap: 8px;
+      grid-template-columns: minmax(250px, 1.35fr) repeat(5, minmax(92px, 1fr));
+      gap: 10px;
       align-items: stretch;
     }}
     .heat-header-cell {{
       text-align: center;
       color: #d8dcef;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       display: grid;
       gap: 6px;
       justify-items: center;
     }}
     .heat-icon {{
-      width: 28px;
-      height: 28px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: rgba(255,255,255,0.06);
       display: grid;
@@ -1245,14 +1245,14 @@ def generate_html_dashboard(analysis, output_dir="output"):
       line-height: 1.25;
       overflow-wrap: anywhere;
       word-break: break-word;
-      font-size: 14px;
+      font-size: 16px;
     }}
     .heat-cell {{
-      min-height: 46px;
-      border-radius: 10px;
+      min-height: 58px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: 0.02em;
       border: 1px solid rgba(255,255,255,0.05);
@@ -1732,7 +1732,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         display: none;
       }}
       .heat-head, .heat-row {{
-        grid-template-columns: minmax(150px, 1.2fr) repeat(5, minmax(48px, 0.7fr));
+        grid-template-columns: minmax(170px, 1.2fr) repeat(5, minmax(58px, 0.8fr));
       }}
       .filters {{
         justify-content: flex-start;
@@ -1775,8 +1775,8 @@ def generate_html_dashboard(analysis, output_dir="output"):
         font-size: 11px;
       }}
       .heat-cell {{
-        min-height: 44px;
-        font-size: 12px;
+        min-height: 46px;
+        font-size: 13px;
       }}
       .heat-outlet {{
         font-size: 13px;
