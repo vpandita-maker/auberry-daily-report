@@ -985,7 +985,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .topbar {{
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       align-items: center;
       padding: 10px 8px 4px;
@@ -1003,10 +1003,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 400;
       font-family: Arial, Helvetica, sans-serif;
       color: var(--muted);
-    }}
-    .topbar-center {{
-      display: flex;
-      justify-content: center;
     }}
     .filters {{
       display: flex;
@@ -2090,9 +2086,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .topbar {{
         grid-template-columns: 1fr;
       }}
-      .topbar-center {{
-        justify-content: flex-start;
-      }}
       .filter-text {{
         white-space: normal;
       }}
@@ -2179,11 +2172,18 @@ def generate_html_dashboard(analysis, output_dir="output"):
         transform: translateY(0);
       }}
     }}
-    .date-picker-wrap {{
+    .dp-overlay {{
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+    }}
+    .dp-wrap {{
       position: relative;
       display: inline-flex;
     }}
-    .date-picker-btn {{
+    .dp-btn {{
       background: var(--panel-2);
       border: 1px solid var(--border);
       color: var(--text);
@@ -2196,26 +2196,27 @@ def generate_html_dashboard(analysis, output_dir="output"):
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(7,10,22,0.4);
       transition: border-color 180ms, background 180ms;
     }}
-    .date-picker-btn:hover {{
+    .dp-btn:hover {{
       border-color: var(--purple);
       background: var(--panel);
     }}
-    .date-picker-btn strong {{
+    .dp-btn strong {{
       color: var(--text);
       font-weight: 600;
     }}
-    .date-picker-chevron {{
+    .dp-chevron {{
       color: var(--muted);
       font-size: 10px;
     }}
-    .date-picker-menu {{
+    .dp-menu {{
       display: none;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: calc(100% + 10px);
+      top: calc(100% + 8px);
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -2226,10 +2227,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       z-index: 100;
       animation: mention-slide-down 180ms cubic-bezier(.22,1,.36,1);
     }}
-    .date-picker-menu.open {{
+    .dp-menu.open {{
       display: block;
     }}
-    .date-picker-option {{
+    .dp-option {{
       padding: 11px 18px;
       cursor: pointer;
       font-size: 13px;
@@ -2237,13 +2238,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
       transition: background 150ms;
       border-bottom: 1px solid var(--border);
     }}
-    .date-picker-option:last-child {{
+    .dp-option:last-child {{
       border-bottom: none;
     }}
-    .date-picker-option:hover {{
+    .dp-option:hover {{
       background: var(--panel-2);
     }}
-    .date-picker-option.active {{
+    .dp-option.active {{
       color: var(--purple);
       font-weight: 700;
     }}
@@ -2256,14 +2257,6 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <div class="brand-block">
           <div class="brand-copy">
             <h1>{brand} Executive Dashboard</h1>
-          </div>
-        </div>
-        <div class="topbar-center">
-          <div class="date-picker-wrap" id="dpWrap">
-            <button class="date-picker-btn" id="dpBtn">
-              &#128197;&nbsp;<strong><span id="dpLabel">&#8230;</span></strong><span class="date-picker-chevron">&#9662;</span>
-            </button>
-            <div class="date-picker-menu" id="dpMenu"></div>
           </div>
         </div>
         <div class="filters">
@@ -2388,6 +2381,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
       <div class="footer-note">{brand}</div>
     </section>
   </main>
+  <div class="dp-overlay">
+    <div class="dp-wrap" id="dpWrap">
+      <button class="dp-btn" id="dpBtn">&#128197;&nbsp;<strong><span id="dpLabel">&#8230;</span></strong><span class="dp-chevron">&#9662;</span></button>
+      <div class="dp-menu" id="dpMenu"></div>
+    </div>
+  </div>
   <script>
   (function() {{
     var isArchive = /\/archive\//.test(window.location.pathname);
@@ -2397,25 +2396,19 @@ def generate_html_dashboard(analysis, output_dir="output"):
       var m = window.location.pathname.match(/(\d{{4}}-\d{{2}}-\d{{2}})\.html/);
       if (m) activeDate = m[1];
     }}
-
     function fmt(d) {{
       var p = d.split('-');
-      var dt = new Date(+p[0], +p[1] - 1, +p[2]);
-      return dt.toLocaleDateString('en-IN', {{weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'}});
+      var dt = new Date(+p[0], +p[1]-1, +p[2]);
+      return dt.toLocaleDateString('en-IN', {{weekday:'short', day:'numeric', month:'short', year:'numeric'}});
     }}
-
     document.getElementById('dpBtn').addEventListener('click', function(e) {{
       e.stopPropagation();
       document.getElementById('dpMenu').classList.toggle('open');
     }});
-
     document.addEventListener('click', function(e) {{
       var w = document.getElementById('dpWrap');
-      if (w && !w.contains(e.target)) {{
-        document.getElementById('dpMenu').classList.remove('open');
-      }}
+      if (w && !w.contains(e.target)) document.getElementById('dpMenu').classList.remove('open');
     }});
-
     fetch(base + 'dates.json')
       .then(function(r) {{ return r.json(); }})
       .then(function(data) {{
@@ -2427,7 +2420,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         lbl.textContent = fmt(active);
         dates.forEach(function(d, i) {{
           var el = document.createElement('div');
-          el.className = 'date-picker-option' + (d === active ? ' active' : '');
+          el.className = 'dp-option' + (d === active ? ' active' : '');
           el.textContent = fmt(d) + (i === 0 ? ' — Latest' : '');
           el.addEventListener('click', function() {{
             window.location.href = i === 0 ? base + 'index.html' : base + 'archive/' + d + '.html';
@@ -2435,9 +2428,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
           menu.appendChild(el);
         }});
       }})
-      .catch(function() {{
-        document.getElementById('dpLabel').textContent = 'History';
-      }});
+      .catch(function() {{ document.getElementById('dpLabel').textContent = 'Select date'; }});
   }})();
   </script>
 </body>
