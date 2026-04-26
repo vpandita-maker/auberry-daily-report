@@ -601,42 +601,96 @@ def _render_review_references(items):
     if not items:
         return "<div class='empty-block'>No new reviews were captured today.</div>"
 
+    avatar_palette = [
+        ("#7c3aed", "#ede9fe"),
+        ("#0369a1", "#e0f2fe"),
+        ("#047857", "#d1fae5"),
+        ("#b45309", "#fef3c7"),
+        ("#be185d", "#fce7f3"),
+        ("#1d4ed8", "#dbeafe"),
+    ]
+
+    def _stars(rating):
+        try:
+            r = float(rating)
+        except (TypeError, ValueError):
+            return '<span class="rv-stars rv-stars-none">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</span>'
+        full = int(r)
+        half = 1 if (r - full) >= 0.5 else 0
+        empty = 5 - full - half
+        return (
+            '<span class="rv-stars">'
+            + '&#x2605;' * full
+            + ('&#x2BE8;' if half else '')
+            + '<span class="rv-star-empty">' + '&#x2605;' * empty + '</span>'
+            + '</span>'
+        )
+
     cards = []
-    for item in items:
+    for i, item in enumerate(items):
         rating = item.get("rating")
-        rating_label = f"{float(rating):.1f}/5" if isinstance(rating, (int, float)) else "Unrated"
+        try:
+            rating_num = float(rating)
+            rating_label = f"{rating_num:.1f}"
+            if rating_num >= 4.5:
+                rating_cls = "rv-rating-high"
+            elif rating_num >= 3.5:
+                rating_cls = "rv-rating-mid"
+            else:
+                rating_cls = "rv-rating-low"
+        except (TypeError, ValueError):
+            rating_label = "—"
+            rating_cls = "rv-rating-mid"
+
+        author_raw = str(item.get("author", "Anonymous")).strip() or "Anonymous"
+        author = escape(author_raw)
+        initial = author_raw[0].upper() if author_raw else "?"
+        bg, fg = avatar_palette[i % len(avatar_palette)]
+
         author_url = str(item.get("author_url", "")).strip()
+        author_link = (
+            f'<a href="{escape(author_url)}" target="_blank" rel="noopener noreferrer" class="rv-name">{author}</a>'
+            if author_url else f'<span class="rv-name">{author}</span>'
+        )
+
         source_url = str(item.get("source_url", "")).strip()
-        author = escape(str(item.get("author", "Anonymous")))
-        author_html = (
-            f'<a href="{escape(author_url)}" target="_blank" rel="noopener noreferrer">{author}</a>'
-            if author_url
-            else author
+        source_link = (
+            f'<a href="{escape(source_url)}" target="_blank" rel="noopener noreferrer" class="rv-source-link">View on Google ↗</a>'
+            if source_url else ""
         )
-        source_html = (
-            f'<a href="{escape(source_url)}" target="_blank" rel="noopener noreferrer">Open source</a>'
-            if source_url
-            else "Source unavailable"
-        )
+
+        outlet_short = escape(_display_outlet_name(str(item.get("outlet", "Unknown outlet"))))
+        date_fmt = escape(_format_display_datetime(item.get("date_time", "")))
+        text = escape(str(item.get("text", "")).strip())
+
         cards.append(
             """
             <article class="review-card">
-              <div class="review-meta">
-                <div class="review-outlet">{outlet}</div>
-                <span class="review-rating">{rating}</span>
+              <div class="rv-header">
+                <div class="rv-avatar" style="background:{bg};color:{fg}">{initial}</div>
+                <div class="rv-author-block">
+                  {author_link}
+                  <div class="rv-date">{date_fmt}</div>
+                </div>
+                <div class="rv-rating-pill {rating_cls}">{rating_label}</div>
               </div>
-              <div class="review-detail">{location}</div>
-              <div class="review-detail">{date_time}</div>
-              <div class="review-author">Reviewer: {author_html}</div>
-              <p>{text}</p>
+              <div class="rv-stars-row">{stars}</div>
+              <p class="rv-text">{text}</p>
+              <div class="rv-footer">
+                <span class="rv-outlet-tag">{outlet_short}</span>
+                {source_link}
+              </div>
             </article>
             """.format(
-                outlet=escape(str(item.get("outlet", "Unknown outlet"))),
-                rating=escape(rating_label),
-                location=escape(str(item.get("location", "Location unavailable"))),
-                date_time=escape(_format_display_datetime(item.get("date_time", "Unknown date/time"))),
-                author_html=author_html,
-                text=escape(str(item.get("text", ""))),
+                bg=bg, fg=fg, initial=initial,
+                author_link=author_link,
+                date_fmt=date_fmt,
+                rating_label=rating_label,
+                rating_cls=rating_cls,
+                stars=_stars(rating),
+                text=text,
+                outlet_short=outlet_short,
+                source_link=source_link,
             )
         )
     return "<div class='review-grid'>{}</div>".format("".join(cards))
@@ -1713,57 +1767,110 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .review-card {{
       border-radius: 18px;
-      padding: 18px;
-      border: 1px solid rgba(111,167,255,0.16);
-      background: linear-gradient(180deg, rgba(48,58,94,0.95), rgba(39,47,77,0.95));
-      display: grid;
-      gap: 10px;
-      align-content: start;
-    }}
-    .review-meta {{
+      padding: 18px 20px 16px;
+      border: 1px solid rgba(111,167,255,0.14);
+      background: linear-gradient(160deg, rgba(40,50,82,0.98), rgba(32,40,66,0.98));
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       gap: 12px;
+      transition: transform 200ms cubic-bezier(.22,1,.36,1), box-shadow 200ms ease, border-color 200ms ease;
+    }}
+    .review-card:hover {{
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(7,10,22,0.38);
+      border-color: rgba(111,167,255,0.28);
+    }}
+    .rv-header {{
+      display: flex;
       align-items: center;
+      gap: 12px;
     }}
-    .review-outlet {{
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.35;
+    .rv-avatar {{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+      font-weight: 800;
+      flex-shrink: 0;
+      letter-spacing: -0.01em;
     }}
-    .review-rating {{
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(111,167,255,0.14);
-      border: 1px solid rgba(111,167,255,0.18);
-      color: #b9d6ff;
-      font-size: 12px;
+    .rv-author-block {{
+      flex: 1;
+      min-width: 0;
+    }}
+    .rv-name {{
+      display: block;
+      font-size: 14px;
       font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }}
-    .review-detail, .review-author {{
+    .rv-name:hover {{ text-decoration: underline; }}
+    .rv-date {{
+      font-size: 11px;
       color: var(--muted);
+      margin-top: 1px;
+      font-weight: 500;
+    }}
+    .rv-rating-pill {{
+      padding: 5px 10px;
+      border-radius: 999px;
       font-size: 13px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-      word-break: break-word;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: -0.01em;
     }}
-    .review-author a, .review-links a {{
-      color: #b9d6ff;
-      text-decoration: none;
-      font-weight: 700;
-    }}
-    .review-author a:hover, .review-links a:hover {{
-      text-decoration: underline;
-    }}
-    .review-card p {{
+    .rv-rating-high {{ background: rgba(99,216,95,0.16); color: #63d85f; border: 1px solid rgba(99,216,95,0.22); }}
+    .rv-rating-mid  {{ background: rgba(241,188,46,0.16); color: #f1bc2e; border: 1px solid rgba(241,188,46,0.22); }}
+    .rv-rating-low  {{ background: rgba(239,100,100,0.16); color: #ef6464; border: 1px solid rgba(239,100,100,0.22); }}
+    .rv-stars-row {{ line-height: 1; margin-top: -4px; }}
+    .rv-stars {{ font-size: 16px; color: #f1bc2e; letter-spacing: 1px; }}
+    .rv-stars-none {{ color: #4a5070; }}
+    .rv-star-empty {{ color: #3a4060; }}
+    .rv-text {{
       margin: 0;
-      color: #f7f8ff;
-      font-size: 14px;
+      color: #e8eaf8;
+      font-size: 13px;
       line-height: 1.65;
       overflow-wrap: anywhere;
       word-break: break-word;
+      flex: 1;
     }}
+    .rv-footer {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 2px;
+    }}
+    .rv-outlet-tag {{
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(171,125,244,0.14);
+      border: 1px solid rgba(171,125,244,0.2);
+      color: #c094ff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+    }}
+    .rv-source-link {{
+      font-size: 11px;
+      font-weight: 600;
+      color: #8fc5ff;
+      text-decoration: none;
+      white-space: nowrap;
+    }}
+    .rv-source-link:hover {{ text-decoration: underline; }}
     .action-row {{
       display: grid;
       gap: 14px;
