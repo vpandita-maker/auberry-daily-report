@@ -1223,7 +1223,7 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
       overflow-wrap: anywhere;
     }}
     .gap-num {{
-      font-size: 26px;
+      font-size: 35px;
       font-weight: 900;
       letter-spacing: -0.02em;
       color: var(--text);
