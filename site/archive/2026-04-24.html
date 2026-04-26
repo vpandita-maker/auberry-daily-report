@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auberry The Bake Shop - All Outlets Dashboard</title>
+  <style>
+    :root {
+      --bg: #171b31;
+      --panel: #232941;
+      --panel-2: #2a314c;
+      --border: #343c5a;
+      --text: #f3f4ff;
+      --muted: #b2b8d1;
+      --green: #63d85f;
+      --green-bg: #4caf5030;
+      --yellow: #f1bc2e;
+      --yellow-bg: #f1bc2e2e;
+      --red: #ef6464;
+      --red-bg: #ef646428;
+      --purple: #ab7df4;
+      --purple-bg: #ab7df426;
+      --blue: #6fa7ff;
+      --chip: #1e2439;
+      --shadow: 0 20px 40px rgba(7, 10, 22, 0.32);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(171,125,244,0.12), transparent 22%),
+        radial-gradient(circle at top right, rgba(99,216,95,0.10), transparent 18%),
+        linear-gradient(180deg, #161a30 0%, #13182c 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      animation: page-fade 700ms cubic-bezier(.22,1,.36,1);
+    }
+    .page {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      transition:
+        transform 220ms cubic-bezier(.22,1,.36,1),
+        box-shadow 220ms cubic-bezier(.22,1,.36,1),
+        border-color 220ms ease,
+        background 220ms ease,
+        filter 220ms ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 54px rgba(7, 10, 22, 0.42);
+      border-color: rgba(171,125,244,0.32);
+    }
+    .topbar {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 10px 8px 4px;
+    }
+    .brand-block {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+    .brand-copy h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+      letter-spacing: 0;
+      font-weight: 400;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--muted);
+    }
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .filter-text {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .filter-text strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .kpis {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .intelligence-panel {
+      grid-column: 1 / -1;
+      padding: 24px;
+    }
+    .intelligence-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 8fr) minmax(320px, 4fr);
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+    .intelligence-section {
+      background: rgba(20, 25, 43, 0.52);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 16px;
+      min-width: 0;
+    }
+    .ranking-section {
+      background: linear-gradient(180deg, rgba(35,42,68,0.82), rgba(24,30,52,0.72));
+    }
+    .signal-stack {
+      display: grid;
+      gap: 16px;
+    }
+    .signal-section {
+      min-height: 0;
+    }
+    .intelligence-section h4 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.35;
+      color: var(--text);
+    }
+    .insight-grid,
+    .pattern-grid,
+    .ranking-list {
+      display: grid;
+      gap: 10px;
+    }
+    .insight-card,
+    .pattern-card,
+    .ranking-row {
+      border-radius: 12px;
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px;
+    }
+    .insight-card h4 {
+      margin: 4px 0 6px;
+      font-size: 16px;
+    }
+    .insight-card p,
+    .pattern-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .insight-kicker,
+    .pattern-type {
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .insight-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .insight-meta span,
+    .pattern-card span {
+      color: var(--text);
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 12px;
+      display: inline-flex;
+      margin-top: 10px;
+    }
+    .gap-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .gap-summary div {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .gap-summary span,
+    .ranking-meta,
+    .ranking-score span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .gap-summary strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text);
+      overflow-wrap: anywhere;
+    }
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) 124px;
+      gap: 12px;
+      align-items: center;
+      min-height: 66px;
+    }
+    .ranking-rank {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--purple-bg);
+      color: var(--text);
+      font-weight: 800;
+    }
+    .ranking-outlet {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .ranking-score {
+      text-align: right;
+      min-width: 112px;
+    }
+    .ranking-score strong {
+      display: block;
+      font-size: 18px;
+    }
+    .ranking-top .ranking-rank {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .ranking-underperforming .ranking-rank {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+    .kpi-card {
+      padding: 18px 18px 14px;
+      display: grid;
+      grid-template-columns: 60px 1fr 110px;
+      gap: 14px;
+      align-items: center;
+    }
+    .kpi-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .kpi-icon.gold { background: #7d6a3638; color: #ffcb47; }
+    .kpi-icon.green { background: #39644d45; color: #66e26c; }
+    .kpi-icon.red { background: #6a434943; color: #ff7474; }
+    .kpi-icon.purple { background: #51427345; color: #c094ff; }
+    .kpi-title { color: var(--muted); font-size: 14px; }
+    .kpi-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+    .kpi-sub { color: var(--muted); margin-top: 6px; font-size: 14px; }
+    .kpi-sub.positive { color: var(--green); }
+    .kpi-sub.negative { color: var(--red); }
+    .sparkline {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sparkline svg { width: 100%; height: 44px; }
+    .items-row,
+    .signals-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }
+    .items-row .list-panel {
+      grid-column: span 4;
+    }
+    .items-row .bubbles-panel {
+      grid-column: span 8;
+    }
+    .signals-row .heatmap-panel {
+      grid-column: span 8;
+    }
+    .signals-row .side-panel {
+      grid-column: span 4;
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .panel-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .panel-header {
+      padding: 0;
+    }
+    .list-panel {
+      padding: 24px;
+      min-height: 100%;
+    }
+    .list-body {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 0 0;
+      min-width: 0;
+    }
+    .list-row {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-height: 118px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        background 180ms ease,
+        border-color 180ms ease;
+    }
+    .list-row:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,0.035);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .item-copy {
+      min-width: 0;
+    }
+    .item-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: #eef1ff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .item-thumb { display: none; }
+    .item-name {
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .item-meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .list-row .pill {
+      grid-column: 2 / -1;
+      width: max-content;
+      margin-top: 6px;
+    }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pill-positive { background: var(--green-bg); color: var(--green); }
+    .pill-negative { background: var(--red-bg); color: var(--red); }
+    .pill-neutral { background: var(--yellow-bg); color: var(--yellow); }
+    .pill-na { background: rgba(170,177,204,0.18); color: #c3c8db; }
+    .list-footer {
+      padding: 12px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .heatmap-panel {
+      padding: 24px;
+      min-height: 100%;
+    }
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend i {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .heat-grid {
+      margin-top: 22px;
+      display: grid;
+      gap: 10px;
+    }
+    .heat-head, .heat-row {
+      display: grid;
+      grid-template-columns: minmax(250px, 1.35fr) repeat(5, minmax(92px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+    .heat-header-cell {
+      text-align: center;
+      color: #d8dcef;
+      font-size: 14px;
+      font-weight: 700;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+    }
+    .heat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: grid;
+      place-items: center;
+    }
+    .heat-outlet {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      font-size: 16px;
+    }
+    .heat-cell {
+      min-height: 58px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        filter 180ms ease,
+        box-shadow 180ms ease;
+    }
+    .heat-cell:hover {
+      transform: translateY(-4px);
+      filter: brightness(1.04);
+      box-shadow: 0 14px 22px rgba(7, 10, 22, 0.2);
+    }
+    .heat-positive { background: #58b958; color: white; }
+    .heat-neutral { background: #dba923; color: white; }
+    .heat-negative { background: #e85f68; color: white; }
+    .heat-na { background: #5a637d; color: #eef2ff; }
+    .bubbles-panel {
+      padding: 24px;
+      min-height: 100%;
+    }
+    .bubble-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      padding-top: 14px;
+      align-content: start;
+    }
+    .mention-card {
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      min-height: 112px;
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease;
+    }
+    .mention-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 18px 28px rgba(6, 9, 21, 0.24);
+      filter: brightness(1.03);
+    }
+    .mention-positive { background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }
+    .mention-neutral { background: linear-gradient(180deg, rgba(219,169,35,0.20), rgba(145,113,35,0.16)); }
+    .mention-negative { background: linear-gradient(180deg, rgba(232,95,104,0.20), rgba(140,58,72,0.16)); }
+    .mention-na { background: rgba(255,255,255,0.045); }
+    .mention-rank {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .mention-body {
+      min-width: 0;
+    }
+    .mention-body h4 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.18;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      hyphens: auto;
+    }
+    .mention-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .mention-sources {
+      margin-top: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(111,167,255,0.18);
+      background: rgba(23, 27, 49, 0.78);
+      overflow: hidden;
+    }
+    .mention-sources-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      user-select: none;
+    }
+    .mention-sources-toggle::-webkit-details-marker {
+      display: none;
+    }
+    .mention-sources-toggle::after {
+      content: " +";
+      float: right;
+      color: rgba(255,255,255,0.7);
+    }
+    .mention-sources[open] .mention-sources-toggle::after {
+      content: " -";
+    }
+    .mention-sources-panel {
+      display: grid;
+      gap: 10px;
+      padding: 0 12px 12px;
+      animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
+    }
+    .mention-sources-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+      margin-bottom: 2px;
+    }
+    .mention-source-card {
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .mention-source-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f0f4ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .mention-source-meta {
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.72);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .mention-source-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #f7f8ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .side-panel {
+      padding: 24px;
+      min-height: 100%;
+    }
+    .side-panel.danger h3 { color: #ff6d6d; }
+    .alert-card {
+      margin-top: 14px;
+      border-radius: 16px;
+      padding: 14px 14px 12px;
+      border: 1px solid transparent;
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        box-shadow 180ms ease,
+        border-color 180ms ease,
+        filter 180ms ease;
+    }
+    .alert-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 30px rgba(8, 11, 26, 0.22);
+      filter: brightness(1.03);
+    }
+    .alert-urgent { background: #3b2633; border-color: #8a3c56; }
+    .alert-warning { background: #3a3423; border-color: #8d7235; }
+    .alert-info { background: #2e2942; border-color: #715ca6; }
+    .alert-clear { background: rgba(66, 118, 80, 0.22); border-color: rgba(99,216,95,0.42); }
+    .alert-kicker {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .alert-card h4 { margin: 0; font-size: 16px; }
+    .alert-card p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+      margin: 8px 0 0;
+    }
+    .alert-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .impact, .status-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .impact-high { background: var(--red-bg); color: var(--red); }
+    .impact-medium { background: var(--yellow-bg); color: var(--yellow); }
+    .impact-low { background: var(--green-bg); color: var(--green); }
+    .status-chip { background: rgba(255,255,255,0.04); color: #e9ecfb; }
+    .recommendations-panel {
+      grid-column: 1 / -1;
+      padding: 20px;
+      height: max-content;
+    }
+    .recommendations-panel .panel-title {
+      color: #bc93ff;
+    }
+    .recommendations-panel .panel-subtitle {
+      margin-top: 6px;
+      max-width: 820px;
+      line-height: 1.5;
+    }
+    .recommendations-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    .reviews-panel {
+      grid-column: 1 / -1;
+      padding: 20px;
+      height: max-content;
+    }
+    .reviews-panel .panel-title {
+      color: #8fc5ff;
+    }
+    .review-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .review-card {
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid rgba(111,167,255,0.16);
+      background: linear-gradient(180deg, rgba(48,58,94,0.95), rgba(39,47,77,0.95));
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .review-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .review-outlet {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .review-rating {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.14);
+      border: 1px solid rgba(111,167,255,0.18);
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .review-detail, .review-author {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .review-author a, .review-links a {
+      color: #b9d6ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .review-author a:hover, .review-links a:hover {
+      text-decoration: underline;
+    }
+    .review-card p {
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .action-row {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      padding: 18px;
+      min-height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(171,125,244,0.16);
+      background: linear-gradient(180deg, rgba(57,62,97,0.95), rgba(44,48,78,0.95));
+      color: inherit;
+      transition:
+        transform 200ms cubic-bezier(.22,1,.36,1),
+        filter 200ms ease,
+        border-color 200ms ease,
+        box-shadow 200ms ease,
+        background 200ms ease;
+    }
+    .action-topline {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+    .action-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(171,125,244,0.18);
+      color: #caafff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .action-copy {
+      min-width: 0;
+    }
+    .action-title {
+      font-weight: 700;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+    .action-title, .action-meta {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .action-meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+    .action-metrics {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .action-chip {
+      display: grid;
+      gap: 4px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      min-width: 0;
+      align-content: start;
+    }
+    .action-chip strong {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+    }
+    .action-chip span {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      color: #f7f8ff;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .metric-chip {
+      background: linear-gradient(180deg, rgba(111,167,255,0.14), rgba(111,167,255,0.06));
+      border-color: rgba(111,167,255,0.18);
+    }
+    .action-row:hover {
+      filter: brightness(1.05);
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 22px 34px rgba(9, 11, 28, 0.24);
+    }
+    .action-strategy {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+    }
+    .action-strategy strong {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+    }
+    .action-strategy p {
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .empty-block {
+      color: var(--muted);
+      padding: 18px 0 6px;
+    }
+    .list-body .empty-block,
+    .bubble-wrap .empty-block {
+      grid-column: 1 / -1;
+      min-height: 118px;
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.035);
+    }
+    .intelligence-section .empty-block {
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.035);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .footer-note {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #d9ddf2;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      padding: 6px 4px 8px;
+      animation: footer-slide-in 900ms cubic-bezier(.22,1,.36,1) 120ms both;
+    }
+    @media (max-width: 1360px) {
+      .recommendations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .review-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .intelligence-grid {
+        grid-template-columns: 1fr;
+      }
+      .signals-row .heatmap-panel,
+      .signals-row .side-panel {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 1120px) {
+      .dashboard {
+        gap: 20px;
+      }
+      .items-row .list-panel,
+      .items-row .bubbles-panel {
+        grid-column: 1 / -1;
+      }
+    }
+    @media (max-width: 980px) {
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .kpi-card {
+        grid-template-columns: 56px 1fr;
+      }
+      .sparkline {
+        display: none;
+      }
+      .heat-head, .heat-row {
+        grid-template-columns: minmax(170px, 1.2fr) repeat(5, minmax(58px, 0.8fr));
+      }
+      .filters {
+        justify-content: flex-start;
+      }
+      .recommendations-grid {
+        grid-template-columns: 1fr;
+      }
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+      .gap-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 720px) {
+      .page {
+        padding: 14px;
+      }
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+      .filter-text {
+        white-space: normal;
+      }
+      .list-row {
+        grid-template-columns: 36px minmax(0, 1fr);
+      }
+      .list-row .pill {
+        grid-column: 2 / -1;
+        justify-self: start;
+      }
+      .items-row,
+      .signals-row {
+        gap: 16px;
+      }
+      .heat-header-cell {
+        font-size: 11px;
+      }
+      .heat-cell {
+        min-height: 46px;
+        font-size: 13px;
+      }
+      .heat-outlet {
+        font-size: 13px;
+      }
+      .bubble-wrap {
+        grid-template-columns: 1fr;
+      }
+      .action-metrics {
+        grid-template-columns: 1fr;
+      }
+      .action-row {
+        padding: 16px;
+      }
+      .ranking-row {
+        grid-template-columns: 38px minmax(0, 1fr);
+      }
+      .ranking-score {
+        grid-column: 2 / -1;
+        text-align: left;
+      }
+      .gap-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+    @keyframes page-fade {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes footer-slide-in {
+      from {
+        opacity: 0;
+        transform: translateX(-18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes mention-slide-down {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="dashboard">
+      <div class="topbar">
+        <div class="brand-block">
+          <div class="brand-copy">
+            <h1>Auberry The Bake Shop - All Outlets Executive Dashboard</h1>
+          </div>
+        </div>
+        <div class="filters">
+          <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
+          <div class="filter-text"><strong>Window:</strong> Friday, 24 April 2026</div>
+        </div>
+      </div>
+
+      <section class="kpis">
+        <article class="card kpi-card">
+          <div class="kpi-icon gold">★</div>
+          <div>
+            <div class="kpi-title">Overall Rating</div>
+            <div class="kpi-value">5.0 <span style="font-size:18px;font-weight:600;">/ 5</span></div>
+            <div class="kpi-sub positive">↑ +0.2 vs yesterday</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 24 L10 26 L20 18 L30 25 L40 20 L50 11 L60 14 L70 5 L80 8 L90 7 L100 3" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon green">☺</div>
+          <div>
+            <div class="kpi-title">Positive Sentiment</div>
+            <div class="kpi-value">80%</div>
+            <div class="kpi-sub positive">↑ +20 vs yesterday</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 28 L10 18 L20 24 L30 26 L40 9 L50 20 L60 19 L70 8 L80 12 L90 11 L100 6" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon red">⛨</div>
+          <div>
+            <div class="kpi-title">Risk Level</div>
+            <div class="kpi-value" style="color:#69dd74;">Low</div>
+            <div class="kpi-sub">April 24, 2026 only</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 29 L10 23 L20 24 L30 18 L40 21 L50 10 L60 7 L70 19 L80 16 L90 16 L100 20" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon purple">◔</div>
+          <div>
+            <div class="kpi-title">Total Reviews</div>
+            <div class="kpi-value">17</div>
+            <div class="kpi-sub positive">↑ +13 vs yesterday</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 21 L10 10 L20 18 L30 7 L40 3 L50 15 L60 4 L70 21 L80 24 L90 22 L100 18" stroke="#b383ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+      </section>
+
+      <section class="card intelligence-panel" id="operational-intelligence">
+        <h3 class="panel-title">Operational Intelligence</h3>
+        <div class="panel-subtitle">Deterministic signals from review volume, outlet performance, and root-cause patterns.</div>
+        <div class="intelligence-grid">
+          <div class="intelligence-section ranking-section">
+            <h4>Outlet Performance Ranking</h4>
+            
+    <div class="gap-summary">
+      <div><span>Best</span><strong>Auberry The Bake Shop - Panjagutta</strong></div>
+      <div><span>Worst</span><strong>AUBERRY - Uppal</strong></div>
+      <div><span>Rating Gap</span><strong>0.0★</strong></div>
+      <div><span>Score Gap</span><strong>0.0</strong></div>
+    </div>
+    <div class='ranking-list'>
+            <div class="ranking-row ranking-top">
+              <div class="ranking-rank">#1</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <div class="ranking-meta">5 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#2</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <div class="ranking-meta">4 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#3</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <div class="ranking-meta">4 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-middle">
+              <div class="ranking-rank">#4</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">Auberry The Bake Shop - Musarambagh</div>
+                <div class="ranking-meta">3 reviews · Normal confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            
+            <div class="ranking-row ranking-underperforming">
+              <div class="ranking-rank">#5</div>
+              <div class="ranking-main">
+                <div class="ranking-outlet">AUBERRY - Uppal</div>
+                <div class="ranking-meta">1 review · Low confidence</div>
+              </div>
+              <div class="ranking-score">
+                <strong>5.0</strong>
+                <span>5.0★ · 100% positive</span>
+              </div>
+            </div>
+            </div>
+          </div>
+          <div class="signal-stack">
+            <div class="intelligence-section signal-section">
+              <h4>Complaint Velocity Spikes</h4>
+              <div class='empty-block'>No complaint velocity spikes detected for this cycle.</div>
+            </div>
+            <div class="intelligence-section signal-section">
+              <h4>Root Cause Patterns</h4>
+              <div class='empty-block'>No repeating root-cause pattern detected yet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="items-row">
+        <section class="card list-panel" id="underperforming-items">
+          <div class="panel-header">
+            <h3 class="panel-title">Underperforming Items</h3>
+            <div class="panel-subtitle">By Mentions</div>
+          </div>
+          <div class="list-body"><div class='empty-block'>No underperforming items flagged yet.</div></div>
+          <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
+        </section>
+
+        <section class="card bubbles-panel" id="items-overview">
+          <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">(All Outlets)</span></h3>
+          <div class="legend">
+            <span><i style="background:#58b958;"></i> Positive</span>
+            <span><i style="background:#dba923;"></i> Neutral</span>
+            <span><i style="background:#e85f68;"></i> Negative</span>
+          </div>
+          <div class="bubble-wrap">
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">1</div>
+              <div class="mention-body">
+                <h4>Donuts (general)</h4>
+                <div class="mention-meta">
+                  <span>9 mentions</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Donuts are very tasty and good staff</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Filled donuts are good.</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
+                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
+                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+                      <p>Must try Nutella donut and had good quality food</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">2</div>
+              <div class="mention-body">
+                <h4>Chocolate Croissant</h4>
+                <div class="mention-meta">
+                  <span>2 mentions</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: AUBERRY - Uppal</div>
+                      <div class="mention-source-meta">Reviewer: Ugadi Sunil · Rating: 5 · 24/04/26 03:23 PM IST</div>
+                      <div class="mention-source-meta">DSL Virtue Mall, Medipally, Srinivasa Colony, Uppal, Hyderabad, Telangana 500039, India</div>
+                      <p>Donuts and croissant🥐  taste super
+My favorite double chocolate donut</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Panjagutta</div>
+                      <div class="mention-source-meta">Reviewer: Karthik Yt · Rating: 5 · 24/04/26 02:09 PM IST</div>
+                      <div class="mention-source-meta">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>The test of the food is so delicious i tray biscoff donut and chocolate croissant it was delicious and also the staff behaviour is also good 💯</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">3</div>
+              <div class="mention-body">
+                <h4>Biscoff Donut</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Donuts are very tasty and good staff</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Filled donuts are good.</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
+                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
+                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+                      <p>Must try Nutella donut and had good quality food</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">4</div>
+              <div class="mention-body">
+                <h4>Nutella Donut</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Donuts are very tasty and good staff</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Filled donuts are good.</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
+                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
+                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+                      <p>Must try Nutella donut and had good quality food</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">5</div>
+              <div class="mention-body">
+                <h4>Double Chocolate Donut</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: Gujjula Vinay · Rating: 5 · 24/04/26 11:04 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Donuts are very tasty and good staff</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 2: Auberry The Bake Shop - Irrummanzil</div>
+                      <div class="mention-source-meta">Reviewer: MuZzU · Rating: 5 · 24/04/26 08:45 PM IST</div>
+                      <div class="mention-source-meta">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Filled donuts are good.</p>
+                    </article>
+                    
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 3: Auberry The Bake Shop - Kukatpally</div>
+                      <div class="mention-source-meta">Reviewer: Charan Yadavally · Rating: 5 · 24/04/26 05:07 PM IST</div>
+                      <div class="mention-source-meta">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+                      <p>Must try Nutella donut and had good quality food</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">6</div>
+              <div class="mention-body">
+                <h4>Vanilla Cupcake</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                <details class='mention-sources'><summary class='mention-sources-toggle'>View referenced reviews</summary><div class='mention-sources-panel'><div class='mention-sources-title'>Reviews mentioning this item</div>
+                    <article class="mention-source-card">
+                      <div class="mention-source-header">Source 1: Auberry The Bake Shop - Panjagutta</div>
+                      <div class="mention-source-meta">Reviewer: Megha Sen · Rating: 5 · 24/04/26 06:09 PM IST</div>
+                      <div class="mention-source-meta">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+                      <p>Vanilla Cupcake testii🤤🤤</p>
+                    </article>
+                    </div></details>
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">7</div>
+              <div class="mention-body">
+                <h4>Cheesecake</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            </div>
+        </section>
+      </div>
+
+      <div class="signals-row">
+        <section class="card heatmap-panel" id="outlet-heatmap">
+          <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
+          <div class="legend">
+            <span><i style="background:#58b958;"></i> Positive</span>
+            <span><i style="background:#dba923;"></i> Neutral</span>
+            <span><i style="background:#e85f68;"></i> Negative</span>
+            <span><i style="background:#5a637d;"></i> N/A</span>
+          </div>
+          
+    <div class="heat-grid">
+      <div class="heat-head">
+        <div></div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">F</div>
+          <div>Food Quality</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">S</div>
+          <div>Service</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">A</div>
+          <div>Ambiance</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">V</div>
+          <div>Value for Money</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">C</div>
+          <div>Coffee Quality</div>
+        </div>
+        
+      </div>
+      
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
+              
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff service received specific praise at Irrummanzil (Azeez named) and Kukatpally, with Panjagutta also noted for good staff behavior.">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly described as worth visiting, indicating strong perceived value across the portfolio.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="Not enough direct feedback">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
+              
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff member Azeez praised by name at Irrummanzil">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh (neat and clean) and Kukatpally (good environment).">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly described as worth visiting, indicating strong perceived value across the portfolio.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="Not enough direct feedback">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
+              
+            <div class="heat-cell heat-positive" title="Perfect sweetness and texture in donuts at Musarambagh">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff member Azeez praised by name at Irrummanzil">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh (neat and clean) and Kukatpally (good environment).">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Worth visiting noted at Panjagutta">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="Not enough direct feedback">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
+              
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with donuts receiving standout acclaim at Musarambagh, Irrummanzil, Panjagutta, Kukatpally, and Uppal.">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff member Azeez praised by name at Irrummanzil">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Neat and clean appearance at Musarambagh">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly described as worth visiting, indicating strong perceived value across the portfolio.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="Not enough direct feedback">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
+              
+            <div class="heat-cell heat-positive" title="Exceptional food quality praised across all outlets with donuts receiving standout acclaim at Musarambagh, Irrummanzil, Panjagutta, Kukatpally, and Uppal.">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff service received specific praise at Irrummanzil (Azeez named) and Kukatpally, with Panjagutta also noted for good staff behavior.">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Cleanliness and environment praised specifically at Musarambagh (neat and clean) and Kukatpally (good environment).">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Panjagutta outlet explicitly described as worth visiting, indicating strong perceived value across the portfolio.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="Not enough direct feedback">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+    </div>
+    
+        </section>
+
+        <section class="card side-panel danger">
+          <h3 class="panel-title">Urgent &amp; Important</h3>
+          
+            <div class="alert-card alert-clear">
+              <div class="alert-kicker">Clear</div>
+              <h4>No negative issues identified in today&#x27;s 17 reviews across 5 outlets</h4>
+              <p>No immediate corrective action is required from the latest review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-low">Low Risk</span>
+                <span class="status-chip">Stable</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>Coffee and beverage category received zero mentions - potential untapped opportunity</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>Limited detailed feedback from Uppal outlet (only 1 review) may mask unreported issues</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+        </section>
+      </div>
+
+      <section class="card recommendations-panel" id="recommendations">
+        <h3 class="panel-title">Top 6 Recommendations</h3>
+        <div class="panel-subtitle">Specific action plans with measurable targets and timing included in the next-step strategy.</div>
+        <div class='recommendations-grid'>
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Recognize and reward staff member Azeez at Irrummanzil</div>
+                  <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Achieve 3+ named staff mentions in reviews across portfolio within next 30 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Within 48 hours, publicly acknowledge Azeez during team briefing; award employee-of-the-week certificate; use his service approach as training benchmark for other outlets by May 1, 2026</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Launch Donut Hero Campaign featuring top-selling variants</div>
+                  <div class="action-meta">Portfolio-wide</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Increase donut category sales by 15% month-over-month across all outlets</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>By May 5, 2026, create in-store signage and social media posts highlighting Biscoff Donut (Panjagutta), Nutella Donut (Kukatpally), Double Chocolate Donut (Uppal), and Filled Donuts (Irrummanzil) as customer favorites with review quotes</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Expand kid-friendly donut variety portfolio-wide based on Musarambagh success</div>
+                  <div class="action-meta">Auberry The Bake Shop - Musarambagh as pilot, then portfolio rollout</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Generate 5+ family/kid-related positive review mentions within 60 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Document Musarambagh&#x27;s variety donut styles for kids; replicate selection at Irrummanzil, Panjagutta, Kukatpally, and Uppal by May 10, 2026; add kid-focused signage at all outlets</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Introduce signature coffee pairing with bestselling donuts</div>
+                  <div class="action-meta">Portfolio-wide starting at Panjagutta</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Generate first 10 positive coffee mentions in reviews within 45 days; achieve 20% attachment rate of coffee with donut orders</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>By May 15, 2026, create donut + coffee combo deal (Biscoff Donut + Latte) at Panjagutta; track sales and expand to other outlets if successful; train staff to suggest coffee pairings at checkout</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Increase review volume at Uppal outlet</div>
+                  <div class="action-meta">AUBERRY - Uppal</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Increase Uppal review count from 1 to minimum 8 reviews within next 30 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Immediately place QR code review prompts at Uppal checkout counter; train staff to verbally request reviews after positive transactions; manager to personally thank reviewers via Google response within 24 hours</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Replicate Musarambagh cleanliness standards across outlets</div>
+                  <div class="action-meta">All outlets benchmarking against Musarambagh</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Achieve 3+ cleanliness/ambiance positive mentions in reviews within 45 days from outlets other than Musarambagh</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>By May 3, 2026, conduct cleanliness audit at Musarambagh to document standards; create photo checklist; implement daily cleanliness verification at Irrummanzil, Panjagutta, Kukatpally, and Uppal with manager sign-off</p>
+              </div>
+            </article>
+            </div>
+      </section>
+
+      <section class="card reviews-panel" id="review-references">
+        <h3 class="panel-title">New Reviews Today</h3>
+        <div class="panel-subtitle">Exact review references used in today’s dashboard, including outlet, location, timestamp, and source link.</div>
+        <div class='review-grid'>
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 11:04 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/118367572167061280858/reviews" target="_blank" rel="noopener noreferrer">Gujjula Vinay</a></div>
+              <p>Donuts are very tasty and good staff</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 08:45 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/118021278619803388278/reviews" target="_blank" rel="noopener noreferrer">MuZzU</a></div>
+              <p>Filled donuts are good.</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 08:43 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/110867639939179524346/reviews" target="_blank" rel="noopener noreferrer">Guguloth Naresh</a></div>
+              <p>Good service by azeez</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Irrummanzil</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Level 1, Next Premia, PVR mall, L &amp; T Infotech, Irram Manzil Colony, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 08:30 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/115998334836891004985/reviews" target="_blank" rel="noopener noreferrer">Shaik Waseem</a></div>
+              <p>Good taste</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 06:09 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/117049402774266207540/reviews" target="_blank" rel="noopener noreferrer">Megha Sen</a></div>
+              <p>Vanilla Cupcake testii🤤🤤</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+              <div class="review-detail">24/04/26 05:13 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/118384317116253803368/reviews" target="_blank" rel="noopener noreferrer">Anitha Sala</a></div>
+              <p>Good environment and good staff service</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+              <div class="review-detail">24/04/26 05:09 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/107452704609020643877/reviews" target="_blank" rel="noopener noreferrer">Bilti Das</a></div>
+              <p>Too good</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+              <div class="review-detail">24/04/26 05:07 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/100668948615888333687/reviews" target="_blank" rel="noopener noreferrer">Charan Yadavally</a></div>
+              <p>Must try Nutella donut and had good quality food</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Kukatpally</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">3rd floor, Nexus Hyderabad Mall, Kukatpally Housing Board Colony, K P H B Phase 9, Kukatpally, Hyderabad, Telangana 500085, India</div>
+              <div class="review-detail">24/04/26 05:04 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/105460687146816693361/reviews" target="_blank" rel="noopener noreferrer">Charan Y</a></div>
+              <p>Had great experience</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 05:03 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/100660004160353711360/reviews" target="_blank" rel="noopener noreferrer">Shailender Singh</a></div>
+              <p>The donuts was so delicious and the cheese cake was soo yummy</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Musarambagh</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">KS-L2-02,Hyderabad Next Galleria MoosaramBagh, Saroor Nagar Circle No.05, Andhra Colony, New Malakpet, Hyderabad, Telangana 500036, India</div>
+              <div class="review-detail">24/04/26 04:44 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/112355163013620444127/reviews" target="_blank" rel="noopener noreferrer">Divya Kalakotla</a></div>
+              <p>One of the best donut l&#x27;ve had. Perfect sweetness and great texture 💗</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Musarambagh</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">KS-L2-02,Hyderabad Next Galleria MoosaramBagh, Saroor Nagar Circle No.05, Andhra Colony, New Malakpet, Hyderabad, Telangana 500036, India</div>
+              <div class="review-detail">24/04/26 04:41 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/101658485610308262014/reviews" target="_blank" rel="noopener noreferrer">Rohith</a></div>
+              <p>Good taste</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Musarambagh</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">KS-L2-02,Hyderabad Next Galleria MoosaramBagh, Saroor Nagar Circle No.05, Andhra Colony, New Malakpet, Hyderabad, Telangana 500036, India</div>
+              <div class="review-detail">24/04/26 04:33 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/105429669356100117248/reviews" target="_blank" rel="noopener noreferrer">Amaravadi Varshini</a></div>
+              <p>Looking neat and clean and variety style of donuts are found here for kids ,My daughter is loved it....</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">AUBERRY - Uppal</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">DSL Virtue Mall, Medipally, Srinivasa Colony, Uppal, Hyderabad, Telangana 500039, India</div>
+              <div class="review-detail">24/04/26 03:23 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/105714205177717191928/reviews" target="_blank" rel="noopener noreferrer">Ugadi Sunil</a></div>
+              <p>Donuts and croissant🥐  taste super
+My favorite double chocolate donut</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 02:09 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/105074344817479946903/reviews" target="_blank" rel="noopener noreferrer">Karthik Yt</a></div>
+              <p>The test of the food is so delicious i tray biscoff donut and chocolate croissant it was delicious and also the staff behaviour is also good 💯</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 12:43 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/116076273857778242176/reviews" target="_blank" rel="noopener noreferrer">Vinod Reddy</a></div>
+              <p>Delicious cakes and snacks. Worth visiting!</p>
+            </article>
+            
+            <article class="review-card">
+              <div class="review-meta">
+                <div class="review-outlet">Auberry The Bake Shop - Panjagutta</div>
+                <span class="review-rating">5.0/5</span>
+              </div>
+              <div class="review-detail">Floor -2, Next Galleria PVR, L&amp;T Mall, Nagarjuna Hills, Punjagutta, Hyderabad, Telangana 500082, India</div>
+              <div class="review-detail">24/04/26 12:41 PM IST</div>
+              <div class="review-author">Reviewer: <a href="https://www.google.com/maps/contrib/118237368627706304152/reviews" target="_blank" rel="noopener noreferrer">Nandini Thirumanpally</a></div>
+              <p>Auberry  has amazing taste and fresh items. Loved the quality</p>
+            </article>
+            </div>
+      </section>
+
+      <div class="footer-note">Auberry The Bake Shop - All Outlets</div>
+    </section>
+  </main>
+</body>
+</html>

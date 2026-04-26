@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auberry The Bake Shop - All Outlets Dashboard</title>
+  <style>
+    :root {
+      --bg: #171b31;
+      --panel: #232941;
+      --panel-2: #2a314c;
+      --border: #343c5a;
+      --text: #f3f4ff;
+      --muted: #b2b8d1;
+      --green: #63d85f;
+      --green-bg: #4caf5030;
+      --yellow: #f1bc2e;
+      --yellow-bg: #f1bc2e2e;
+      --red: #ef6464;
+      --red-bg: #ef646428;
+      --purple: #ab7df4;
+      --purple-bg: #ab7df426;
+      --blue: #6fa7ff;
+      --chip: #1e2439;
+      --shadow: 0 20px 40px rgba(7, 10, 22, 0.32);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(171,125,244,0.12), transparent 22%),
+        radial-gradient(circle at top right, rgba(99,216,95,0.10), transparent 18%),
+        linear-gradient(180deg, #161a30 0%, #13182c 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      animation: page-fade 700ms cubic-bezier(.22,1,.36,1);
+    }
+    .page {
+      max-width: 1536px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: 350px minmax(0, 1fr) 320px;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(40,47,74,0.98), rgba(33,39,63,0.98));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      transition:
+        transform 220ms cubic-bezier(.22,1,.36,1),
+        box-shadow 220ms cubic-bezier(.22,1,.36,1),
+        border-color 220ms ease,
+        background 220ms ease,
+        filter 220ms ease;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 54px rgba(7, 10, 22, 0.42);
+      border-color: rgba(171,125,244,0.32);
+    }
+    .topbar {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 10px 8px 4px;
+    }
+    .brand-block {
+      display: flex;
+      gap: 0;
+      align-items: center;
+    }
+    .brand-copy h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+      letter-spacing: 0;
+      font-weight: 400;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--muted);
+    }
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .filter-text {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .filter-text strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+    .kpis {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .kpi-card {
+      padding: 18px 18px 14px;
+      display: grid;
+      grid-template-columns: 60px 1fr 110px;
+      gap: 14px;
+      align-items: center;
+    }
+    .kpi-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      font-weight: 800;
+    }
+    .kpi-icon.gold { background: #7d6a3638; color: #ffcb47; }
+    .kpi-icon.green { background: #39644d45; color: #66e26c; }
+    .kpi-icon.red { background: #6a434943; color: #ff7474; }
+    .kpi-icon.purple { background: #51427345; color: #c094ff; }
+    .kpi-title { color: var(--muted); font-size: 14px; }
+    .kpi-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+    .kpi-sub { color: var(--muted); margin-top: 6px; font-size: 14px; }
+    .kpi-sub.positive { color: var(--green); }
+    .kpi-sub.negative { color: var(--red); }
+    .sparkline {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sparkline svg { width: 100%; height: 44px; }
+    .left-column, .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+      align-self: stretch;
+    }
+    .center-column {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+      min-width: 0;
+      align-self: start;
+      height: max-content;
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .panel-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .panel-header {
+      padding: 18px 18px 0;
+    }
+    .list-panel {
+      padding-bottom: 14px;
+      height: max-content;
+    }
+    .left-column .list-panel:last-child {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .list-body {
+      padding: 8px 14px 14px;
+      min-width: 0;
+    }
+    .list-row {
+      display: grid;
+      grid-template-columns: 24px 48px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 10px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        background 180ms ease,
+        border-color 180ms ease;
+    }
+    .list-row:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,0.035);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .item-copy {
+      min-width: 0;
+    }
+    .item-rank {
+      color: #d4d8ea;
+      font-weight: 700;
+      text-align: center;
+    }
+    .item-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #9a6b42, #c99762);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .item-name {
+      font-weight: 700;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .item-meta { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pill-positive { background: var(--green-bg); color: var(--green); }
+    .pill-negative { background: var(--red-bg); color: var(--red); }
+    .pill-neutral { background: var(--yellow-bg); color: var(--yellow); }
+    .pill-na { background: rgba(170,177,204,0.18); color: #c3c8db; }
+    .list-footer {
+      padding: 0 18px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .heatmap-panel {
+      padding: 18px;
+      height: max-content;
+    }
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend i {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .heat-grid {
+      margin-top: 18px;
+      display: grid;
+      gap: 8px;
+    }
+    .heat-head, .heat-row {
+      display: grid;
+      grid-template-columns: 160px repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      align-items: stretch;
+    }
+    .heat-header-cell {
+      text-align: center;
+      color: #d8dcef;
+      font-size: 13px;
+      font-weight: 700;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+    }
+    .heat-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: grid;
+      place-items: center;
+    }
+    .heat-outlet {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-weight: 700;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .heat-cell {
+      min-height: 48px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        filter 180ms ease,
+        box-shadow 180ms ease;
+    }
+    .heat-cell:hover {
+      transform: translateY(-4px);
+      filter: brightness(1.04);
+      box-shadow: 0 14px 22px rgba(7, 10, 22, 0.2);
+    }
+    .heat-positive { background: #58b958; color: white; }
+    .heat-neutral { background: #dba923; color: white; }
+    .heat-negative { background: #e85f68; color: white; }
+    .heat-na { background: #5a637d; color: #eef2ff; }
+    .bubbles-panel {
+      padding: 18px;
+      height: max-content;
+    }
+    .bubble-wrap {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      min-height: 270px;
+      padding-top: 14px;
+      align-content: start;
+    }
+    .mention-card {
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-height: 92px;
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        border-color 180ms ease,
+      box-shadow 180ms ease,
+      filter 180ms ease;
+    }
+    .mention-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 18px 28px rgba(6, 9, 21, 0.24);
+      filter: brightness(1.03);
+    }
+    .mention-positive { background: linear-gradient(180deg, rgba(76,170,75,0.22), rgba(65,137,63,0.18)); }
+    .mention-neutral { background: linear-gradient(180deg, rgba(213,162,24,0.22), rgba(184,136,20,0.18)); }
+    .mention-negative { background: linear-gradient(180deg, rgba(214,101,101,0.22), rgba(187,79,79,0.18)); }
+    .mention-na { background: linear-gradient(180deg, rgba(107,115,139,0.22), rgba(83,90,113,0.18)); }
+    .mention-rank {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #eef1ff;
+    }
+    .mention-body h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .mention-meta {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      color: rgba(255,255,255,0.86);
+      font-size: 13px;
+    }
+    .mention-sources {
+      margin-top: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(111,167,255,0.18);
+      background: rgba(23, 27, 49, 0.78);
+      overflow: hidden;
+    }
+    .mention-sources-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+      user-select: none;
+    }
+    .mention-sources-toggle::-webkit-details-marker {
+      display: none;
+    }
+    .mention-sources-toggle::after {
+      content: " +";
+      float: right;
+      color: rgba(255,255,255,0.7);
+    }
+    .mention-sources[open] .mention-sources-toggle::after {
+      content: " -";
+    }
+    .mention-sources-panel {
+      display: grid;
+      gap: 10px;
+      padding: 0 12px 12px;
+      animation: mention-slide-down 220ms cubic-bezier(.22,1,.36,1);
+    }
+    .mention-sources-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+      margin-bottom: 2px;
+    }
+    .mention-source-card {
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .mention-source-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f0f4ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .mention-source-meta {
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.72);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .mention-source-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #f7f8ff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .side-panel {
+      padding: 18px;
+      height: max-content;
+    }
+    .right-column .side-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .side-panel.danger h3 { color: #ff6d6d; }
+    .alert-card {
+      margin-top: 14px;
+      border-radius: 16px;
+      padding: 14px 14px 12px;
+      border: 1px solid transparent;
+      transition:
+        transform 180ms cubic-bezier(.22,1,.36,1),
+        box-shadow 180ms ease,
+        border-color 180ms ease,
+        filter 180ms ease;
+    }
+    .alert-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 30px rgba(8, 11, 26, 0.22);
+      filter: brightness(1.03);
+    }
+    .alert-urgent { background: #3b2633; border-color: #8a3c56; }
+    .alert-warning { background: #3a3423; border-color: #8d7235; }
+    .alert-info { background: #2e2942; border-color: #715ca6; }
+    .alert-kicker {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .alert-card h4 { margin: 0; font-size: 16px; }
+    .alert-card p {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+      margin: 8px 0 0;
+    }
+    .alert-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .impact, .status-chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .impact-high { background: var(--red-bg); color: var(--red); }
+    .impact-medium { background: var(--yellow-bg); color: var(--yellow); }
+    .impact-low { background: var(--green-bg); color: var(--green); }
+    .status-chip { background: rgba(255,255,255,0.04); color: #e9ecfb; }
+    .recommendations-panel {
+      grid-column: 1 / -1;
+      padding: 20px;
+      height: max-content;
+    }
+    .recommendations-panel .panel-title {
+      color: #bc93ff;
+    }
+    .recommendations-panel .panel-subtitle {
+      margin-top: 6px;
+      max-width: 820px;
+      line-height: 1.5;
+    }
+    .recommendations-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      min-width: 0;
+    }
+    .reviews-panel {
+      grid-column: 1 / -1;
+      padding: 20px;
+      height: max-content;
+    }
+    .reviews-panel .panel-title {
+      color: #8fc5ff;
+    }
+    .review-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .review-card {
+      border-radius: 18px;
+      padding: 18px;
+      border: 1px solid rgba(111,167,255,0.16);
+      background: linear-gradient(180deg, rgba(48,58,94,0.95), rgba(39,47,77,0.95));
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .review-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .review-outlet {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .review-rating {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.14);
+      border: 1px solid rgba(111,167,255,0.18);
+      color: #b9d6ff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .review-detail, .review-author {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .review-author a, .review-links a {
+      color: #b9d6ff;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .review-author a:hover, .review-links a:hover {
+      text-decoration: underline;
+    }
+    .review-card p {
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .review-links {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .source-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(111,167,255,0.18);
+      border: 1px solid rgba(111,167,255,0.28);
+      color: #d8e8ff !important;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .source-pill:hover {
+      background: rgba(111,167,255,0.26);
+      text-decoration: none;
+    }
+    .action-row {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      padding: 18px;
+      min-height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(171,125,244,0.16);
+      background: linear-gradient(180deg, rgba(57,62,97,0.95), rgba(44,48,78,0.95));
+      color: inherit;
+      transition:
+        transform 200ms cubic-bezier(.22,1,.36,1),
+        filter 200ms ease,
+        border-color 200ms ease,
+        box-shadow 200ms ease,
+        background 200ms ease;
+    }
+    .action-topline {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+    .action-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(171,125,244,0.18);
+      color: #caafff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+    .action-copy {
+      min-width: 0;
+    }
+    .action-title {
+      font-weight: 700;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+    .action-title, .action-meta {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .action-meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+    .action-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .action-chip {
+      display: grid;
+      gap: 4px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      min-width: 0;
+      align-content: start;
+    }
+    .action-chip strong {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+    }
+    .action-chip span {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      color: #f7f8ff;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .metric-chip {
+      background: linear-gradient(180deg, rgba(111,167,255,0.14), rgba(111,167,255,0.06));
+      border-color: rgba(111,167,255,0.18);
+    }
+    .timeline-chip {
+      background: linear-gradient(180deg, rgba(171,125,244,0.14), rgba(171,125,244,0.06));
+      border-color: rgba(171,125,244,0.18);
+    }
+    .action-row:hover {
+      filter: brightness(1.05);
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 22px 34px rgba(9, 11, 28, 0.24);
+    }
+    .action-strategy {
+      display: grid;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+    }
+    .action-strategy strong {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.68);
+    }
+    .action-strategy p {
+      margin: 0;
+      color: #f7f8ff;
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .empty-block {
+      color: var(--muted);
+      padding: 18px 0 6px;
+    }
+    .footer-note {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #d9ddf2;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      padding: 6px 4px 8px;
+      animation: footer-slide-in 900ms cubic-bezier(.22,1,.36,1) 120ms both;
+    }
+    @media (max-width: 1360px) {
+      .dashboard {
+        grid-template-columns: 320px minmax(0, 1fr);
+      }
+      .right-column {
+        grid-column: 1 / -1;
+      }
+      .recommendations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .review-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 1120px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      .left-column, .center-column, .right-column {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-self: start;
+      }
+    }
+    @media (max-width: 980px) {
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .kpi-card {
+        grid-template-columns: 56px 1fr;
+      }
+      .sparkline {
+        display: none;
+      }
+      .heat-head, .heat-row {
+        grid-template-columns: 120px repeat(5, minmax(54px, 1fr));
+      }
+      .filters {
+        justify-content: flex-start;
+      }
+      .recommendations-grid {
+        grid-template-columns: 1fr;
+      }
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 720px) {
+      .page {
+        padding: 14px;
+      }
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+      .filter-text {
+        white-space: normal;
+      }
+      .list-row {
+        grid-template-columns: 24px 44px minmax(0, 1fr);
+      }
+      .list-row .pill {
+        grid-column: 2 / -1;
+        justify-self: start;
+      }
+      .heat-header-cell {
+        font-size: 11px;
+      }
+      .heat-cell {
+        min-height: 44px;
+        font-size: 12px;
+      }
+      .heat-outlet {
+        font-size: 13px;
+      }
+      .bubble-wrap {
+        grid-template-columns: 1fr;
+      }
+      .action-metrics {
+        grid-template-columns: 1fr;
+      }
+      .action-row {
+        padding: 16px;
+      }
+    }
+    @keyframes page-fade {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes footer-slide-in {
+      from {
+        opacity: 0;
+        transform: translateX(-18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes mention-slide-down {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="dashboard">
+      <div class="topbar">
+        <div class="brand-block">
+          <div class="brand-copy">
+            <h1>Auberry The Bake Shop - All Outlets Executive Dashboard</h1>
+          </div>
+        </div>
+        <div class="filters">
+          <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
+          <div class="filter-text"><strong>Window:</strong> Dates unavailable</div>
+        </div>
+      </div>
+
+      <section class="kpis">
+        <article class="card kpi-card">
+          <div class="kpi-icon gold">★</div>
+          <div>
+            <div class="kpi-title">Overall Rating</div>
+            <div class="kpi-value">4.4 <span style="font-size:18px;font-weight:600;">/ 5</span></div>
+            <div class="kpi-sub positive">↑ -0.6 vs yesterday</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 24 L10 26 L20 18 L30 25 L40 20 L50 11 L60 14 L70 5 L80 8 L90 7 L100 3" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon green">☺</div>
+          <div>
+            <div class="kpi-title">Positive Sentiment</div>
+            <div class="kpi-value">100%</div>
+            <div class="kpi-sub positive">↑ No change</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 28 L10 18 L20 24 L30 26 L40 9 L50 20 L60 19 L70 8 L80 12 L90 11 L100 6" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon red">⛨</div>
+          <div>
+            <div class="kpi-title">Risk Level</div>
+            <div class="kpi-value" style="color:#f1bc2e;">Medium</div>
+            <div class="kpi-sub">April 23, 2026 only</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 29 L10 23 L20 24 L30 18 L40 21 L50 10 L60 7 L70 19 L80 16 L90 16 L100 20" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+        <article class="card kpi-card">
+          <div class="kpi-icon purple">◔</div>
+          <div>
+            <div class="kpi-title">Total Reviews</div>
+            <div class="kpi-value">26</div>
+            <div class="kpi-sub positive">↑ +16 vs yesterday</div>
+          </div>
+          <div class="sparkline">
+          <svg viewBox="0 0 100 36" fill="none"><path d="M0 21 L10 10 L20 18 L30 7 L40 3 L50 15 L60 4 L70 21 L80 24 L90 22 L100 18" stroke="#b383ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        </article>
+      </section>
+
+      <div class="left-column">
+        <section class="card list-panel" id="underperforming-items">
+          <div class="panel-header">
+            <h3 class="panel-title">Underperforming Items</h3>
+          <div class="panel-subtitle">By Mentions</div>
+          </div>
+          <div class="list-body">
+            <div class="list-row">
+              <div class="item-rank">1</div>
+              <div class="item-thumb">C</div>
+              <div class="item-copy">
+                <div class="item-name">Custard doughnuts</div>
+                <div class="item-meta">1 mention</div>
+              </div>
+              <span class="pill pill-negative">Negative</span>
+            </div>
+            
+            <div class="list-row">
+              <div class="item-rank">2</div>
+              <div class="item-thumb">M</div>
+              <div class="item-copy">
+                <div class="item-name">Muffins</div>
+                <div class="item-meta">1 mention</div>
+              </div>
+              <span class="pill pill-negative">Negative</span>
+            </div>
+            </div>
+          <div class="list-footer">Most-mentioned risk items from the latest review cycle.</div>
+        </section>
+      </div>
+
+      <div class="center-column">
+        <section class="card heatmap-panel" id="outlet-heatmap">
+          <h3 class="panel-title">Outlet Sentiment Heatmap</h3>
+          <div class="legend">
+            <span><i style="background:#58b958;"></i> Positive</span>
+            <span><i style="background:#dba923;"></i> Neutral</span>
+            <span><i style="background:#e85f68;"></i> Negative</span>
+            <span><i style="background:#5a637d;"></i> N/A</span>
+          </div>
+          
+    <div class="heat-grid">
+      <div class="heat-head">
+        <div></div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">F</div>
+          <div>Food Quality</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">S</div>
+          <div>Service</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">A</div>
+          <div>Ambiance</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">V</div>
+          <div>Value for Money</div>
+        </div>
+        
+        <div class="heat-header-cell">
+          <div class="heat-icon">C</div>
+          <div>Coffee Quality</div>
+        </div>
+        
+      </div>
+      
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
+              
+            <div class="heat-cell heat-negative" title="Stale muffins at Musarambagh">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-negative" title="Rude and dismissive staff at Musarambagh">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Panjagutta outlet noted for pleasant atmosphere; no negative ambiance feedback across outlets.">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-negative" title="Premium pricing for subpar custard doughnuts at Musarambagh">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
+              
+            <div class="heat-cell heat-positive" title="Soft and spongy donuts at Irrummanzil">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil praised for helping choose best donuts">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Panjagutta outlet noted for pleasant atmosphere; no negative ambiance feedback across outlets.">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Budget-friendly prices at Kukatpally">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Good coffee options at Irrummanzil">
+              <span>C</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
+              
+            <div class="heat-cell heat-positive" title="Irrummanzil, Panjagutta, Kukatpally, Kondapur, and Uppal outlets receive strong praise for soft donuts and croissants, while Musarambagh has recurring complaints about stale muffins and poorly filled donuts.">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil praised for helping choose best donuts">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Pleasant atmosphere at Panjagutta">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Kukatpally and Irrummanzil praised for budget-friendly pricing and good quality, but Musarambagh criticized for premium pricing not matching product quality.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
+              
+            <div class="heat-cell heat-positive" title="Irrummanzil, Panjagutta, Kukatpally, Kondapur, and Uppal outlets receive strong praise for soft donuts and croissants, while Musarambagh has recurring complaints about stale muffins and poorly filled donuts.">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Azeez at Irrummanzil praised for helping choose best donuts">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Panjagutta outlet noted for pleasant atmosphere; no negative ambiance feedback across outlets.">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Budget-friendly prices at Kukatpally">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+            <div class="heat-row">
+              <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
+              
+            <div class="heat-cell heat-positive" title="Irrummanzil, Panjagutta, Kukatpally, Kondapur, and Uppal outlets receive strong praise for soft donuts and croissants, while Musarambagh has recurring complaints about stale muffins and poorly filled donuts.">
+              <span>F</span>
+            </div>
+            
+            <div class="heat-cell heat-positive" title="Staff at Irrummanzil (Azeez) and Panjagutta (Premchand) receive specific praise for helpfulness, while Musarambagh had a complaint about rude counter staff.">
+              <span>S</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Panjagutta outlet noted for pleasant atmosphere; no negative ambiance feedback across outlets.">
+              <span>A</span>
+            </div>
+            
+            <div class="heat-cell heat-neutral" title="Kukatpally and Irrummanzil praised for budget-friendly pricing and good quality, but Musarambagh criticized for premium pricing not matching product quality.">
+              <span>V</span>
+            </div>
+            
+            <div class="heat-cell heat-na" title="No clear outlet-level signal yet">
+              <span>N/A</span>
+            </div>
+            
+            </div>
+            
+    </div>
+    
+        </section>
+
+        <section class="card bubbles-panel" id="items-overview">
+          <h3 class="panel-title">Most Mentioned Items <span style="color:var(--muted);font-weight:600;">(All Outlets)</span></h3>
+          <div class="legend">
+            <span><i style="background:#58b958;"></i> Positive</span>
+            <span><i style="background:#dba923;"></i> Neutral</span>
+            <span><i style="background:#e85f68;"></i> Negative</span>
+          </div>
+          <div class="bubble-wrap">
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">1</div>
+              <div class="mention-body">
+                <h4>Donuts (general)</h4>
+                <div class="mention-meta">
+                  <span>10 mentions</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">2</div>
+              <div class="mention-body">
+                <h4>Chocolate donut/croissant</h4>
+                <div class="mention-meta">
+                  <span>4 mentions</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-negative">
+              <div class="mention-rank">3</div>
+              <div class="mention-body">
+                <h4>Muffins</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-negative">Negative</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-negative">
+              <div class="mention-rank">4</div>
+              <div class="mention-body">
+                <h4>Custard doughnuts</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-negative">Negative</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">5</div>
+              <div class="mention-body">
+                <h4>Biscoff donut</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            
+            <article class="mention-card mention-positive">
+              <div class="mention-rank">6</div>
+              <div class="mention-body">
+                <h4>Puffs</h4>
+                <div class="mention-meta">
+                  <span>1 mention</span>
+                  <span class="pill pill-positive">Positive</span>
+                </div>
+                
+              </div>
+            </article>
+            </div>
+        </section>
+      </div>
+
+      <div class="right-column">
+        <section class="card side-panel danger">
+          <h3 class="panel-title">Urgent &amp; Important</h3>
+          
+            <div class="alert-card alert-urgent">
+              <div class="alert-kicker">Urgent</div>
+              <h4>Freshness and quality control failures at Musarambagh outlet (stale muffins, underfilled donuts)</h4>
+              <p>Highest-priority issue surfaced from the latest review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-high">High Impact</span>
+                <span class="status-chip">In Progress</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>Rude customer service when handling complaints at Musarambagh outlet</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+            <div class="alert-card alert-warning">
+              <div class="alert-kicker">Watchlist</div>
+              <h4>Value perception gap at Musarambagh - premium pricing not justified by product quality</h4>
+              <p>Keep this under observation in the next review cycle.</p>
+              <div class="alert-meta">
+                <span class="impact impact-medium">Medium Impact</span>
+                <span class="status-chip">Monitoring</span>
+              </div>
+            </div>
+            
+        </section>
+      </div>
+
+      <section class="card recommendations-panel" id="recommendations">
+        <h3 class="panel-title">Recommendations</h3>
+        <div class="panel-subtitle">Action plans with measurable targets and timelines across the full portfolio.</div>
+        <div class='recommendations-grid'>
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Urgent quality audit at Musarambagh outlet</div>
+                  <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Zero freshness complaints and achieve 4.0+ average rating within 60 days</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>Immediate implementation within 7 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Implement twice-daily freshness checks, establish discard protocols for items older than 6 hours, and audit filling quantities against standard recipes</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Customer service retraining at Musarambagh</div>
+                  <div class="action-meta">Auberry The Bake Shop - Musarambagh</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Zero service-related complaints in next 30 reviews</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>Complete training within 2 weeks</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Conduct mandatory complaint-handling workshop for all counter staff with role-play scenarios and empower staff with refund/replacement authority</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Recognize and replicate top performer behaviors</div>
+                  <div class="action-meta">Portfolio-wide (model from Panjagutta and Irrummanzil)</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Minimum 2 named staff compliments per outlet per month</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>3 weeks for training rollout</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Document service approach of Premchand and Azeez, create best-practice video training, and implement staff recognition program</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Standardize donut filling quantities across outlets</div>
+                  <div class="action-meta">Portfolio-wide (priority: Musarambagh)</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>95% compliance on filling weight standards</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>4 weeks for full implementation</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Create visual portion guides, implement weighing protocols for filled products, and conduct mystery shopper audits</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Leverage Irrummanzil&#x27;s value positioning in marketing</div>
+                  <div class="action-meta">Portfolio-wide marketing with Irrummanzil as flagship</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>15% increase in first-time visitors across outlets within 60 days</span>
+                </span>
+                <span class="action-chip timeline-chip">
+                  <strong>Timeline</strong>
+                  <span>Campaign launch within 4 weeks</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Develop &#x27;Better than premium at budget price&#x27; campaign highlighting favorable comparison to Krispy Kreme and Dunkin</p>
+              </div>
+            </article>
+            </div>
+      </section>
+
+      <section class="card reviews-panel" id="review-references">
+        <h3 class="panel-title">New Reviews Today</h3>
+        <div class="panel-subtitle">Exact review references used in today’s dashboard, including outlet, location, timestamp, and source link.</div>
+        <div class='empty-block'>No new reviews were captured today.</div>
+      </section>
+
+      <div class="footer-note">Auberry The Bake Shop - All Outlets</div>
+    </section>
+  </main>
+</body>
+</html>
