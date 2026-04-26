@@ -1,113 +1,29 @@
 name: Auberry Daily Report
 
 on:
-  schedule:
-    # Every 5 minutes during the 9 AM Asia/Kolkata send window
-    - cron: "30,35,40,45,50,55 3 * * *"
-    # 9:30 AM Asia/Kolkata retry window
-    - cron: "0 4 * * *"
   workflow_dispatch:
 
 jobs:
   send-report:
     runs-on: ubuntu-latest
     permissions:
-      actions: read
       contents: read
     concurrency:
       group: auberry-daily-report
       cancel-in-progress: false
     steps:
-      - name: Decide whether this run should send
-        id: schedule_guard
-        if: github.event_name == 'schedule'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const workflowFile = '.github/workflows/daily-report.yml';
-            const now = new Date();
-
-            function getKolkataParts(date) {
-              const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Asia/Kolkata',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hourCycle: 'h23',
-              });
-              return Object.fromEntries(
-                formatter
-                  .formatToParts(date)
-                  .filter((part) => part.type !== 'literal')
-                  .map((part) => [part.type, part.value])
-              );
-            }
-
-            function minutesFromMidnight(parts) {
-              return Number(parts.hour) * 60 + Number(parts.minute);
-            }
-
-            const istParts = getKolkataParts(now);
-            const currentMinutes = minutesFromMidnight(istParts);
-            const primaryWindowStart = 9 * 60;
-            const primaryWindowEnd = 9 * 60 + 25;
-            let slot = '';
-            if (currentMinutes >= primaryWindowStart && currentMinutes <= primaryWindowEnd) {
-              slot = 'primary';
-            }
-
-            if (!slot) {
-              core.notice(`Skipping off-window cron at Kolkata time ${istParts.hour}:${istParts.minute}.`);
-              core.setOutput('should_send', 'false');
-              return;
-            }
-
-            const recentRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: workflowFile,
-              per_page: 100,
-            });
-
-            const cutoff = now.getTime() - (3 * 60 * 60 * 1000);
-            const priorSuccess = recentRuns.find((run) => {
-              if (run.id === context.runId) {
-                return false;
-              }
-              if (run.event !== 'schedule' || run.conclusion !== 'success') {
-                return false;
-              }
-              const updatedAt = Date.parse(run.updated_at || run.created_at);
-              return Number.isFinite(updatedAt) && updatedAt >= cutoff;
-            });
-
-            if (priorSuccess) {
-              core.notice(`Skipping ${slot} run because scheduled run ${priorSuccess.id} already succeeded recently.`);
-              core.setOutput('should_send', 'false');
-              return;
-            }
-
-            core.notice(`Proceeding with ${slot} send window at Kolkata time ${istParts.hour}:${istParts.minute}.`);
-            core.setOutput('should_send', 'true');
-
       - name: Check out repository
-        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
-        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         run: python -m pip install -r requirements.txt
 
       - name: Write environment file
-        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         run: |
           cat <<'EOF' > .env
           GOOGLE_PLACES_API_KEY=${{ secrets.GOOGLE_PLACES_API_KEY }}
@@ -124,7 +40,6 @@ jobs:
           EOF
 
       - name: Generate and send report
-        if: github.event_name != 'schedule' || steps.schedule_guard.outputs.should_send == 'true'
         env:
           REQUIRE_REPORT_REVIEWS: "0"
         run: python send_report.py --send
