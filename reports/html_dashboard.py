@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from html import escape
+import json
 from pathlib import Path
 import re
 from zoneinfo import ZoneInfo
@@ -876,7 +877,7 @@ def _render_root_cause_patterns(patterns):
     return "<div class='pattern-grid'>{}</div>".format("".join(cards))
 
 
-def generate_html_dashboard(analysis, output_dir="output"):
+def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -899,6 +900,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     competitor_benchmarks = analysis.get("competitor_benchmarks") or {}
 
     avg_rating = float(analysis.get("average_rating", 0) or 0)
+    trend_data_json = json.dumps(trend_data or [])
     competitor_section_html = _render_competitor_section(competitor_benchmarks, avg_rating)
     previous_avg_rating = _comparison_value(analysis, "average_rating", avg_rating)
     positive_categories = sum(
@@ -922,6 +924,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{brand} Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {{
       --bg: #171b31;
@@ -1211,8 +1214,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 60px;
     }}
-    .sparkline svg {{ width: 100%; height: 44px; }}
+    .sparkline canvas {{ width: 100% !important; height: 60px !important; }}
     .items-row,
     .signals-row {{
       grid-column: 1 / -1;
@@ -2273,7 +2277,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <div class="kpi-value">{avg_rating:.1f} <span style="font-size:18px;font-weight:600;">/ 5</span></div>
             <div class="kpi-sub positive">↑ {rating_delta}</div>
           </div>
-          <div class="sparkline">{spark_green}</div>
+          <div class="sparkline"><canvas id="chart-rating"></canvas></div>
         </article>
         <article class="card kpi-card">
           <div class="kpi-icon green">☺</div>
@@ -2282,7 +2286,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <div class="kpi-value">{sentiment_pct}%</div>
             <div class="kpi-sub positive">↑ {sentiment_delta}</div>
           </div>
-          <div class="sparkline">{spark_green_2}</div>
+          <div class="sparkline"><canvas id="chart-sentiment"></canvas></div>
         </article>
         <article class="card kpi-card">
           <div class="kpi-icon red">⛨</div>
@@ -2291,7 +2295,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <div class="kpi-value" style="color:{risk_color};">{risk_level}</div>
             <div class="kpi-sub">{report_scope}</div>
           </div>
-          <div class="sparkline">{spark_risk}</div>
+          <div class="sparkline"><canvas id="chart-risk"></canvas></div>
         </article>
         <article class="card kpi-card">
           <div class="kpi-icon purple">◔</div>
@@ -2300,7 +2304,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <div class="kpi-value">{total_reviews}</div>
             <div class="kpi-sub positive">↑ {review_delta}</div>
           </div>
-          <div class="sparkline">{spark_purple}</div>
+          <div class="sparkline"><canvas id="chart-reviews"></canvas></div>
         </article>
       </section>
 
@@ -2389,6 +2393,34 @@ def generate_html_dashboard(analysis, output_dir="output"):
   </div>
   <script>
   (function() {{
+    var td = {trend_data_json};
+    if (td && td.length >= 2) {{
+      var lbl = td.map(function(d) {{
+        var p = d.date.split('-');
+        return new Date(+p[0], +p[1]-1, +p[2]).toLocaleDateString('en-IN', {{day:'numeric', month:'short'}});
+      }});
+      var cfg = {{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {{
+          legend: {{display: false}},
+          tooltip: {{callbacks: {{title: function(i) {{ return lbl[i[0].dataIndex]; }}}}}}
+        }},
+        scales: {{x: {{display: false}}, y: {{display: false}}}},
+        elements: {{line: {{tension: 0.4, borderWidth: 2}}, point: {{radius: 3, hoverRadius: 5}}}}
+      }};
+      function mc(id, data, color, bg) {{
+        var c = document.getElementById(id);
+        if (!c) return;
+        new Chart(c, {{type:'line', data:{{labels:lbl, datasets:[{{data:data, borderColor:color, backgroundColor:bg, fill:true, pointBackgroundColor:color}}]}}, options:cfg}});
+      }}
+      mc('chart-rating',   td.map(function(d){{return d.avg_rating;}}),    '#63d85f', 'rgba(99,216,95,0.15)');
+      mc('chart-sentiment',td.map(function(d){{return d.sentiment_pct;}}), '#63d85f', 'rgba(99,216,95,0.15)');
+      mc('chart-risk',     td.map(function(d){{return d.risk_score;}}),     '#ef6464', 'rgba(239,100,100,0.15)');
+      mc('chart-reviews',  td.map(function(d){{return d.total_reviews;}}),  '#ab7df4', 'rgba(171,125,244,0.15)');
+    }}
+  }})();
+  (function() {{
     var isArchive = /\/archive\//.test(window.location.pathname);
     var base = isArchive ? '../' : './';
     var activeDate = null;
@@ -2462,18 +2494,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
         review_references_html=_render_review_references(review_references),
         outlet_scope=escape("All Outlets" if len(outlets) != 1 else outlets[0]),
         date_str=escape(date_str),
-        spark_green="""
-          <svg viewBox="0 0 100 36" fill="none"><path d="M0 24 L10 26 L20 18 L30 25 L40 20 L50 11 L60 14 L70 5 L80 8 L90 7 L100 3" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        """,
-        spark_green_2="""
-          <svg viewBox="0 0 100 36" fill="none"><path d="M0 28 L10 18 L20 24 L30 26 L40 9 L50 20 L60 19 L70 8 L80 12 L90 11 L100 6" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        """,
-        spark_risk="""
-          <svg viewBox="0 0 100 36" fill="none"><path d="M0 29 L10 23 L20 24 L30 18 L40 21 L50 10 L60 7 L70 19 L80 16 L90 16 L100 20" stroke="#67dd69" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        """,
-        spark_purple="""
-          <svg viewBox="0 0 100 36" fill="none"><path d="M0 21 L10 10 L20 18 L30 7 L40 3 L50 15 L60 4 L70 21 L80 24 L90 22 L100 18" stroke="#b383ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        """,
+        trend_data_json=trend_data_json,
     )
 
     filename.write_text(html, encoding="utf-8")

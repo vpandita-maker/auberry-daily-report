@@ -435,7 +435,8 @@ def build_combined_report(outlets):
     comparison_date = report_date - timedelta(days=1)
     if not combined_reviews:
         analysis = _build_empty_analysis(report_date, comparison_date, configured_outlet_count, visible_failed_outlets, outlet_locations)
-        html_path = generate_html_dashboard(analysis)
+        trend_data = _load_trend_data(report_date, analysis)
+        html_path = generate_html_dashboard(analysis, trend_data=trend_data)
         analysis["html_dashboard_path"] = str(Path(html_path).resolve())
         return Path(html_path), analysis, visible_failed_outlets
 
@@ -530,12 +531,37 @@ def build_combined_report(outlets):
         print(f"Competitor benchmarking skipped: {_redact_secrets(exc)}")
     analysis["competitor_benchmarks"] = competitor_benchmarks
 
-    html_path = generate_html_dashboard(analysis)
+    trend_data = _load_trend_data(report_date, analysis)
+    html_path = generate_html_dashboard(analysis, trend_data=trend_data)
     analysis["html_dashboard_path"] = str(Path(html_path).resolve())
     return Path(html_path), analysis, visible_failed_outlets
 
 
-def publish_dashboard_site(html_path, site_dir="site"):
+def _load_trend_data(report_date, analysis, site_dir="site"):
+    archive_path = Path(site_dir) / "archive"
+    entries = []
+    if archive_path.exists():
+        for f in sorted(archive_path.glob("????-??-??.json"), reverse=True)[:6]:
+            try:
+                entries.append(json.loads(f.read_text(encoding="utf-8")))
+            except Exception:
+                pass
+    entries.reverse()
+    categories = analysis.get("categories") or {}
+    positive_categories = sum(1 for info in categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0)
+    sentiment_pct = round((positive_categories / len(categories)) * 100) if categories else 0
+    risk_map = {"low": 1, "medium": 2, "high": 3}
+    entries.append({
+        "date": report_date.isoformat(),
+        "avg_rating": float(analysis.get("average_rating", 0) or 0),
+        "sentiment_pct": sentiment_pct,
+        "total_reviews": int(analysis.get("total_reviews_analyzed", 0) or 0),
+        "risk_score": risk_map.get(str(analysis.get("rating_risk", "")).lower(), 2),
+    })
+    return entries if len(entries) >= 2 else None
+
+
+def publish_dashboard_site(html_path, site_dir="site", analysis=None):
     site_path = Path(site_dir)
     site_path.mkdir(parents=True, exist_ok=True)
     archive_path = site_path / "archive"
@@ -550,6 +576,20 @@ def publish_dashboard_site(html_path, site_dir="site"):
         raw = date_match.group(1)
         date_str = f"{raw[:4]}-{raw[4:6]}-{raw[6:]}"
         shutil.copyfile(html_path, archive_path / f"{date_str}.html")
+
+        if analysis is not None:
+            categories = analysis.get("categories") or {}
+            pos = sum(1 for info in categories.values() if float((info or {}).get("score", 0) or 0) >= 4.0)
+            sentiment_pct = round((pos / len(categories)) * 100) if categories else 0
+            risk_map = {"low": 1, "medium": 2, "high": 3}
+            kpi = {
+                "date": date_str,
+                "avg_rating": float(analysis.get("average_rating", 0) or 0),
+                "sentiment_pct": sentiment_pct,
+                "total_reviews": int(analysis.get("total_reviews_analyzed", 0) or 0),
+                "risk_score": risk_map.get(str(analysis.get("rating_risk", "")).lower(), 2),
+            }
+            (archive_path / f"{date_str}.json").write_text(json.dumps(kpi), encoding="utf-8")
 
     archive_dates = sorted(
         [f.stem for f in archive_path.glob("????-??-??.html")],

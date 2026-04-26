@@ -6,7 +6,7 @@ from send_report import build_combined_report, load_outlets, publish_dashboard_s
 
 def main():
     html_path, analysis, failed_outlets = build_combined_report(load_outlets())
-    site_index = publish_dashboard_site(html_path)
+    site_index = publish_dashboard_site(html_path, analysis=analysis)
 
     print(f"Published dashboard site to {site_index}")
     print(f"Source dashboard file: {Path(html_path).resolve()}")
