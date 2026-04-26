@@ -769,8 +769,8 @@ def _render_outlet_ranking(outlet_ranking):
     <div class="gap-summary">
       <div><span>Best</span><strong>{best}</strong></div>
       <div><span>Worst</span><strong>{worst}</strong></div>
-      <div><span>Rating Gap</span><strong>{rating_gap}★</strong></div>
-      <div><span>Score Gap</span><strong>{score_gap}</strong></div>
+      <div class="gap-num-cell"><span>Rating Gap</span><strong class="gap-num">{rating_gap}★</strong></div>
+      <div class="gap-num-cell"><span>Score Gap</span><strong class="gap-num">{score_gap}</strong></div>
     </div>
     """.format(
         best=escape(str(summary.get("best_outlet") or "N/A")),
@@ -1221,6 +1221,12 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
       font-size: 13px;
       color: var(--text);
       overflow-wrap: anywhere;
+    }}
+    .gap-num {{
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text);
     }}
     .ranking-row {{
       display: grid;
