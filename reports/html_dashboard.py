@@ -985,7 +985,7 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .topbar {{
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       gap: 14px;
       align-items: center;
       padding: 10px 8px 4px;
@@ -1003,6 +1003,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
       font-weight: 400;
       font-family: Arial, Helvetica, sans-serif;
       color: var(--muted);
+    }}
+    .topbar-center {{
+      display: flex;
+      justify-content: center;
     }}
     .filters {{
       display: flex;
@@ -2086,6 +2090,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       .topbar {{
         grid-template-columns: 1fr;
       }}
+      .topbar-center {{
+        justify-content: flex-start;
+      }}
       .filter-text {{
         white-space: normal;
       }}
@@ -2172,45 +2179,45 @@ def generate_html_dashboard(analysis, output_dir="output"):
         transform: translateY(0);
       }}
     }}
-    .date-picker-bar {{
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: center;
-      padding: 4px 0 8px;
-    }}
     .date-picker-wrap {{
       position: relative;
-      display: inline-block;
+      display: inline-flex;
     }}
     .date-picker-btn {{
-      background: var(--panel-2);
-      border: 1px solid var(--border);
+      background: none;
+      border: none;
       color: var(--text);
-      padding: 10px 22px;
-      border-radius: 10px;
+      padding: 0;
       cursor: pointer;
       font-size: 14px;
+      font-family: Arial, Helvetica, sans-serif;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
       white-space: nowrap;
-      transition: border-color 200ms, background 200ms;
     }}
-    .date-picker-btn:hover {{
-      border-color: var(--purple);
-      background: var(--panel);
+    .date-picker-btn strong {{
+      color: var(--text);
+      font-weight: 700;
+    }}
+    .date-picker-btn:hover strong {{
+      color: var(--purple);
+    }}
+    .date-picker-chevron {{
+      color: var(--muted);
+      font-size: 11px;
     }}
     .date-picker-menu {{
       display: none;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: calc(100% + 8px);
+      top: calc(100% + 10px);
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: 0 20px 50px rgba(7,10,22,0.6);
-      min-width: 260px;
+      min-width: 240px;
       max-height: 320px;
       overflow-y: auto;
       z-index: 100;
@@ -2220,9 +2227,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: block;
     }}
     .date-picker-option {{
-      padding: 12px 20px;
+      padding: 11px 18px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text);
       transition: background 150ms;
       border-bottom: 1px solid var(--border);
@@ -2248,16 +2255,17 @@ def generate_html_dashboard(analysis, output_dir="output"):
             <h1>{brand} Executive Dashboard</h1>
           </div>
         </div>
+        <div class="topbar-center">
+          <div class="date-picker-wrap" id="dpWrap">
+            <button class="date-picker-btn" id="dpBtn">
+              &#128197;&nbsp;<strong><span id="dpLabel">&#8230;</span></strong><span class="date-picker-chevron">&#9662;</span>
+            </button>
+            <div class="date-picker-menu" id="dpMenu"></div>
+          </div>
+        </div>
         <div class="filters">
           <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
           <div class="filter-text"><strong>Window:</strong> {review_window}</div>
-        </div>
-      </div>
-
-      <div class="date-picker-bar">
-        <div class="date-picker-wrap" id="dpWrap">
-          <button class="date-picker-btn" id="dpBtn">&#128197; <span id="dpLabel">&#8230;</span> &#9662;</button>
-          <div class="date-picker-menu" id="dpMenu"></div>
         </div>
       </div>
 
