@@ -2172,6 +2172,64 @@ def generate_html_dashboard(analysis, output_dir="output"):
         transform: translateY(0);
       }}
     }}
+    .date-picker-wrap {{
+      position: relative;
+      display: inline-block;
+    }}
+    .date-picker-btn {{
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      transition: border-color 200ms, background 200ms;
+    }}
+    .date-picker-btn:hover {{
+      border-color: var(--purple);
+      background: var(--panel);
+    }}
+    .date-picker-menu {{
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(7,10,22,0.5);
+      min-width: 220px;
+      max-height: 280px;
+      overflow-y: auto;
+      z-index: 100;
+      animation: mention-slide-down 180ms cubic-bezier(.22,1,.36,1);
+    }}
+    .date-picker-menu.open {{
+      display: block;
+    }}
+    .date-picker-option {{
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text);
+      transition: background 150ms;
+      border-bottom: 1px solid var(--border);
+    }}
+    .date-picker-option:last-child {{
+      border-bottom: none;
+    }}
+    .date-picker-option:hover {{
+      background: var(--panel-2);
+    }}
+    .date-picker-option.active {{
+      color: var(--purple);
+      font-weight: 700;
+    }}
   </style>
 </head>
 <body>
@@ -2186,6 +2244,10 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <div class="filters">
           <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
           <div class="filter-text"><strong>Window:</strong> {review_window}</div>
+          <div class="date-picker-wrap" id="dpWrap">
+            <button class="date-picker-btn" id="dpBtn">&#128197; <span id="dpLabel">&#8230;</span> &#9662;</button>
+            <div class="date-picker-menu" id="dpMenu"></div>
+          </div>
         </div>
       </div>
 
@@ -2305,6 +2367,58 @@ def generate_html_dashboard(analysis, output_dir="output"):
       <div class="footer-note">{brand}</div>
     </section>
   </main>
+  <script>
+  (function() {{
+    var isArchive = /\/archive\//.test(window.location.pathname);
+    var base = isArchive ? '../' : './';
+    var activeDate = null;
+    if (isArchive) {{
+      var m = window.location.pathname.match(/(\d{{4}}-\d{{2}}-\d{{2}})\.html/);
+      if (m) activeDate = m[1];
+    }}
+
+    function fmt(d) {{
+      var p = d.split('-');
+      var dt = new Date(+p[0], +p[1] - 1, +p[2]);
+      return dt.toLocaleDateString('en-IN', {{weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'}});
+    }}
+
+    document.getElementById('dpBtn').addEventListener('click', function(e) {{
+      e.stopPropagation();
+      document.getElementById('dpMenu').classList.toggle('open');
+    }});
+
+    document.addEventListener('click', function(e) {{
+      var w = document.getElementById('dpWrap');
+      if (w && !w.contains(e.target)) {{
+        document.getElementById('dpMenu').classList.remove('open');
+      }}
+    }});
+
+    fetch(base + 'dates.json')
+      .then(function(r) {{ return r.json(); }})
+      .then(function(data) {{
+        var dates = data.dates || [];
+        var lbl = document.getElementById('dpLabel');
+        var menu = document.getElementById('dpMenu');
+        if (!dates.length) {{ lbl.textContent = 'No history'; return; }}
+        var active = activeDate || dates[0];
+        lbl.textContent = fmt(active);
+        dates.forEach(function(d, i) {{
+          var el = document.createElement('div');
+          el.className = 'date-picker-option' + (d === active ? ' active' : '');
+          el.textContent = fmt(d) + (i === 0 ? ' — Latest' : '');
+          el.addEventListener('click', function() {{
+            window.location.href = i === 0 ? base + 'index.html' : base + 'archive/' + d + '.html';
+          }});
+          menu.appendChild(el);
+        }});
+      }})
+      .catch(function() {{
+        document.getElementById('dpLabel').textContent = 'History';
+      }});
+  }})();
+  </script>
 </body>
 </html>
 """.format(

@@ -538,10 +538,28 @@ def build_combined_report(outlets):
 def publish_dashboard_site(html_path, site_dir="site"):
     site_path = Path(site_dir)
     site_path.mkdir(parents=True, exist_ok=True)
+    archive_path = site_path / "archive"
+    archive_path.mkdir(parents=True, exist_ok=True)
 
     index_path = site_path / "index.html"
     shutil.copyfile(html_path, index_path)
     (site_path / ".nojekyll").write_text("", encoding="utf-8")
+
+    date_match = re.search(r"_(\d{8})\.", Path(html_path).name)
+    if date_match:
+        raw = date_match.group(1)
+        date_str = f"{raw[:4]}-{raw[4:6]}-{raw[6:]}"
+        shutil.copyfile(html_path, archive_path / f"{date_str}.html")
+
+    archive_dates = sorted(
+        [f.stem for f in archive_path.glob("????-??-??.html")],
+        reverse=True,
+    )
+    (site_path / "dates.json").write_text(
+        json.dumps({"dates": archive_dates}, indent=2),
+        encoding="utf-8",
+    )
+
     return index_path.resolve()
 
 
