@@ -2172,6 +2172,12 @@ def generate_html_dashboard(analysis, output_dir="output"):
         transform: translateY(0);
       }}
     }}
+    .date-picker-bar {{
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      padding: 4px 0 8px;
+    }}
     .date-picker-wrap {{
       position: relative;
       display: inline-block;
@@ -2180,13 +2186,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
       background: var(--panel-2);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 6px 14px;
-      border-radius: 8px;
+      padding: 10px 22px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 14px;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 10px;
       white-space: nowrap;
       transition: border-color 200ms, background 200ms;
     }}
@@ -2197,14 +2203,15 @@ def generate_html_dashboard(analysis, output_dir="output"):
     .date-picker-menu {{
       display: none;
       position: absolute;
-      right: 0;
-      top: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      top: calc(100% + 8px);
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 16px 40px rgba(7,10,22,0.5);
-      min-width: 220px;
-      max-height: 280px;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(7,10,22,0.6);
+      min-width: 260px;
+      max-height: 320px;
       overflow-y: auto;
       z-index: 100;
       animation: mention-slide-down 180ms cubic-bezier(.22,1,.36,1);
@@ -2213,9 +2220,9 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: block;
     }}
     .date-picker-option {{
-      padding: 10px 16px;
+      padding: 12px 20px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text);
       transition: background 150ms;
       border-bottom: 1px solid var(--border);
@@ -2244,10 +2251,13 @@ def generate_html_dashboard(analysis, output_dir="output"):
         <div class="filters">
           <div class="filter-text"><strong>Scope:</strong> All Outlets</div>
           <div class="filter-text"><strong>Window:</strong> {review_window}</div>
-          <div class="date-picker-wrap" id="dpWrap">
-            <button class="date-picker-btn" id="dpBtn">&#128197; <span id="dpLabel">&#8230;</span> &#9662;</button>
-            <div class="date-picker-menu" id="dpMenu"></div>
-          </div>
+        </div>
+      </div>
+
+      <div class="date-picker-bar">
+        <div class="date-picker-wrap" id="dpWrap">
+          <button class="date-picker-btn" id="dpBtn">&#128197; <span id="dpLabel">&#8230;</span> &#9662;</button>
+          <div class="date-picker-menu" id="dpMenu"></div>
         </div>
       </div>
 
