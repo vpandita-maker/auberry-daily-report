@@ -850,6 +850,37 @@
       }
     }
   </style>
+
+  <style>
+    .dp-overlay { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 9999; }
+    .dp-wrap { position: relative; display: inline-flex; }
+    .dp-btn {
+      background: #2a314c; border: 1px solid #343c5a; color: #f3f4ff;
+      padding: 6px 14px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; font-family: Arial, Helvetica, sans-serif;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(7,10,22,0.5);
+      transition: border-color 180ms, background 180ms;
+    }
+    .dp-btn:hover { border-color: #ab7df4; background: #232941; }
+    .dp-btn strong { color: #f3f4ff; font-weight: 600; }
+    .dp-chevron { color: #b2b8d1; font-size: 10px; }
+    .dp-menu {
+      display: none; position: absolute; left: 50%; transform: translateX(-50%);
+      top: calc(100% + 8px); background: #232941; border: 1px solid #343c5a;
+      border-radius: 12px; box-shadow: 0 20px 50px rgba(7,10,22,0.6);
+      min-width: 240px; max-height: 320px; overflow-y: auto; z-index: 100;
+    }
+    .dp-menu.open { display: block; }
+    .dp-option {
+      padding: 11px 18px; cursor: pointer; font-size: 13px;
+      color: #f3f4ff; border-bottom: 1px solid #343c5a;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .dp-option:last-child { border-bottom: none; }
+    .dp-option:hover { background: #2a314c; }
+    .dp-option.active { color: #ab7df4; font-weight: 700; }
+  </style>
 </head>
 <body>
   <main class="page">
@@ -1441,5 +1472,54 @@ But prices are quite medium</p>
       <div class="footer-note">Auberry The Bake Shop - All Outlets</div>
     </section>
   </main>
+
+  <div class="dp-overlay">
+    <div class="dp-wrap" id="dpWrap2">
+      <button class="dp-btn" id="dpBtn2">
+        &#128197;&nbsp;<strong><span id="dpLabel2">&#8230;</span></strong><span class="dp-chevron">&#9662;</span>
+      </button>
+      <div class="dp-menu" id="dpMenu2"></div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var m = window.location.pathname.match(/(\d{4}-\d{2}-\d{2})\.html/);
+    var activeDate = m ? m[1] : null;
+    function fmt(d) {
+      var p = d.split('-');
+      var dt = new Date(+p[0], +p[1]-1, +p[2]);
+      return dt.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+    }
+    document.getElementById('dpBtn2').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('dpMenu2').classList.toggle('open');
+    });
+    document.addEventListener('click', function(e) {
+      var w = document.getElementById('dpWrap2');
+      if (w && !w.contains(e.target)) document.getElementById('dpMenu2').classList.remove('open');
+    });
+    fetch('../dates.json')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var dates = data.dates || [];
+        var lbl = document.getElementById('dpLabel2');
+        var menu = document.getElementById('dpMenu2');
+        if (!dates.length) { lbl.textContent = 'No history'; return; }
+        var active = activeDate || dates[0];
+        lbl.textContent = fmt(active);
+        dates.forEach(function(d, i) {
+          var el = document.createElement('div');
+          el.className = 'dp-option' + (d === active ? ' active' : '');
+          el.textContent = fmt(d) + (i === 0 ? ' — Latest' : '');
+          el.addEventListener('click', function() {
+            window.location.href = i === 0 ? '../index.html' : '../archive/' + d + '.html';
+          });
+          menu.appendChild(el);
+        });
+      })
+      .catch(function() { document.getElementById('dpLabel2').textContent = 'Select date'; });
+  })();
+  </script>
 </body>
 </html>

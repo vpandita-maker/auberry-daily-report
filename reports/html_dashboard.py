@@ -2184,28 +2184,31 @@ def generate_html_dashboard(analysis, output_dir="output"):
       display: inline-flex;
     }}
     .date-picker-btn {{
-      background: none;
-      border: none;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
       color: var(--text);
-      padding: 0;
+      padding: 6px 14px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
       font-family: Arial, Helvetica, sans-serif;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       white-space: nowrap;
+      transition: border-color 180ms, background 180ms;
+    }}
+    .date-picker-btn:hover {{
+      border-color: var(--purple);
+      background: var(--panel);
     }}
     .date-picker-btn strong {{
       color: var(--text);
-      font-weight: 700;
-    }}
-    .date-picker-btn:hover strong {{
-      color: var(--purple);
+      font-weight: 600;
     }}
     .date-picker-chevron {{
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
     }}
     .date-picker-menu {{
       display: none;
