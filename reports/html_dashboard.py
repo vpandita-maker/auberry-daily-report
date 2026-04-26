@@ -924,6 +924,9 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{brand} Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {{
@@ -954,7 +957,7 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
         radial-gradient(circle at top right, rgba(99,216,95,0.10), transparent 18%),
         linear-gradient(180deg, #161a30 0%, #13182c 100%);
       color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Inter', Arial, Helvetica, sans-serif;
       animation: page-fade 700ms cubic-bezier(.22,1,.36,1);
     }}
     .page {{
@@ -1000,11 +1003,19 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .brand-copy h1 {{
       margin: 0;
-      font-size: 16px;
-      line-height: 1.4;
-      letter-spacing: 0;
-      font-weight: 400;
-      font-family: Arial, Helvetica, sans-serif;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+      font-family: 'Inter', Arial, Helvetica, sans-serif;
+      color: var(--text);
+    }}
+    .brand-copy .brand-sub {{
+      margin: 3px 0 0;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--muted);
     }}
     .filters {{
@@ -1015,13 +1026,19 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .filter-text {{
       color: var(--muted);
-      font-size: 14px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       line-height: 1.5;
       white-space: nowrap;
     }}
     .filter-text strong {{
       color: var(--text);
       font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: 13px;
     }}
     .kpis {{
       grid-column: 1 / -1;
@@ -1065,9 +1082,12 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .intelligence-section h4 {{
       margin: 0 0 10px;
-      font-size: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
       line-height: 1.35;
-      color: var(--text);
     }}
     .insight-grid,
     .pattern-grid,
@@ -1085,7 +1105,10 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .insight-card h4 {{
       margin: 4px 0 6px;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
     }}
     .insight-card p,
     .pattern-card p {{
@@ -1204,9 +1227,9 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     .kpi-icon.green {{ background: #39644d45; color: #66e26c; }}
     .kpi-icon.red {{ background: #6a434943; color: #ff7474; }}
     .kpi-icon.purple {{ background: #51427345; color: #c094ff; }}
-    .kpi-title {{ color: var(--muted); font-size: 14px; }}
-    .kpi-value {{ font-size: 28px; font-weight: 800; margin-top: 4px; }}
-    .kpi-sub {{ color: var(--muted); margin-top: 6px; font-size: 14px; }}
+    .kpi-title {{ color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }}
+    .kpi-value {{ font-size: 30px; font-weight: 900; margin-top: 6px; letter-spacing: -0.02em; }}
+    .kpi-sub {{ color: var(--muted); margin-top: 6px; font-size: 12px; font-weight: 500; }}
     .kpi-sub.positive {{ color: var(--green); }}
     .kpi-sub.negative {{ color: var(--red); }}
     .sparkline {{
@@ -1239,13 +1262,18 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
     }}
     .panel-title {{
       margin: 0;
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
     }}
     .panel-subtitle {{
-      margin-top: 2px;
+      margin-top: 4px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0;
     }}
     .panel-header {{
       padding: 0;
@@ -2260,7 +2288,8 @@ def generate_html_dashboard(analysis, output_dir="output", trend_data=None):
       <div class="topbar">
         <div class="brand-block">
           <div class="brand-copy">
-            <h1>{brand} Executive Dashboard</h1>
+            <h1>{brand}</h1>
+            <div class="brand-sub">Executive Intelligence Dashboard</div>
           </div>
         </div>
         <div class="filters">
