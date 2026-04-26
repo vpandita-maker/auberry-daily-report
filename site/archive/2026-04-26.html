@@ -67,7 +67,7 @@
     .topbar {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       align-items: center;
       padding: 10px 8px 4px;
@@ -85,10 +85,6 @@
       font-weight: 400;
       font-family: Arial, Helvetica, sans-serif;
       color: var(--muted);
-    }
-    .topbar-center {
-      display: flex;
-      justify-content: center;
     }
     .filters {
       display: flex;
@@ -1172,9 +1168,6 @@
       .topbar {
         grid-template-columns: 1fr;
       }
-      .topbar-center {
-        justify-content: flex-start;
-      }
       .filter-text {
         white-space: normal;
       }
@@ -1261,11 +1254,18 @@
         transform: translateY(0);
       }
     }
-    .date-picker-wrap {
+    .dp-overlay {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+    }
+    .dp-wrap {
       position: relative;
       display: inline-flex;
     }
-    .date-picker-btn {
+    .dp-btn {
       background: var(--panel-2);
       border: 1px solid var(--border);
       color: var(--text);
@@ -1278,26 +1278,27 @@
       align-items: center;
       gap: 6px;
       white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(7,10,22,0.4);
       transition: border-color 180ms, background 180ms;
     }
-    .date-picker-btn:hover {
+    .dp-btn:hover {
       border-color: var(--purple);
       background: var(--panel);
     }
-    .date-picker-btn strong {
+    .dp-btn strong {
       color: var(--text);
       font-weight: 600;
     }
-    .date-picker-chevron {
+    .dp-chevron {
       color: var(--muted);
       font-size: 10px;
     }
-    .date-picker-menu {
+    .dp-menu {
       display: none;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: calc(100% + 10px);
+      top: calc(100% + 8px);
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -1308,10 +1309,10 @@
       z-index: 100;
       animation: mention-slide-down 180ms cubic-bezier(.22,1,.36,1);
     }
-    .date-picker-menu.open {
+    .dp-menu.open {
       display: block;
     }
-    .date-picker-option {
+    .dp-option {
       padding: 11px 18px;
       cursor: pointer;
       font-size: 13px;
@@ -1319,13 +1320,13 @@
       transition: background 150ms;
       border-bottom: 1px solid var(--border);
     }
-    .date-picker-option:last-child {
+    .dp-option:last-child {
       border-bottom: none;
     }
-    .date-picker-option:hover {
+    .dp-option:hover {
       background: var(--panel-2);
     }
-    .date-picker-option.active {
+    .dp-option.active {
       color: var(--purple);
       font-weight: 700;
     }
@@ -1338,14 +1339,6 @@
         <div class="brand-block">
           <div class="brand-copy">
             <h1>Auberry The Bake Shop - All Outlets Executive Dashboard</h1>
-          </div>
-        </div>
-        <div class="topbar-center">
-          <div class="date-picker-wrap" id="dpWrap">
-            <button class="date-picker-btn" id="dpBtn">
-              &#128197;&nbsp;<strong><span id="dpLabel">&#8230;</span></strong><span class="date-picker-chevron">&#9662;</span>
-            </button>
-            <div class="date-picker-menu" id="dpMenu"></div>
           </div>
         </div>
         <div class="filters">
@@ -1464,7 +1457,7 @@
               <div class="item-rank">1</div>
               <div class="item-thumb">C</div>
               <div class="item-copy">
-                <div class="item-name">Colourful Boxes (Packaging)</div>
+                <div class="item-name">Colourful Boxes (packaging)</div>
                 <div class="item-meta">1 mention</div>
               </div>
               <span class="pill pill-negative">Negative</span>
@@ -1522,7 +1515,7 @@
             <article class="mention-card mention-negative">
               <div class="mention-rank">3</div>
               <div class="mention-body">
-                <h4>Colourful Boxes (Packaging)</h4>
+                <h4>Colourful Boxes (packaging)</h4>
                 <div class="mention-meta">
                   <span>1 mention</span>
                   <span class="pill pill-negative">Negative</span>
@@ -1585,7 +1578,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Musarambagh</div>
               
-            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination praised as excellent at Irrummanzil outlet.">
+            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination received enthusiastic praise at Irrummanzil outlet.">
               <span>F</span>
             </div>
             
@@ -1597,7 +1590,7 @@
               <span>N/A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="No negative value concerns; high ratings suggest perceived value is strong portfolio-wide.">
+            <div class="heat-cell heat-positive" title="No explicit value complaints; high ratings suggest perceived value is satisfactory across outlets.">
               <span>V</span>
             </div>
             
@@ -1610,7 +1603,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Irrummanzil</div>
               
-            <div class="heat-cell heat-positive" title="Filter coffee with veg puff combination described as heaven at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Filter coffee with veg puff combination described as &#x27;heaven&#x27; at Irrummanzil">
               <span>F</span>
             </div>
             
@@ -1622,11 +1615,11 @@
               <span>A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="No negative value concerns; high ratings suggest perceived value is strong portfolio-wide.">
+            <div class="heat-cell heat-positive" title="No explicit value complaints; high ratings suggest perceived value is satisfactory across outlets.">
               <span>V</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="Filter coffee described as heavenly at Irrummanzil">
+            <div class="heat-cell heat-positive" title="Filter coffee described as &#x27;heaven&#x27; at Irrummanzil">
               <span>C</span>
             </div>
             
@@ -1635,7 +1628,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Panjagutta</div>
               
-            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination praised as excellent at Irrummanzil outlet.">
+            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination received enthusiastic praise at Irrummanzil outlet.">
               <span>F</span>
             </div>
             
@@ -1647,7 +1640,7 @@
               <span>N/A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="No negative value concerns; high ratings suggest perceived value is strong portfolio-wide.">
+            <div class="heat-cell heat-positive" title="No explicit value complaints; high ratings suggest perceived value is satisfactory across outlets.">
               <span>V</span>
             </div>
             
@@ -1660,7 +1653,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kukatpally</div>
               
-            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination praised as excellent at Irrummanzil outlet.">
+            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination received enthusiastic praise at Irrummanzil outlet.">
               <span>F</span>
             </div>
             
@@ -1672,7 +1665,7 @@
               <span>N/A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="No negative value concerns; high ratings suggest perceived value is strong portfolio-wide.">
+            <div class="heat-cell heat-positive" title="No explicit value complaints; high ratings suggest perceived value is satisfactory across outlets.">
               <span>V</span>
             </div>
             
@@ -1685,7 +1678,7 @@
             <div class="heat-row">
               <div class="heat-outlet">Auberry The Bake Shop - Kondapur</div>
               
-            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination praised as excellent at Irrummanzil outlet.">
+            <div class="heat-cell heat-positive" title="Filter coffee and veg puff combination received enthusiastic praise at Irrummanzil outlet.">
               <span>F</span>
             </div>
             
@@ -1697,7 +1690,7 @@
               <span>N/A</span>
             </div>
             
-            <div class="heat-cell heat-positive" title="No negative value concerns; high ratings suggest perceived value is strong portfolio-wide.">
+            <div class="heat-cell heat-positive" title="No explicit value complaints; high ratings suggest perceived value is satisfactory across outlets.">
               <span>V</span>
             </div>
             
@@ -1716,7 +1709,7 @@
           
             <div class="alert-card alert-urgent">
               <div class="alert-kicker">Urgent</div>
-              <h4>Colourful packaging boxes discontinued at Irrummanzil causing customer disappointment (3-star review on 2026-04-24)</h4>
+              <h4>Customer at Irrummanzil disappointed by discontinuation of colourful packaging boxes (3-star review on 2026-04-24)</h4>
               <p>Highest-priority issue surfaced from the latest review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-high">High Impact</span>
@@ -1726,7 +1719,7 @@
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>One review at Irrummanzil on 2026-04-25 had no text feedback limiting insight depth</h4>
+              <h4>One review at Irrummanzil on 2026-04-25 had no text content, indicating possible engagement gap</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1736,7 +1729,7 @@
             
             <div class="alert-card alert-warning">
               <div class="alert-kicker">Watchlist</div>
-              <h4>No reviews from other outlets beyond Irrummanzil and Kukatpally limiting portfolio visibility</h4>
+              <h4>Limited review volume across portfolio makes sentiment trends harder to track</h4>
               <p>Keep this under observation in the next review cycle.</p>
               <div class="alert-meta">
                 <span class="impact impact-medium">Medium Impact</span>
@@ -1750,7 +1743,7 @@
       
     <section class="card competitor-panel" id="competitor-benchmarking">
       <h3 class="panel-title">Competitor Benchmarking</h3>
-      <p class="panel-subtitle">Auberry is tied with Theobroma at 4.6 avg rating, with superior filter coffee and service praise but lacking the specialty cake differentiation and ambiance appeal that Theobroma leverages.</p>
+      <p class="panel-subtitle">Auberry is competitively tied with Theobroma on overall ratings (both 4.6) but differentiates through exceptional filter coffee and consistent service, while Theobroma leads in specialty cakes and ambiance perception.</p>
       <div class="comp-snapshot-row">
         <div class="comp-card comp-card-auberry">
           <div class="comp-name">Auberry (You)</div>
@@ -1777,7 +1770,7 @@
                 <span class="comp-score-comp">4.6</span>
                 <span class="pill pill-positive">Ahead</span>
               </div>
-              <div class="comp-compare-note">Auberry&#x27;s veg puff and filter coffee combo earns perfect scores, though Theobroma&#x27;s specialty cakes generate stronger emotional responses.</div>
+              <div class="comp-compare-note">Auberry&#x27;s specific food items receive enthusiastic praise while Theobroma reviews are more generic except for specialty cakes.</div>
             </div>
             
             <div class="comp-compare-row">
@@ -1788,7 +1781,7 @@
                 <span class="comp-score-comp">4.6</span>
                 <span class="pill pill-positive">Ahead</span>
               </div>
-              <div class="comp-compare-note">Auberry receives explicit staff service praise at multiple outlets while Theobroma reviews lack specific service mentions.</div>
+              <div class="comp-compare-note">Auberry receives explicit staff service mentions at multiple outlets whereas Theobroma lacks specific service commentary.</div>
             </div>
             
             <div class="comp-compare-row">
@@ -1799,7 +1792,7 @@
                 <span class="comp-score-comp">4.6</span>
                 <span class="pill pill-neutral">Tied</span>
               </div>
-              <div class="comp-compare-note">Neither brand shows value complaints; scores inferred from overall satisfaction with no direct pricing feedback.</div>
+              <div class="comp-compare-note">Neither brand has explicit value complaints; both appear to deliver satisfactory perceived value.</div>
             </div>
             
             <div class="comp-compare-row">
@@ -1810,22 +1803,22 @@
                 <span class="comp-score-comp">4.6</span>
                 <span class="pill pill-positive">Ahead</span>
               </div>
-              <div class="comp-compare-note">Auberry&#x27;s filter coffee is a highlighted strength with no comparable beverage praise found in Theobroma reviews.</div>
+              <div class="comp-compare-note">Auberry&#x27;s filter coffee is a praised signature item while Theobroma has no specific coffee quality mentions.</div>
             </div>
             </div>
         </div>
         <div class="comp-gaps-block">
           <div class="comp-gap-col">
             <div class="comp-gap-title comp-gap-positive">Where Auberry Leads</div>
-            <ul class="comp-gap-list"><li>Filter coffee excellence praised as &#x27;heavenly&#x27; gives Auberry a beverage edge over Theobroma which has no specific coffee mentions</li><li>Consistent staff service praise across multiple outlets vs Theobroma where service is not specifically highlighted</li></ul>
+            <ul class="comp-gap-list"><li>Superior filter coffee expertise compared to Theobroma, which lacks specific coffee mentions in reviews</li><li>Consistently praised staff service across multiple outlets versus Theobroma&#x27;s generic &#x27;good food&#x27; feedback</li><li>Signature veg puff and filter coffee pairing offers a unique savory-beverage combination Theobroma doesn&#x27;t highlight</li></ul>
           </div>
           <div class="comp-gap-col">
             <div class="comp-gap-title comp-gap-negative">Where Competitors Lead</div>
-            <ul class="comp-gap-list"><li>Theobroma has standout specialty items like Mango chocolate truffle cake generating &#x27;mind-blowing&#x27; reviews that create memorable differentiation</li><li>Theobroma receives explicit ambiance praise (&#x27;best ambience&#x27;) while Auberry has neutral-to-negative ambiance signals including packaging downgrade complaints</li></ul>
+            <ul class="comp-gap-list"><li>Theobroma has stronger specialty cake reputation with specific praise for Mango Chocolate Truffle Cake</li><li>Theobroma explicitly praised for &#x27;best ambience&#x27; while Auberry received complaints about discontinued colorful packaging</li><li>Theobroma has higher review volume (50 sampled) providing better market visibility than Auberry&#x27;s limited reviews</li></ul>
           </div>
         </div>
       </div>
-      <div class="comp-strategic">Auberry should restore premium packaging and enhance in-store ambiance to close the experience gap with Theobroma, which is winning on atmosphere. Simultaneously, Auberry should aggressively market its filter coffee as a signature differentiator since Theobroma lacks a comparable beverage identity.</div>
+      <div class="comp-strategic">Auberry should aggressively market its filter coffee and veg puff combination as a signature differentiator against cake-focused competitors like Theobroma. Simultaneously, addressing the packaging presentation concerns and actively encouraging customer reviews will close the ambiance perception gap and improve market visibility.</div>
     </section>
     
 
@@ -1837,19 +1830,19 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Reinstate colourful packaging boxes at Irrummanzil</div>
+                  <div class="action-title">Reinstate Colourful Packaging Boxes at Irrummanzil</div>
                   <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Zero packaging complaints and rating improvement from 3-star reviewer within 30 days</span>
+                  <span>Zero packaging-related complaints and at least 2 positive mentions of colourful boxes within 30 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Review packaging inventory by 2026-04-28; reintroduce colourful boxes by 2026-05-01; owner to confirm supplier availability and announce return via in-store signage</p>
+                <p>By 2026-05-01, source and reintroduce the colourful boxes that were previously used; announce return via in-store signage and social media tagging the Irrummanzil location to recover the disappointed customer and attract packaging-conscious buyers.</p>
               </div>
             </article>
             
@@ -1857,19 +1850,19 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Launch Filter Coffee + Veg Puff combo deal at Irrummanzil</div>
+                  <div class="action-title">Promote Filter Coffee + Veg Puff Combo at Irrummanzil</div>
                   <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>25% increase in combo orders within 2 weeks tracked via POS data</span>
+                  <span>Increase combo sales by 25% and capture 3+ positive combo mentions in reviews within 45 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>Create bundled combo offer by 2026-04-30 priced at 10% discount; display combo prominently at counter and train staff to upsell by name</p>
+                <p>Create a named combo deal (&#x27;Heaven Combo&#x27;) for filter coffee and veg puff by 2026-04-28; feature it on menu boards and train staff to recommend it during morning and evening peak hours.</p>
               </div>
             </article>
             
@@ -1877,19 +1870,59 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Replicate filter coffee success to Kukatpally outlet</div>
+                  <div class="action-title">Recognize and Reward Staff Service Excellence</div>
+                  <div class="action-meta">Portfolio-wide (Irrummanzil and Kukatpally)</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Maintain 100% positive service mentions in reviews over next 60 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>By 2026-04-30, implement a monthly &#x27;Service Star&#x27; recognition program; use today&#x27;s reviews (2026-04-25) as baseline examples in staff briefings to reinforce praised behaviors.</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Follow Up on Empty Review at Irrummanzil</div>
+                  <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
+                </div>
+              </div>
+              <div class="action-metrics">
+                <span class="action-chip metric-chip">
+                  <strong>Target</strong>
+                  <span>Achieve 80% text-inclusive reviews at Irrummanzil over next 30 days</span>
+                </span>
+              </div>
+              <div class="action-strategy">
+                <strong>Next Steps</strong>
+                <p>Within 48 hours, respond publicly to the 5-star review with no text (dated 2026-04-25) thanking the customer and inviting them to share their experience; use this to encourage future detailed feedback.</p>
+              </div>
+            </article>
+            
+            <article class="action-row">
+              <div class="action-topline">
+                <div class="action-icon">→</div>
+                <div class="action-copy">
+                  <div class="action-title">Cross-Promote Filter Coffee at Kukatpally Outlet</div>
                   <div class="action-meta">Auberry The Bake Shop - Kukatpally</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>At least 2 positive filter coffee mentions in Kukatpally reviews within 30 days</span>
+                  <span>Generate at least 2 positive filter coffee mentions in Kukatpally reviews within 45 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>By 2026-05-05 verify Kukatpally filter coffee preparation matches Irrummanzil recipe; owner to conduct taste test and ensure barista training alignment</p>
+                <p>By 2026-05-05, replicate the successful filter coffee + veg puff pairing promotion from Irrummanzil at Kukatpally; train staff to highlight this combination to customers.</p>
               </div>
             </article>
             
@@ -1897,59 +1930,19 @@
               <div class="action-topline">
                 <div class="action-icon">→</div>
                 <div class="action-copy">
-                  <div class="action-title">Recognize and reward staff at Irrummanzil and Kukatpally</div>
-                  <div class="action-meta">Irrummanzil and Kukatpally outlets</div>
+                  <div class="action-title">Increase Review Volume with QR Code Feedback Cards</div>
+                  <div class="action-meta">Portfolio-wide</div>
                 </div>
               </div>
               <div class="action-metrics">
                 <span class="action-chip metric-chip">
                   <strong>Target</strong>
-                  <span>Maintain 100% positive service mentions for next 60 days</span>
+                  <span>Increase total weekly reviews from 5 to 15+ within 60 days</span>
                 </span>
               </div>
               <div class="action-strategy">
                 <strong>Next Steps</strong>
-                <p>By 2026-04-27 owner to personally acknowledge service staff mentioned in reviews; implement monthly recognition program with visible staff leaderboard</p>
-              </div>
-            </article>
-            
-            <article class="action-row">
-              <div class="action-topline">
-                <div class="action-icon">→</div>
-                <div class="action-copy">
-                  <div class="action-title">Encourage detailed review feedback at Irrummanzil</div>
-                  <div class="action-meta">Auberry The Bake Shop - Irrummanzil</div>
-                </div>
-              </div>
-              <div class="action-metrics">
-                <span class="action-chip metric-chip">
-                  <strong>Target</strong>
-                  <span>Reduce no-text reviews to under 10% of total within 45 days</span>
-                </span>
-              </div>
-              <div class="action-strategy">
-                <strong>Next Steps</strong>
-                <p>By 2026-04-28 add QR code table tents with prompt asking customers to mention specific items enjoyed; staff to verbally request feedback at checkout</p>
-              </div>
-            </article>
-            
-            <article class="action-row">
-              <div class="action-topline">
-                <div class="action-icon">→</div>
-                <div class="action-copy">
-                  <div class="action-title">Expand review collection at underrepresented outlets</div>
-                  <div class="action-meta">Portfolio-wide excluding Irrummanzil and Kukatpally</div>
-                </div>
-              </div>
-              <div class="action-metrics">
-                <span class="action-chip metric-chip">
-                  <strong>Target</strong>
-                  <span>Collect minimum 5 reviews per outlet within 30 days</span>
-                </span>
-              </div>
-              <div class="action-strategy">
-                <strong>Next Steps</strong>
-                <p>By 2026-05-01 owner to deploy Google review request cards at all other outlets; staff trained to invite reviews after positive interactions</p>
+                <p>By 2026-05-10, place QR code feedback cards at billing counters at both Irrummanzil and Kukatpally; offer a 10% discount on next visit for customers who leave a Google review.</p>
               </div>
             </article>
             </div>
@@ -2019,6 +2012,12 @@
       <div class="footer-note">Auberry The Bake Shop - All Outlets</div>
     </section>
   </main>
+  <div class="dp-overlay">
+    <div class="dp-wrap" id="dpWrap">
+      <button class="dp-btn" id="dpBtn">&#128197;&nbsp;<strong><span id="dpLabel">&#8230;</span></strong><span class="dp-chevron">&#9662;</span></button>
+      <div class="dp-menu" id="dpMenu"></div>
+    </div>
+  </div>
   <script>
   (function() {
     var isArchive = /\/archive\//.test(window.location.pathname);
@@ -2028,25 +2027,19 @@
       var m = window.location.pathname.match(/(\d{4}-\d{2}-\d{2})\.html/);
       if (m) activeDate = m[1];
     }
-
     function fmt(d) {
       var p = d.split('-');
-      var dt = new Date(+p[0], +p[1] - 1, +p[2]);
-      return dt.toLocaleDateString('en-IN', {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'});
+      var dt = new Date(+p[0], +p[1]-1, +p[2]);
+      return dt.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
     }
-
     document.getElementById('dpBtn').addEventListener('click', function(e) {
       e.stopPropagation();
       document.getElementById('dpMenu').classList.toggle('open');
     });
-
     document.addEventListener('click', function(e) {
       var w = document.getElementById('dpWrap');
-      if (w && !w.contains(e.target)) {
-        document.getElementById('dpMenu').classList.remove('open');
-      }
+      if (w && !w.contains(e.target)) document.getElementById('dpMenu').classList.remove('open');
     });
-
     fetch(base + 'dates.json')
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -2058,7 +2051,7 @@
         lbl.textContent = fmt(active);
         dates.forEach(function(d, i) {
           var el = document.createElement('div');
-          el.className = 'date-picker-option' + (d === active ? ' active' : '');
+          el.className = 'dp-option' + (d === active ? ' active' : '');
           el.textContent = fmt(d) + (i === 0 ? ' — Latest' : '');
           el.addEventListener('click', function() {
             window.location.href = i === 0 ? base + 'index.html' : base + 'archive/' + d + '.html';
@@ -2066,9 +2059,7 @@
           menu.appendChild(el);
         });
       })
-      .catch(function() {
-        document.getElementById('dpLabel').textContent = 'History';
-      });
+      .catch(function() { document.getElementById('dpLabel').textContent = 'Select date'; });
   })();
   </script>
 </body>
